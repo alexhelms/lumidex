@@ -1,0 +1,41 @@
+<UserControl
+    x:Class="Lumidex.Features.Main.MainView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:Lumidex.Features.Main"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="vm:MainViewModel"
+    mc:Ignorable="d">
+    <DockPanel>
+
+        <DockPanel Height="32" DockPanel.Dock="Top">
+            <Panel Width="48" DockPanel.Dock="Left">
+                <i:Icon
+                    HorizontalAlignment="Center"
+                    FontSize="16"
+                    Value="fa-solid fa-rocket" />
+            </Panel>
+            <Menu Background="{x:Null}">
+                <MenuItem Header="_File">
+                    <MenuItem Header="E_xit" />
+                </MenuItem>
+            </Menu>
+        </DockPanel>
+
+        <Rectangle
+            Height="1"
+            DockPanel.Dock="Top"
+            Fill="#4f4f4f" />
+
+        <DockPanel>
+            <ContentControl Content="{Binding SideNavBar}" DockPanel.Dock="Left" />
+            <ContentControl Content="{Binding SelectedTab}" />
+        </DockPanel>
+
+    </DockPanel>
+
+</UserControl>

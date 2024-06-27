@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35013.160
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumidex", "Lumidex\Lumidex.csproj", "{017D3D53-D778-48C8-85FC-435513990AFB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumidex.Desktop", "Lumidex.Desktop\Lumidex.Desktop.csproj", "{6C8B8F70-3E02-4CC7-9A55-43A494E412DD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{ACE1D2D4-331A-4715-A869-C6B31EBBD637}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumidex.Tests", "Lumidex.Tests\Lumidex.Tests.csproj", "{0663666B-90FE-47DA-A7D9-7217EE50CC1E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumidex.Core", "Lumidex.Core\Lumidex.Core.csproj", "{252A45C1-7C23-4D61-90A4-4F93C5D37FCF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lumidex.Console", "Lumidex.Console\Lumidex.Console.csproj", "{ED0DE424-B1CC-4D55-8D8D-1EEFF9CDD034}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{017D3D53-D778-48C8-85FC-435513990AFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{017D3D53-D778-48C8-85FC-435513990AFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{017D3D53-D778-48C8-85FC-435513990AFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{017D3D53-D778-48C8-85FC-435513990AFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C8B8F70-3E02-4CC7-9A55-43A494E412DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C8B8F70-3E02-4CC7-9A55-43A494E412DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C8B8F70-3E02-4CC7-9A55-43A494E412DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C8B8F70-3E02-4CC7-9A55-43A494E412DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0663666B-90FE-47DA-A7D9-7217EE50CC1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0663666B-90FE-47DA-A7D9-7217EE50CC1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0663666B-90FE-47DA-A7D9-7217EE50CC1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0663666B-90FE-47DA-A7D9-7217EE50CC1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{252A45C1-7C23-4D61-90A4-4F93C5D37FCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{252A45C1-7C23-4D61-90A4-4F93C5D37FCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{252A45C1-7C23-4D61-90A4-4F93C5D37FCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{252A45C1-7C23-4D61-90A4-4F93C5D37FCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED0DE424-B1CC-4D55-8D8D-1EEFF9CDD034}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED0DE424-B1CC-4D55-8D8D-1EEFF9CDD034}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED0DE424-B1CC-4D55-8D8D-1EEFF9CDD034}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED0DE424-B1CC-4D55-8D8D-1EEFF9CDD034}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {941472EB-63FD-4DF4-A0F0-7DD790F73BF9}
+	EndGlobalSection
+EndGlobal
