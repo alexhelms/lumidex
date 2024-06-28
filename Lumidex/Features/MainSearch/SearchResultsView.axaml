@@ -1,0 +1,86 @@
+<UserControl
+    x:Class="Lumidex.Features.MainSearch.SearchResultsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converter="using:Lumidex.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:data="using:Lumidex.Core.Data"
+    xmlns:i="https://github.com/projektanker/icons.avalonia"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:search="using:Lumidex.Features.MainSearch"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="search:SearchResultsViewModel"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <converter:TimeSpanToTotalSecondsConverter x:Key="TimeSpanToTotalSeconds" />
+        <converter:LocalDateTimeConverter x:Key="LocalDateTime" />
+        <converter:FilenameConverter x:Key="Filename" />
+    </UserControl.Resources>
+    <Grid>
+        <DataGrid
+            BorderBrush="#656565"
+            BorderThickness="1"
+            CanUserReorderColumns="True"
+            GridLinesVisibility="Horizontal"
+            IsReadOnly="True"
+            ItemsSource="{Binding SearchResults}"
+            VerticalScrollBarVisibility="Visible">
+            <DataGrid.Styles>
+                <Style Selector="DataGridColumnHeader">
+                    <Setter Property="Foreground" Value="White" />
+                </Style>
+            </DataGrid.Styles>
+            <DataGrid.Columns>
+                <DataGridTextColumn
+                    x:DataType="data:ImageFile"
+                    Binding="{Binding ObjectName}"
+                    Header="Object Name" />
+                <DataGridTextColumn
+                    x:DataType="data:ImageFile"
+                    Binding="{Binding Type}"
+                    Header="Type" />
+                <DataGridTextColumn
+                    x:DataType="data:ImageFile"
+                    Binding="{Binding Kind}"
+                    Header="Kind" />
+                <DataGridTextColumn
+                    x:DataType="data:ImageFile"
+                    Binding="{Binding Exposure, StringFormat={}###0.###}"
+                    Header="Exposure (s)" />
+                <DataGridTextColumn
+                    x:DataType="data:ImageFile"
+                    Binding="{Binding FilterName}"
+                    Header="Filter" />
+                <DataGridTextColumn
+                    x:DataType="data:ImageFile"
+                    Binding="{Binding Binning}"
+                    Header="Binning" />
+                <DataGridTextColumn
+                    x:DataType="data:ImageFile"
+                    Binding="{Binding ObservationTimestampUtc, Converter={StaticResource LocalDateTime}, StringFormat={}yyyy-MM-dd HH:mm:ss}"
+                    Header="Observation (Local)" />
+                <DataGridTextColumn
+                    x:DataType="data:ImageFile"
+                    Binding="{Binding ObservationTimestampUtc, StringFormat={}yyyy-MM-dd HH:mm:ss}"
+                    Header="Observation (UTC)" />
+                <DataGridTemplateColumn x:DataType="data:ImageFile" Header="Filename">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="data:ImageFile">
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Text="{Binding Path, Converter={StaticResource Filename}}"
+                                ToolTip.Tip="{Binding Path}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Border Background="#11ffffff" IsVisible="{Binding IsSearching, FallbackValue=False}">
+            <i:Icon
+                Animation="Pulse"
+                FontSize="48"
+                Value="fa-spinner" />
+        </Border>
+    </Grid>
+</UserControl>

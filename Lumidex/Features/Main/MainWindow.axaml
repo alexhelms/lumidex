@@ -11,22 +11,8 @@
     Height="1080"
     d:DesignHeight="450"
     d:DesignWidth="800"
-    Background="Transparent"
     ExtendClientAreaToDecorationsHint="True"
     Icon="/Assets/avalonia-logo.ico"
-    TransparencyLevelHint="AcrylicBlur"
     mc:Ignorable="d">
-    <Panel>
-        <ExperimentalAcrylicBorder IsHitTestVisible="False">
-            <ExperimentalAcrylicBorder.Material>
-                <ExperimentalAcrylicMaterial
-                    BackgroundSource="Digger"
-                    MaterialOpacity="0.65"
-                    TintColor="Black"
-                    TintOpacity="1" />
-            </ExperimentalAcrylicBorder.Material>
-        </ExperimentalAcrylicBorder>
-
-        <main:MainView />
-    </Panel>
+    <main:MainView />
 </Window>

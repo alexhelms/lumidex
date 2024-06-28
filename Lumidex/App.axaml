@@ -10,19 +10,19 @@
     </Application.DataTemplates>
 
     <Application.Styles>
-        <FluentTheme DensityStyle="Compact">
+        <FluentTheme>
             <FluentTheme.Palettes>
                 <ColorPaletteResources
                     x:Key="Dark"
                     Accent="#ff005496"
-                    AltHigh="Black"
+                    AltHigh="#161616"
                     AltLow="Black"
-                    AltMedium="Black"
+                    AltMedium="#303030"
                     AltMediumHigh="Black"
-                    AltMediumLow="Black"
+                    AltMediumLow="#161616"
                     BaseHigh="White"
                     BaseLow="#ff3c3e42"
-                    BaseMedium="#ff9ea0a1"
+                    BaseMedium="#656565"
                     BaseMediumHigh="#ffb7b8b9"
                     BaseMediumLow="#ff6d6f72"
                     ChromeAltLow="#ffb7b8b9"

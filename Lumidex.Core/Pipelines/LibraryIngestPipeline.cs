@@ -181,10 +181,17 @@ public class LibraryIngestPipeline
 
             if (imageFiles.Count > 0)
             {
-                await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-                await dbContext.ImageFiles.AddRangeAsync(imageFiles);
-                await dbContext.SaveChangesAsync();
-                await addedProgressBlock.SendAsync(imageFiles.Count);
+                try
+                {
+                    await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+                    await dbContext.ImageFiles.AddRangeAsync(imageFiles);
+                    await dbContext.SaveChangesAsync();
+                    await addedProgressBlock.SendAsync(imageFiles.Count);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Error adding images to database");
+                }
             }
         }, new ExecutionDataflowBlockOptions
         {

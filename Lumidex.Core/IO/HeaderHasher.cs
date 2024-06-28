@@ -56,7 +56,7 @@ public class FitsHeaderHasher : HeaderHasher
                 if (isEndRecord)
                 {
                     sha1.TransformFinalBlock(fileBuffer, 0, 0);
-                    goto exit;
+                    goto exit;  // The one acceptable use of goto :)
                 }
                 else
                 {

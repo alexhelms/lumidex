@@ -134,7 +134,7 @@ public class HeaderReader
 
         foreach (var keyword in keywords)
         {
-            if (header.GetEntry(keyword) is HeaderEntry<TKeyword> and { Value: { } } instrumentEntry)
+            if (header.GetEntry(keyword) is HeaderEntry<TKeyword> and { Value: not null } instrumentEntry)
             {
                 propInfo.SetValue(imageFile, instrumentEntry.Value);
                 break;
@@ -178,8 +178,7 @@ public class HeaderReader
     {
         ExtractKeyword<string, string?>(header, imageFile, x => x.CameraName!,
             "INSTRUME");
-        ExtractKeyword<double, TimeSpan?>(header, imageFile, x => x.Exposure, 
-            static x => TimeSpan.FromSeconds(x),
+        ExtractKeyword<double, double?>(header, imageFile, x => x.Exposure, 
             "EXPOSURE", "EXPTIME");
         ExtractKeyword<double, double?>(header, imageFile, x => x.CameraTemperatureSetPoint,
             "SET-TEMP", "CCD-TSET");

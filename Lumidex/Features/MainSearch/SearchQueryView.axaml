@@ -1,0 +1,195 @@
+<UserControl
+    x:Class="Lumidex.Features.MainSearch.SearchQueryView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="https://github.com/projektanker/icons.avalonia"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:search="using:Lumidex.Features.MainSearch"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="search:SearchQueryViewModel"
+    mc:Ignorable="d">
+    <StackPanel>
+
+        <!--  Object Name  -->
+        <Grid ColumnDefinitions="1*,2*">
+            <TextBlock
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                Text="Object Name" />
+            <DockPanel Grid.Column="1">
+                <Button
+                    Margin="5,0,0,0"
+                    VerticalAlignment="Stretch"
+                    i:Attached.Icon="mdi-close"
+                    Command="{Binding ClearObjectNameCommand}"
+                    DockPanel.Dock="Right"
+                    ToolTip.Tip="Clear Object Name" />
+                <TextBox Text="{Binding ObjectName}" />
+            </DockPanel>
+        </Grid>
+
+        <!--  Image Type  -->
+        <Grid Margin="0,8,0,0" ColumnDefinitions="1*,2*">
+            <TextBlock
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                Text="Image Type" />
+            <DockPanel Grid.Column="1">
+                <Button
+                    Margin="5,0,0,0"
+                    VerticalAlignment="Stretch"
+                    i:Attached.Icon="mdi-close"
+                    Command="{Binding ClearSelectedImageTypeCommand}"
+                    DockPanel.Dock="Right"
+                    ToolTip.Tip="Clear Image Type" />
+                <ComboBox
+                    HorizontalAlignment="Stretch"
+                    ItemsSource="{Binding ImageTypes, Mode=OneTime}"
+                    SelectedItem="{Binding SelectedImageType}" />
+            </DockPanel>
+        </Grid>
+
+        <!--  Image Kind  -->
+        <Grid Margin="0,8,0,0" ColumnDefinitions="1*,2*">
+            <TextBlock
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                Text="Image Kind" />
+            <DockPanel Grid.Column="1">
+                <Button
+                    Margin="5,0,0,0"
+                    VerticalAlignment="Stretch"
+                    i:Attached.Icon="mdi-close"
+                    Command="{Binding ClearSelectedImageKindCommand}"
+                    DockPanel.Dock="Right"
+                    ToolTip.Tip="Clear Image Kind" />
+                <ComboBox
+                    HorizontalAlignment="Stretch"
+                    ItemsSource="{Binding ImageKinds, Mode=OneTime}"
+                    SelectedItem="{Binding SelectedImageKind}" />
+            </DockPanel>
+        </Grid>
+
+        <!--  Exposure  -->
+        <Grid Margin="0,8,0,0" ColumnDefinitions="1*,2*">
+            <TextBlock
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                Text="Exposure (s)" />
+            <DockPanel Grid.Column="1">
+                <Button
+                    Margin="5,0,0,0"
+                    VerticalAlignment="Stretch"
+                    i:Attached.Icon="mdi-close"
+                    Command="{Binding ClearExposureCommand}"
+                    DockPanel.Dock="Right"
+                    ToolTip.Tip="Clear Exposure" />
+                <Grid ColumnDefinitions="1*,Auto,1*">
+                    <NumericUpDown
+                        Grid.Column="0"
+                        Maximum="3600"
+                        Minimum="0"
+                        ShowButtonSpinner="False"
+                        Value="{Binding ExposureMin}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="8,0"
+                        VerticalAlignment="Center"
+                        Text="to" />
+                    <NumericUpDown
+                        Grid.Column="2"
+                        Maximum="3600"
+                        Minimum="0"
+                        ShowButtonSpinner="False"
+                        Value="{Binding ExposureMax}" />
+                </Grid>
+            </DockPanel>
+        </Grid>
+
+        <!--  Filter  -->
+        <Grid Margin="0,8,0,0" ColumnDefinitions="1*,2*">
+            <TextBlock
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                Text="Filter" />
+            <DockPanel Grid.Column="1">
+                <Button
+                    Margin="5,0,0,0"
+                    VerticalAlignment="Stretch"
+                    i:Attached.Icon="mdi-close"
+                    Command="{Binding ClearSelectedFilterCommand}"
+                    DockPanel.Dock="Right"
+                    ToolTip.Tip="Clear Filter" />
+                <TextBox Text="{Binding SelectedFilter}" />
+            </DockPanel>
+        </Grid>
+
+        <!--  Observation Date Begin  -->
+        <Grid Margin="0,8,0,0" ColumnDefinitions="1*,2*">
+            <TextBlock
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                Text="Date Begin" />
+            <DockPanel Grid.Column="1">
+                <Button
+                    Margin="5,0,0,0"
+                    VerticalAlignment="Stretch"
+                    i:Attached.Icon="mdi-close"
+                    Command="{Binding ClearDateBeginCommand}"
+                    DockPanel.Dock="Right"
+                    ToolTip.Tip="Clear Begin Date" />
+                <CalendarDatePicker
+                    HorizontalAlignment="Stretch"
+                    CustomDateFormatString="yyyy/MM/dd"
+                    IsTodayHighlighted="True"
+                    SelectedDate="{Binding SelectedDateBegin}"
+                    SelectedDateFormat="Custom"
+                    ToolTip.Tip="Begin date, UTC"
+                    Watermark=" " />
+            </DockPanel>
+        </Grid>
+
+        <!--  Observation Date End  -->
+        <Grid Margin="0,8,0,0" ColumnDefinitions="1*,2*">
+            <TextBlock
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                Text="Date End" />
+            <DockPanel Grid.Column="1">
+                <Button
+                    Margin="5,0,0,0"
+                    VerticalAlignment="Stretch"
+                    i:Attached.Icon="mdi-close"
+                    Command="{Binding ClearDateEndCommand}"
+                    DockPanel.Dock="Right"
+                    ToolTip.Tip="Clear End Date" />
+                <CalendarDatePicker
+                    HorizontalAlignment="Stretch"
+                    CustomDateFormatString="yyyy/MM/dd"
+                    IsTodayHighlighted="True"
+                    SelectedDate="{Binding SelectedDateEnd}"
+                    SelectedDateFormat="Custom"
+                    ToolTip.Tip="End date, UTC"
+                    Watermark=" " />
+            </DockPanel>
+        </Grid>
+
+        <StackPanel
+            Margin="0,8,36,0"
+            HorizontalAlignment="Right"
+            Orientation="Horizontal">
+            <Button
+                Margin="0,0,5,0"
+                Command="{Binding ClearCommand}"
+                Content="Clear" />
+            <Button
+                Classes="accent"
+                Command="{Binding SearchCommand}"
+                Content="Search" />
+        </StackPanel>
+
+
+    </StackPanel>
+</UserControl>

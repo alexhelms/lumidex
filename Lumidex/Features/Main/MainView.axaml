@@ -29,7 +29,7 @@
         <Rectangle
             Height="1"
             DockPanel.Dock="Top"
-            Fill="#4f4f4f" />
+            Fill="#656565" />
 
         <DockPanel>
             <ContentControl Content="{Binding SideNavBar}" DockPanel.Dock="Left" />
