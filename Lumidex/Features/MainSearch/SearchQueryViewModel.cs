@@ -14,8 +14,8 @@ public partial class SearchQueryViewModel : ViewModelBase
     [ObservableProperty] DateTime? _selectedDateBegin;
     [ObservableProperty] DateTime? _selectedDateEnd;
 
-    public List<ImageKind> ImageKinds { get; } = Enum.GetValues<ImageKind>().ToList();
-    public List<ImageType> ImageTypes { get; } = Enum.GetValues<ImageType>().ToList();
+    public List<ImageKind> ImageKinds { get; } = Enum.GetValues<ImageKind>().OrderBy(x => x.ToString()).ToList();
+    public List<ImageType> ImageTypes { get; } = Enum.GetValues<ImageType>().OrderBy(x => x.ToString()).ToList();
 
     [RelayCommand]
     private void ClearObjectName() => ObjectName = null;
