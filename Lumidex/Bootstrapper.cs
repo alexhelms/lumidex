@@ -10,20 +10,24 @@ public static class Bootstrapper
 
     public static void Start()
     {
-        Core.Bootstrapper.InitializeLogger();
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+
+        Core.Bootstrapper.Start();
 
         var services = new ServiceCollection();
         services.AddLumidexCore();
         services.AddLumidexUi();
         Services = services.BuildServiceProvider();
+
+        Services.UseLumidexCore();
     }
 
     public static void Stop()
     {
-        (Services as ServiceProvider)?.Dispose();
         Log.Information("Lumidex exiting, bye");
+        (Services as ServiceProvider)?.Dispose();
+        Core.Bootstrapper.Stop();
         Log.CloseAndFlush();
     }
 

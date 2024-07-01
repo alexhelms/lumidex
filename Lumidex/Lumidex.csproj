@@ -27,6 +27,7 @@
     <PackageReference Include="Avalonia.Fonts.Inter" />
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Humanizer" />
     <PackageReference Include="Projektanker.Icons.Avalonia.MaterialDesign" />
     <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" />
 
@@ -43,6 +44,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\Library\LibraryManagerView.axaml.cs">
+      <DependentUpon>LibraryManagerView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Features\Library\LibraryView.axaml.cs">
+      <DependentUpon>LibraryView.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Features\MainSearch\SearchQueryView.axaml.cs">
       <DependentUpon>SearchQueryView.axaml</DependentUpon>
     </Compile>

@@ -19,6 +19,7 @@
     </UserControl.Resources>
     <Grid>
         <DataGrid
+            Background="#333538"
             BorderBrush="#656565"
             BorderThickness="1"
             CanUserReorderColumns="True"

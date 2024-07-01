@@ -17,6 +17,17 @@ public static class Bootstrapper
         RuntimeHelpers.RunClassConstructor(typeof(NativeLoader).TypeHandle);
     }
 
+    public static void Start()
+    {
+        InitializeLogger();
+        LogApplicationInfo();
+    }
+
+    public static void Stop()
+    {
+        // Empty for now
+    }
+
     public static void InitializeLogger()
     {
         Log.Logger = new LoggerConfiguration()
@@ -28,8 +39,6 @@ public static class Bootstrapper
                 retainedFileCountLimit: 7))
             .Enrich.FromLogContext()
             .CreateLogger();
-
-        LogApplicationInfo();
     }
 
     private static void LogApplicationInfo()

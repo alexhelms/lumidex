@@ -8,6 +8,8 @@ class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        // TODO: Consider a splash screen that is shown immediately and before bootstrap.
+
         Bootstrapper.Start();
 
         try

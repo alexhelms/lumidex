@@ -5,6 +5,7 @@ namespace Lumidex.Features.SideNavBar;
 public partial class SideNavBarViewModel : ViewModelBase
 {
     public const string SearchTabName = "Search";
+    public const string LibraryTabName = "Library";
 
     public AvaloniaList<SideNavBarItemViewModel> Tabs { get; }
 
@@ -17,7 +18,12 @@ public partial class SideNavBarViewModel : ViewModelBase
                 Name = SearchTabName,
                 ToolTipText = "Search all images",
                 Icon = "mdi-magnify",
-                IsSelected = true,
+            },
+            new()
+            {
+                Name = LibraryTabName,
+                ToolTipText = "Manage your library",
+                Icon = "mdi-bookshelf",
             },
         };
     }

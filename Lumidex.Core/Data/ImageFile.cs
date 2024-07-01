@@ -1,20 +1,23 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Lumidex.Core.Data;
 
 [Index(nameof(HeaderHash))]
+[Index(nameof(Path))]
 public class ImageFile
 {
-    [Key]
     public int Id { get; set; }
 
-    [Column(TypeName = "TEXT COLLATE NOCASE")]
-    public string HeaderHash { get; set; } = string.Empty;
+    public int LibraryId { get; set; }
+
+    public Library Library { get; set; } = null!;
 
     [Column(TypeName = "TEXT COLLATE NOCASE")]
-    public string Path { get; set; } = string.Empty;
+    public string HeaderHash { get; set; } = null!;
+
+    [Column(TypeName = "TEXT COLLATE NOCASE")]
+    public string Path { get; set; } = null!;
 
     [Column(TypeName = "DATETIME")]
     public DateTime CreatedOn { get; set; } = DateTime.UtcNow;

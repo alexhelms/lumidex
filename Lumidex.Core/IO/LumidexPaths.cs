@@ -12,4 +12,6 @@ public static class LumidexPaths
     }
 
     public static string Logs => Path.Combine(AppData, "Logs");
+
+    public static string DefaultLibrary => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Lumidex Library");
 }

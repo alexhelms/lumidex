@@ -11,11 +11,14 @@ using System.Threading.Tasks.Dataflow;
 
 namespace Lumidex.Core.Pipelines;
 
-public record IngestProgress
+public record IngestStatus(IFileInfo FileInfo, string Message);
+
+public class IngestProgress
 {
-    public int AddedCount { get; init; }
-    public int SkipCount { get; init; }
-    public int ErrorCount { get; init; }
+    public List<IngestStatus> Added { get; init; } = new();
+    public List<IngestStatus> Skipped { get; init; } = new();
+    public List<IngestStatus> Errors { get; init; } = new();
+    public int TotalCount => Added.Count + Skipped.Count + Errors.Count;
 }
 
 public class LibraryIngestPipeline
@@ -23,20 +26,15 @@ public class LibraryIngestPipeline
     private readonly IFileSystem _fileSystem;
     private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
 
-    private int _addedCount;
-    private int _skippedCount;
-    private int _errorCount;
+    private record FileMessage(IFileInfo FileInfo, int LibraryId);
+    private record HashedImage(IFileInfo FileInfo, int LibraryId, string Hash);
 
-    private record HashedImage(IFileInfo FileInfo, string Hash);
+    public ConcurrentBag<IngestStatus> Added { get; private set; } = new();
+    public ConcurrentBag<IngestStatus> Skipped { get; private set; } = new();
+    public ConcurrentBag<IngestStatus> Errors { get; private set; } = new();
+    public int TotalCount => Added.Count + Skipped.Count + Errors.Count;
 
-    public ConcurrentBag<IFileInfo> HashFailures { get; private set; } = new();
-
-    public ConcurrentBag<IFileInfo> HeaderParseFailures { get; private set; } = new();
-
-    public int AddedCount => _addedCount;
-    public int SkippedCount => _skippedCount;
-    public int ErrorCount => _errorCount;
-    public int TotalCount => AddedCount + SkippedCount + ErrorCount;
+    public TimeSpan Elapsed { get; private set; }
 
     public LibraryIngestPipeline(
         IFileSystem fileSystem,
@@ -58,16 +56,23 @@ public class LibraryIngestPipeline
     public Task<int> GetEstimatedTotalFiles(string rootDirectory) 
         => Task.Run(() => DirectoryWalker.Walk(_fileSystem, rootDirectory).Count());
 
-    public async Task ProcessAsync(string rootDirectory, IProgress<IngestProgress>? progress = null, CancellationToken token = default)
+    public async Task ProcessAsync(Library library, IProgress<IngestProgress>? progress = null, CancellationToken token = default)
     {
-        HashFailures = new();
-        HeaderParseFailures = new();
+        Added = new();
+        Skipped = new();
+        Errors = new();
 
         var internalProgress = new Progress<IngestProgress>(p =>
         {
-            Interlocked.Add(ref _addedCount, p.AddedCount);
-            Interlocked.Add(ref _skippedCount, p.SkipCount);
-            Interlocked.Add(ref _errorCount, p.ErrorCount);
+            foreach (var item in p.Added)
+                Added.Add(item);
+
+            foreach (var item in p.Skipped)
+                Skipped.Add(item);
+
+            foreach (var item in p.Errors)
+                Errors.Add(item);
+
             progress?.Report(p);
         });
 
@@ -75,60 +80,72 @@ public class LibraryIngestPipeline
 
         Log.Information("Starting library ingest pipeline...");
         var start = Stopwatch.GetTimestamp();
-        foreach (var fileInfo in DirectoryWalker.Walk(_fileSystem, rootDirectory))
+        foreach (var fileInfo in DirectoryWalker.Walk(_fileSystem, library.Path))
         {
-            pipeline.Post(fileInfo);
+            pipeline.Post(new FileMessage(fileInfo, library.Id));
         }
 
         pipeline.Complete();
-        await pipeline.Completion.WaitAsync(token);
-        await completion;
 
-        var elapsed = Stopwatch.GetElapsedTime(start);
-        Log.Information("Library ingest completed in {Elapsed:F3} seconds", elapsed.TotalSeconds);
-        Log.Information("{AddedCount} added, {SkippedCount} skipped, {ErrorCount} errors", AddedCount, SkippedCount, ErrorCount);
-
-        if (HashFailures.Count > 0)
+        try
         {
-            Log.Warning("{Count} hash failures, listed below");
-            foreach (var failure in HashFailures)
+            await pipeline.Completion.WaitAsync(token);
+            await completion;
+            await using (var dbContext = _dbContextFactory.CreateDbContext())
             {
-                Log.Warning("Hash failure: {Filename}", failure.FullName);
+                await dbContext.Libraries
+                    .Where(l => l.Id == library.Id)
+                    .ExecuteUpdateAsync(x => x.SetProperty(l => l.LastScan, DateTime.UtcNow));
             }
         }
-
-        if (HeaderParseFailures.Count > 0)
+        catch (OperationCanceledException)
         {
-            Log.Warning("{Count} header parse failures, listed below");
-            foreach (var failure in HeaderParseFailures)
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, "Error processing library");
+        }
+
+        Elapsed = Stopwatch.GetElapsedTime(start);
+        Log.Information("Library ingest completed in {Elapsed:F3} seconds", Elapsed.TotalSeconds);
+        Log.Information("{AddedCount} added, {SkippedCount} skipped, {ErrorCount} errors", Added.Count, Skipped.Count, Errors.Count);
+
+        if (Errors.Count > 0)
+        {
+            foreach (var error in Errors)
             {
-                Log.Warning("Header parse failure: {Filename}", failure.FullName);
+                Log.Warning("{Message}: {Filename}", error.Message, error.FileInfo.FullName);
             }
         }
     }
 
-    private (ITargetBlock<IFileInfo>, Task) CreatePipeline(IProgress<IngestProgress>? progress = null)
+    private (ITargetBlock<FileMessage>, Task) CreatePipeline(IProgress<IngestProgress>? progress = null)
     {
         // HELPER BLOCKS: Progress etc.
-        var addedProgressBlock = new ActionBlock<int>(count => progress?.Report(new() { AddedCount = count }));
-        var skippedProgressBlock = new ActionBlock<int>(count => progress?.Report(new() { SkipCount = count }));
-        var errorProgressBlock = new ActionBlock<int>(count => progress?.Report(new() { ErrorCount = count }));
+        var addedProgressBlock = new ActionBlock<List<IngestStatus>>(
+            status => progress?.Report(new() { Added = status })
+        );
+        var skippedProgressBlock = new ActionBlock<IngestStatus>(
+            status => progress?.Report(new() { Skipped = [status] })
+        );
+        var errorProgressBlock = new ActionBlock<IngestStatus>(
+            status => progress?.Report(new() { Errors = [status] })
+        );
 
         // STEP 1: Hash the header and only process the file if the hash is not in the database.
-        var hashBlock = new TransformBlock<IFileInfo, Result<HashedImage>>(async fileInfo =>
+        var hashBlock = new TransformBlock<FileMessage, Result<HashedImage>>(async message =>
         {
             try
             {
                 var hasher = new FitsHeaderHasher();
-                var hash = await hasher.ComputeHashAsync(fileInfo.FullName);
+                var hash = await hasher.ComputeHashAsync(message.FileInfo.FullName);
                 var hashString = string.Concat(hash.Select(h => h.ToString("x2")));
-                return Result.Ok(new HashedImage(fileInfo, hashString));
+                return Result.Ok(new HashedImage(message.FileInfo, message.LibraryId, hashString));
             }
             catch (Exception ex)
             {
-                await errorProgressBlock.SendAsync(1);
-                HashFailures.Add(fileInfo);
-                Log.Error(ex, "Error hashing {Filename}", fileInfo.FullName);
+                await errorProgressBlock.SendAsync(new(message.FileInfo, "Hash Error"));
+                Log.Error(ex, "Error hashing {Filename}", message.FileInfo.FullName);
                 return Result.Fail(new Error("Error hashing file"));
             }
         },
@@ -139,18 +156,18 @@ public class LibraryIngestPipeline
         });
 
         // STEP 2: Extract data from the image header and create the database object.
-        var createImageFileBlock = new TransformBlock<Result<HashedImage>, Result<ImageFile>>(async result =>
+        var createImageFileBlock = new TransformBlock<Result<HashedImage>, Result<(IFileInfo, ImageFile)>>(async result =>
         {
             try
             {
                 var reader = new HeaderReader();
                 var imageFile = reader.Process(result.Value.FileInfo, result.Value.Hash);
-                return Result.Ok(imageFile);
+                imageFile.LibraryId = result.Value.LibraryId;
+                return Result.Ok((result.Value.FileInfo, imageFile));
             }
             catch (Exception ex)
             {
-                await errorProgressBlock.SendAsync(1);
-                HeaderParseFailures.Add(result.Value.FileInfo);
+                await errorProgressBlock.SendAsync(new(result.Value.FileInfo, "Header Error"));
                 Log.Error(ex, "Error processing image header in {Filename}", result.Value.FileInfo.FullName);
                 return Result.Fail(new Error("Error processing image header"));
             }
@@ -160,33 +177,41 @@ public class LibraryIngestPipeline
             MaxDegreeOfParallelism = Environment.ProcessorCount,
         });
 
-        // STEP 3: Batch new database objects.
-        var addToDatabaseBatchBlock = new BatchBlock<Result<ImageFile>>(100);
+        // STEP 3: Batch objects to be added to the database.
+        var addToDatabaseBatchBlock = new BatchBlock<Result<(IFileInfo, ImageFile)>>(100);
 
         // STEP 4: Save new objects in database.
-        var addToDatabaseBlock = new ActionBlock<Result<ImageFile>[]>(async results =>
+        var addToDatabaseBlock = new ActionBlock<Result<(IFileInfo, ImageFile)>[]>(async results =>
         {
-            var imageFiles = results
+            var successes = results
                 .Where(result => result.IsSuccess)
                 .Select( result => result.Value)
                 .ToList();
+
             var failures = results
                 .Where(result => result.IsFailed)
                 .Select( result => result.Value);
+
             if (failures.Any())
             {
                 // This should never happen because the pipeline is setup to filter these before this block.
                 Log.Error("Failed images made it to the database block");
             }
 
-            if (imageFiles.Count > 0)
+            if (successes.Count > 0)
             {
                 try
                 {
+                    var fileInfos = successes.Select(x => x.Item1);
+                    var imageFiles = successes.Select(x => x.Item2);
                     await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
                     await dbContext.ImageFiles.AddRangeAsync(imageFiles);
                     await dbContext.SaveChangesAsync();
-                    await addedProgressBlock.SendAsync(imageFiles.Count);
+                    await addedProgressBlock.SendAsync(
+                        fileInfos
+                            .Select(fileInfo => new IngestStatus(fileInfo, "Added"))
+                            .ToList()
+                    );
                 }
                 catch (Exception ex)
                 {
@@ -208,10 +233,13 @@ public class LibraryIngestPipeline
                 bool isInDatabase = dbContext.ImageFiles.Any(imageFile => imageFile.HeaderHash == result.Value.Hash);
                 return isInDatabase == false;
             });
-        hashBlock.LinkTo(new ActionBlock<Result<HashedImage>>(async _ => await skippedProgressBlock.SendAsync(1)), options);
+        hashBlock.LinkTo(new ActionBlock<Result<HashedImage>>(async x =>
+        {
+            await skippedProgressBlock.SendAsync(new(x.Value.FileInfo, "Skipped"));
+        }), options);
 
         createImageFileBlock.LinkTo(addToDatabaseBatchBlock, options, result => result.IsSuccess);
-        createImageFileBlock.LinkTo(DataflowBlock.NullTarget<Result<ImageFile>>(), options);
+        //createImageFileBlock.LinkTo(DataflowBlock.NullTarget<Result<ImageFile>>(), options);
 
         addToDatabaseBatchBlock.LinkTo(addToDatabaseBlock, options);
 

@@ -6,15 +6,15 @@ public static class DependencyInjection
 {
     public static void AddLumidexUi(this IServiceCollection services)
     {
-        RegisterAllDerivedTypes<ViewModelBase>(services);
-        RegisterLazyForType<ViewModelBase>(services);
+        RegisterAllDerivedTypes<IViewModelBase>(services);
+        RegisterLazyForType<IViewModelBase>(services);
 
         RegisterAllDerivedTypes<Avalonia.Controls.Window>(services);
         RegisterAllDerivedTypes<Avalonia.Controls.UserControl>(services);
     }
 
     private static IEnumerable<Type> GetDerivedTypes<T>()
-        => typeof(ViewModelBase).Assembly
+        => typeof(IViewModelBase).Assembly
             .GetTypes()
             .Where(t => typeof(T).IsAssignableFrom(t))
             .Where(t => t.IsClass)
