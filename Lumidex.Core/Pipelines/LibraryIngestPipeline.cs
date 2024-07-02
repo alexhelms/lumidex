@@ -80,26 +80,31 @@ public class LibraryIngestPipeline
 
         Log.Information("Starting library ingest pipeline...");
         var start = Stopwatch.GetTimestamp();
-        foreach (var fileInfo in DirectoryWalker.Walk(_fileSystem, library.Path))
+        
+        // Walk the directories on a background thread
+        await Task.Run(async () =>
         {
-            pipeline.Post(new FileMessage(fileInfo, library.Id));
-        }
+            foreach (var fileInfo in DirectoryWalker.Walk(_fileSystem, library.Path))
+            {
+                await pipeline.SendAsync(new FileMessage(fileInfo, library.Id));
+            }
+        });
 
         pipeline.Complete();
 
         try
         {
+            await using var dbContext = _dbContextFactory.CreateDbContext();
+            await dbContext.Libraries
+                .Where(l => l.Id == library.Id)
+                .ExecuteUpdateAsync(x => x.SetProperty(l => l.LastScan, DateTime.UtcNow));
+
             await pipeline.Completion.WaitAsync(token);
             await completion;
-            await using (var dbContext = _dbContextFactory.CreateDbContext())
-            {
-                await dbContext.Libraries
-                    .Where(l => l.Id == library.Id)
-                    .ExecuteUpdateAsync(x => x.SetProperty(l => l.LastScan, DateTime.UtcNow));
-            }
         }
         catch (OperationCanceledException)
         {
+            Log.Information("Ingest canceled");
         }
         catch (Exception e)
         {
@@ -119,7 +124,7 @@ public class LibraryIngestPipeline
         }
     }
 
-    private (ITargetBlock<FileMessage>, Task) CreatePipeline(IProgress<IngestProgress>? progress = null)
+    private (ITargetBlock<FileMessage>, Task) CreatePipeline(IProgress<IngestProgress>? progress = null, CancellationToken token = default)
     {
         // HELPER BLOCKS: Progress etc.
         var addedProgressBlock = new ActionBlock<List<IngestStatus>>(
@@ -154,6 +159,7 @@ public class LibraryIngestPipeline
         {
             MaxDegreeOfParallelism = Environment.ProcessorCount,
             SingleProducerConstrained = true,
+            CancellationToken = token,
         });
 
         // STEP 2: Extract data from the image header and create the database object.
@@ -176,10 +182,16 @@ public class LibraryIngestPipeline
         new ExecutionDataflowBlockOptions
         {
             MaxDegreeOfParallelism = Environment.ProcessorCount,
+            CancellationToken = token,
         });
 
         // STEP 3: Batch objects to be added to the database.
-        var addToDatabaseBatchBlock = new BatchBlock<Result<(IFileInfo, ImageFile)>>(100);
+        var addToDatabaseBatchBlock = new BatchBlock<Result<(IFileInfo, ImageFile)>>(
+            100,
+            new GroupingDataflowBlockOptions()
+            {
+                CancellationToken = token,
+            });
 
         // STEP 4: Save new objects in database.
         var addToDatabaseBlock = new ActionBlock<Result<(IFileInfo, ImageFile)>[]>(async results =>
@@ -222,6 +234,7 @@ public class LibraryIngestPipeline
         }, new ExecutionDataflowBlockOptions
         {
             BoundedCapacity = 1,
+            CancellationToken = token,
         });
 
         // Build the pipline
@@ -239,14 +252,22 @@ public class LibraryIngestPipeline
             });
         hashBlock.LinkTo(new ActionBlock<Result<HashedImage>>(async result =>
         {
-            if (result.Errors.OfType<PipelineError>().FirstOrDefault() is { } error)
+            IFileInfo? fileInfo = result.ValueOrDefault?.FileInfo;
+
+            if (result.IsFailed)
             {
-                await skippedProgressBlock.SendAsync(new(error.FileInfo, "Skipped"));
+                if (result.Errors.OfType<PipelineError>().FirstOrDefault() is { } error)
+                {
+                    fileInfo = error.FileInfo;
+                }
             }
+
+            if (fileInfo is not null)
+                await skippedProgressBlock.SendAsync(new(fileInfo, "Skipped"));
+
         }), options);
 
         createImageFileBlock.LinkTo(addToDatabaseBatchBlock, options, result => result.IsSuccess);
-        //createImageFileBlock.LinkTo(DataflowBlock.NullTarget<Result<ImageFile>>(), options);
 
         addToDatabaseBatchBlock.LinkTo(addToDatabaseBlock, options);
 
