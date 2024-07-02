@@ -3,6 +3,7 @@ using Lumidex.Core.IO;
 using Serilog;
 using System.IO.Abstractions;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Lumidex.Core.Detection;
 
@@ -153,13 +154,20 @@ public class HeaderReader
         params string[] keywords)
         where TKeyword : IComparable
     {
-        var propInfo = propertySelector.GetPropertyInfo();
+        PropertyInfo propInfo = propertySelector.GetPropertyInfo();
 
-        foreach (var keyword in keywords)
+        foreach (string keyword in keywords)
         {
             if (header.GetEntry(keyword) is HeaderEntry<TKeyword> and { Value: not null } instrumentEntry)
             {
-                propInfo.SetValue(imageFile, instrumentEntry.Value);
+                if (instrumentEntry.Value is string s)
+                {
+                    propInfo.SetValue(imageFile, s.Trim());
+                }
+                else
+                {
+                    propInfo.SetValue(imageFile, instrumentEntry.Value);
+                }
                 break;
             }
         }
@@ -173,13 +181,13 @@ public class HeaderReader
         params string[] keywords)
         where TKeyword : IComparable
     {
-        var propInfo = propertySelector.GetPropertyInfo();
-        var currentKeyword = string.Empty;
-        var currentValueStr = string.Empty;
+        PropertyInfo propInfo = propertySelector.GetPropertyInfo();
+        string currentKeyword = string.Empty;
+        string? currentValueStr = string.Empty;
 
         try
         {
-            foreach (var keyword in keywords)
+            foreach (string keyword in keywords)
             {
                 currentKeyword = keyword;
                 if (header.GetEntry(keyword) is HeaderEntry<TKeyword> and { Value: { } } instrumentEntry)
