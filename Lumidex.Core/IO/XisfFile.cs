@@ -92,23 +92,27 @@ public class XisfFile
                         // Complex
                         else if (rawValue.StartsWith('('))
                         {
-                            Log.Warning("XISF header {Keyword} = `{Value}` complex type ignored", keyword, rawValue);
+                            Log.Warning("XISF header {Keyword} = `{Value}` complex type ignored in {Filename}", keyword, rawValue, fileInfo.FullName);
                         }
                         else
                         {
-                            Log.Warning("XISF header {Keyword} = `{Value}` type inference failed", keyword, rawValue);
+                            Log.Warning("XISF header {Keyword} = `{Value}` type inference failed in {Filename}", keyword, rawValue, fileInfo.FullName);
                         }
                     }
                     catch (Exception e)
                     {
-                        Log.Error(e, "Unhandled error parsing XISF header {Keyword} = `{Value}`", keyword, rawValue);
+                        Log.Error(e, "Unhandled error parsing XISF header {Keyword} = `{Value}` in {Filename}", keyword, rawValue, fileInfo.FullName);
                     }
                 }
             }
             else
             {
-                throw new Exception("Image header not found in XISF");
+                throw new Exception($"Image header not found in XISF {_filename}");
             }
+        }
+        catch(Exception e)
+        {
+            Log.Error(e, "Error reading XISF header {Filename}", fileInfo.FullName);
         }
         finally
         {
