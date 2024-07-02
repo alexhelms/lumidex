@@ -23,6 +23,7 @@
             BorderBrush="#656565"
             BorderThickness="1"
             CanUserReorderColumns="True"
+            CanUserResizeColumns="True"
             GridLinesVisibility="Horizontal"
             IsReadOnly="True"
             ItemsSource="{Binding SearchResults}"

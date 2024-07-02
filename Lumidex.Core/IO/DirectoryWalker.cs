@@ -5,7 +5,7 @@ namespace Lumidex.Core.IO;
 
 public static class DirectoryWalker
 {
-    public static readonly string[] SupportedExtensions = ["fit", "fits"];
+    public static readonly string[] SupportedExtensions = ["fit", "fits", "xisf"];
 
     public static IEnumerable<IFileInfo> Walk(string rootDir)
         => Walk(new FileSystem(), rootDir, SupportedExtensions);

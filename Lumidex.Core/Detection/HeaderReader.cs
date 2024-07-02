@@ -10,9 +10,13 @@ public class HeaderReader
 {
     public ImageFile Process(IFileInfo fileInfo, string headerHash)
     {
-        using var fits = new FitsFile(fileInfo.FullName, FitsFile.IoMode.Read);
-        var header = fits.ReadHeader();
+        if (!fileInfo.Exists)
+        {
+            throw new FileNotFoundException("Image file not found", fileInfo.FullName);
+        }
 
+        var header = GetHeader(fileInfo);
+        
         var imageFile = new ImageFile
         {
             HeaderHash = headerHash,
@@ -33,6 +37,25 @@ public class HeaderReader
         ExtractWeatherKeywords(header, imageFile);
 
         return imageFile;
+    }
+
+    private ImageHeader GetHeader(IFileInfo fileInfo)
+    {
+        var extension = fileInfo.Extension.ToLowerInvariant();
+        if (extension == ".xisf")
+        {
+            var xisf = new XisfFile(fileInfo.FullName);
+            return xisf.ReadHeader();
+        }
+        else if (extension.StartsWith(".fit"))
+        {
+            using var fits = new FitsFile(fileInfo.FullName, FitsFile.IoMode.Read);
+            return fits.ReadHeader();
+        }
+        else
+        {
+            throw new NotImplementedException($"{extension} not supported");
+        }
     }
 
     private ImageType DetermineImageType(ImageHeader header)

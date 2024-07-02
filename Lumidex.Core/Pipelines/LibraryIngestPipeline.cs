@@ -137,7 +137,8 @@ public class LibraryIngestPipeline
         {
             try
             {
-                var hasher = new FitsHeaderHasher();
+                var extension = message.FileInfo.Extension.ToLowerInvariant();
+                HeaderHasher hasher = extension == ".xisf" ? new XisfHeaderHasher() : new FitsHeaderHasher();
                 var hash = await hasher.ComputeHashAsync(message.FileInfo.FullName);
                 var hashString = string.Concat(hash.Select(h => h.ToString("x2")));
                 return Result.Ok(new HashedImage(message.FileInfo, message.LibraryId, hashString));
@@ -146,7 +147,7 @@ public class LibraryIngestPipeline
             {
                 await errorProgressBlock.SendAsync(new(message.FileInfo, "Hash Error"));
                 Log.Error(ex, "Error hashing {Filename}", message.FileInfo.FullName);
-                return Result.Fail(new Error("Error hashing file"));
+                return Result.Fail(new PipelineError(message.FileInfo, "Error hashing file"));
             }
         },
         new ExecutionDataflowBlockOptions
@@ -169,7 +170,7 @@ public class LibraryIngestPipeline
             {
                 await errorProgressBlock.SendAsync(new(result.Value.FileInfo, "Header Error"));
                 Log.Error(ex, "Error processing image header in {Filename}", result.Value.FileInfo.FullName);
-                return Result.Fail(new Error("Error processing image header"));
+                return Result.Fail(new PipelineError(result.Value.FileInfo, "Error processing image header"));
             }
         },
         new ExecutionDataflowBlockOptions
@@ -229,13 +230,19 @@ public class LibraryIngestPipeline
         hashBlock.LinkTo(createImageFileBlock, options,
             result =>
             {
+                if (result.IsFailed)
+                    return false;
+
                 using var dbContext = _dbContextFactory.CreateDbContext();
                 bool isInDatabase = dbContext.ImageFiles.Any(imageFile => imageFile.HeaderHash == result.Value.Hash);
                 return isInDatabase == false;
             });
-        hashBlock.LinkTo(new ActionBlock<Result<HashedImage>>(async x =>
+        hashBlock.LinkTo(new ActionBlock<Result<HashedImage>>(async result =>
         {
-            await skippedProgressBlock.SendAsync(new(x.Value.FileInfo, "Skipped"));
+            if (result.Errors.OfType<PipelineError>().FirstOrDefault() is { } error)
+            {
+                await skippedProgressBlock.SendAsync(new(error.FileInfo, "Skipped"));
+            }
         }), options);
 
         createImageFileBlock.LinkTo(addToDatabaseBatchBlock, options, result => result.IsSuccess);
@@ -250,5 +257,16 @@ public class LibraryIngestPipeline
             });
 
         return (hashBlock, completion);
+    }
+
+    private class PipelineError : FluentResults.Error
+    {
+        public IFileInfo FileInfo { get; }
+
+        public PipelineError(IFileInfo fileInfo, string message)
+            : base(message)
+        {
+            FileInfo = fileInfo;
+        }
     }
 }
