@@ -17,72 +17,194 @@
         <converter:LocalDateTimeConverter x:Key="LocalDateTime" />
         <converter:FilenameConverter x:Key="Filename" />
     </UserControl.Resources>
-    <Grid>
-        <DataGrid
-            Background="#333538"
-            BorderBrush="#656565"
-            BorderThickness="1"
-            CanUserReorderColumns="True"
-            CanUserResizeColumns="True"
-            GridLinesVisibility="Horizontal"
-            IsReadOnly="True"
-            ItemsSource="{Binding SearchResults}"
-            VerticalScrollBarVisibility="Visible">
-            <DataGrid.Styles>
-                <Style Selector="DataGridColumnHeader">
-                    <Setter Property="Foreground" Value="White" />
-                </Style>
-            </DataGrid.Styles>
-            <DataGrid.Columns>
-                <DataGridTextColumn
-                    x:DataType="data:ImageFile"
-                    Binding="{Binding ObjectName}"
-                    Header="Object Name" />
-                <DataGridTextColumn
-                    x:DataType="data:ImageFile"
-                    Binding="{Binding Type}"
-                    Header="Type" />
-                <DataGridTextColumn
-                    x:DataType="data:ImageFile"
-                    Binding="{Binding Kind}"
-                    Header="Kind" />
-                <DataGridTextColumn
-                    x:DataType="data:ImageFile"
-                    Binding="{Binding Exposure, StringFormat={}###0.###}"
-                    Header="Exposure (s)" />
-                <DataGridTextColumn
-                    x:DataType="data:ImageFile"
-                    Binding="{Binding FilterName}"
-                    Header="Filter" />
-                <DataGridTextColumn
-                    x:DataType="data:ImageFile"
-                    Binding="{Binding Binning}"
-                    Header="Binning" />
-                <DataGridTextColumn
-                    x:DataType="data:ImageFile"
-                    Binding="{Binding ObservationTimestampUtc, Converter={StaticResource LocalDateTime}, StringFormat={}yyyy-MM-dd HH:mm:ss}"
-                    Header="Observation (Local)" />
-                <DataGridTextColumn
-                    x:DataType="data:ImageFile"
-                    Binding="{Binding ObservationTimestampUtc, StringFormat={}yyyy-MM-dd HH:mm:ss}"
-                    Header="Observation (UTC)" />
-                <DataGridTemplateColumn x:DataType="data:ImageFile" Header="Filename">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="data:ImageFile">
-                            <TextBlock
-                                VerticalAlignment="Center"
-                                Text="{Binding Path, Converter={StaticResource Filename}}"
-                                ToolTip.Tip="{Binding Path}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
-        <Border Background="#11ffffff" IsVisible="{Binding IsSearching, FallbackValue=False}">
+    <Grid ColumnDefinitions="3*,Auto,0.75*">
+        <DockPanel>
+
+            <StackPanel
+                Margin="6,6,6,0"
+                DockPanel.Dock="Bottom"
+                Orientation="Horizontal">
+
+                <TextBlock Text="Rows" />
+                <TextBlock Margin="8,0,0,0" Text="{Binding SearchResults.Count}" />
+                <TextBlock
+                    Margin="8,0"
+                    Opacity="0.3"
+                    Text="|" />
+
+                <TextBlock Text="Objects" />
+                <TextBlock Margin="8,0,0,0" Text="{Binding DistintObjectNameCount}" />
+                <TextBlock
+                    Margin="8,0"
+                    Opacity="0.3"
+                    Text="|" />
+
+                <TextBlock Text="Lights" />
+                <TextBlock Margin="8,0,0,0" Text="{Binding LightCount}" />
+                <TextBlock
+                    Margin="8,0"
+                    Opacity="0.3"
+                    Text="|" />
+
+                <TextBlock Text="Flats" />
+                <TextBlock Margin="8,0,0,0" Text="{Binding FlatCount}" />
+                <TextBlock
+                    Margin="8,0"
+                    Opacity="0.3"
+                    Text="|" />
+
+                <TextBlock Text="Darks" />
+                <TextBlock Margin="8,0,0,0" Text="{Binding DarkCount}" />
+                <TextBlock
+                    Margin="8,0"
+                    Opacity="0.3"
+                    Text="|" />
+
+                <TextBlock Text="Bias" />
+                <TextBlock Margin="8,0,0,0" Text="{Binding BiasCount}" />
+                <TextBlock
+                    Margin="8,0"
+                    Opacity="0.3"
+                    Text="|" />
+
+                <TextBlock Text="Unknown" />
+                <TextBlock Margin="8,0,0,0" Text="{Binding UnknownCount}" />
+
+            </StackPanel>
+
+            <DataGrid
+                Grid.Column="0"
+                Background="#333538"
+                BorderBrush="#656565"
+                BorderThickness="1"
+                CanUserReorderColumns="True"
+                CanUserResizeColumns="True"
+                GridLinesVisibility="Horizontal"
+                IsReadOnly="True"
+                ItemsSource="{Binding SearchResults}"
+                VerticalScrollBarVisibility="Visible">
+                <DataGrid.Styles>
+                    <Style Selector="DataGridColumnHeader">
+                        <Setter Property="Foreground" Value="White" />
+                    </Style>
+                    <Style Selector="ScrollBar">
+                        <Setter Property="AllowAutoHide" Value="False" />
+                    </Style>
+                </DataGrid.Styles>
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        x:DataType="data:ImageFile"
+                        Binding="{Binding ObjectName}"
+                        Header="Object Name" />
+                    <DataGridTextColumn
+                        x:DataType="data:ImageFile"
+                        Binding="{Binding Type}"
+                        Header="Type" />
+                    <DataGridTextColumn
+                        x:DataType="data:ImageFile"
+                        Binding="{Binding Kind}"
+                        Header="Kind" />
+                    <DataGridTextColumn
+                        x:DataType="data:ImageFile"
+                        Binding="{Binding Exposure, StringFormat={}###0.###}"
+                        Header="Exposure (s)" />
+                    <DataGridTextColumn
+                        x:DataType="data:ImageFile"
+                        Binding="{Binding FilterName}"
+                        Header="Filter" />
+                    <DataGridTextColumn
+                        x:DataType="data:ImageFile"
+                        Binding="{Binding Binning}"
+                        Header="Binning" />
+                    <DataGridTextColumn
+                        x:DataType="data:ImageFile"
+                        Binding="{Binding ObservationTimestampUtc, Converter={StaticResource LocalDateTime}, StringFormat={}yyyy-MM-dd HH:mm:ss, TargetNullValue={}}"
+                        Header="Observation (Local)" />
+                    <DataGridTextColumn
+                        x:DataType="data:ImageFile"
+                        Binding="{Binding ObservationTimestampUtc, StringFormat={}yyyy-MM-dd HH:mm:ss, TargetNullValue={}}"
+                        Header="Observation (UTC)" />
+                    <DataGridTemplateColumn x:DataType="data:ImageFile" Header="Filename">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate DataType="data:ImageFile">
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    Text="{Binding Path, Converter={StaticResource Filename}}"
+                                    ToolTip.Tip="{Binding Path}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+
+        </DockPanel>
+
+        <Border
+            Grid.Column="0"
+            Background="#11ffffff"
+            IsVisible="{Binding IsSearching, FallbackValue=False}">
             <i:Icon
                 Animation="Pulse"
                 FontSize="48"
                 Value="fa-spinner" />
         </Border>
+
+        <GridSplitter
+            Grid.Column="1"
+            MinWidth="4"
+            Margin="8,0"
+            Background="#55656565"
+            ResizeDirection="Columns" />
+
+        <StackPanel Grid.Column="2">
+
+            <Grid Margin="0,8,0,0" RowDefinitions="*,*">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Text="Total Integration (hr)" />
+                <TextBlock
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Text="{Binding TotalIntegration, TargetNullValue={}--}"
+                    TextAlignment="Right" />
+
+            </Grid>
+
+            <DataGrid
+                Margin="0,12,0,0"
+                CanUserReorderColumns="False"
+                CanUserResizeColumns="True"
+                CanUserSortColumns="True"
+                IsReadOnly="True"
+                ItemsSource="{Binding IntegrationStats}"
+                SelectionMode="Single">
+                <DataGrid.Styles>
+                    <Style Selector="DataGridColumnHeader">
+                        <Setter Property="Foreground" Value="White" />
+                    </Style>
+                </DataGrid.Styles>
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        x:DataType="search:IntegrationStatistic"
+                        Binding="{Binding Filter}"
+                        Header="Filter" />
+                    <DataGridTextColumn
+                        x:DataType="search:IntegrationStatistic"
+                        Binding="{Binding TotalIntegrationDisplay}"
+                        Header="Total (hr)" />
+                    <DataGridTextColumn
+                        x:DataType="search:IntegrationStatistic"
+                        Binding="{Binding CountDisplay}"
+                        Header="Count" />
+                </DataGrid.Columns>
+            </DataGrid>
+
+        </StackPanel>
     </Grid>
 </UserControl>

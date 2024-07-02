@@ -97,11 +97,12 @@
                 Width="235"
                 Height="20"
                 Margin="12,0"
-                IsVisible="{Binding Scanning}"
+                IsIndeterminate="{Binding ProgressIndeterminate}"
+                IsVisible="{Binding ShowProgress}"
                 Maximum="{Binding ScanTotalCount}"
                 Minimum="0"
                 ProgressTextFormat="{}{0}/{3} Files ({1:0}%)"
-                ShowProgressText="True"
+                ShowProgressText="{Binding !ProgressIndeterminate}"
                 Value="{Binding ScanProgressCount}" />
             <Button
                 Classes="accent"

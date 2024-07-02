@@ -4,7 +4,6 @@ using Lumidex.Core.Pipelines;
 using Lumidex.Features.Library.Messages;
 using Lumidex.Validation;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Lumidex.Features.Library;
@@ -17,6 +16,8 @@ public partial class LibraryViewModel : ValidatableViewModelBase
     [ObservableProperty] DateTime? _lastScan;
     [ObservableProperty] int _fileCount;
     [ObservableProperty] bool _scanning;
+    [ObservableProperty] bool _progressIndeterminate;
+    [ObservableProperty] bool _showProgress;
     [ObservableProperty] bool _scanResultsAvailable;
     [ObservableProperty] int _scanTotalCount;
     [ObservableProperty] int _scanProgressCount;
@@ -122,6 +123,9 @@ public partial class LibraryViewModel : ValidatableViewModelBase
 
         try
         {
+            Scanning = false;
+            ProgressIndeterminate = true;
+            ShowProgress = true;
             ScanProgressCount = 0;
             ScanTotalCount = 1;
             ScanSummary = null;
@@ -135,6 +139,7 @@ public partial class LibraryViewModel : ValidatableViewModelBase
                 ScanProgressCount += p.TotalCount;
             });
 
+            ProgressIndeterminate = false;
             Scanning = true;
             await pipeline.ProcessAsync(library, progress, token);
 
@@ -157,6 +162,8 @@ public partial class LibraryViewModel : ValidatableViewModelBase
         finally
         {
             Scanning = false;
+            ProgressIndeterminate = false;
+            ShowProgress = false;
         }
 
         // Refresh basic library stats
