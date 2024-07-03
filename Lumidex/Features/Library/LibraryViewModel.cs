@@ -108,7 +108,7 @@ public partial class LibraryViewModel : ValidatableViewModelBase
 
             if (folder.Count == 1)
             {
-                Path = folder[0].Path.AbsolutePath;
+                Path = Uri.UnescapeDataString(folder[0].Path.AbsolutePath);
                 SaveChanges();
             }
         }
