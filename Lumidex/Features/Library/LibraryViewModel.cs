@@ -27,7 +27,7 @@ public partial class LibraryViewModel : ValidatableViewModelBase
     [NotifyDataErrorInfo]
     [Required(ErrorMessage = "Name is required.")]
     [MinLength(3, ErrorMessage = "3 character minimum.")]
-    [MaxLength(128, ErrorMessage = "128 character minimum.")]
+    [MaxLength(128, ErrorMessage = "128 character maximum.")]
     [NotifyCanExecuteChangedFor(nameof(ScanLibraryCommand))]
     string _name = string.Empty;
 

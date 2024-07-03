@@ -6,6 +6,7 @@ public partial class SideNavBarViewModel : ViewModelBase
 {
     public const string SearchTabName = "Search";
     public const string LibraryTabName = "Library";
+    public const string EquipmentTabName = "Equipment";
 
     public AvaloniaList<SideNavBarItemViewModel> Tabs { get; }
 
@@ -24,6 +25,12 @@ public partial class SideNavBarViewModel : ViewModelBase
                 Name = LibraryTabName,
                 ToolTipText = "Manage your library",
                 Icon = "mdi-bookshelf",
+            },
+            new()
+            {
+                Name = EquipmentTabName,
+                ToolTipText = "Manage your equipment",
+                Icon = "mdi-telescope",
             },
         };
     }

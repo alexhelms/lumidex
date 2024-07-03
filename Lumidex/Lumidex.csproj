@@ -26,6 +26,7 @@
     <PackageReference Include="Avalonia.Controls.TreeDataGrid" />
     <PackageReference Include="Avalonia.Fonts.Inter" />
     <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Avalonia.Xaml.Interactivity" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="Humanizer" />
     <PackageReference Include="Projektanker.Icons.Avalonia.MaterialDesign" />

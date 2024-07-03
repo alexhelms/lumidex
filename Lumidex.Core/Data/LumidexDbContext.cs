@@ -17,6 +17,7 @@ public class LumidexDbContext : DbContext
 {
     public DbSet<AppSettings> AppSettings { get; set; }
     public DbSet<Library> Libraries { get; set; }
+    public DbSet<EquipmentTag> EquipmentTags { get; set; }
     public DbSet<ImageFile> ImageFiles { get; set; }
 
     public string DbPath { get; }

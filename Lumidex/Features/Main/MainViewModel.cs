@@ -1,4 +1,5 @@
-﻿using Lumidex.Features.Library;
+﻿using Lumidex.Features.Equipment;
+using Lumidex.Features.Library;
 using Lumidex.Features.MainSearch;
 using Lumidex.Features.SideNavBar;
 using Lumidex.Messages;
@@ -10,6 +11,7 @@ public partial class MainViewModel : ViewModelBase,
 {
     private readonly Lazy<MainSearchViewModel> _mainSearch;
     private readonly Lazy<LibraryManagerViewModel> _libraryManager;
+    private readonly Lazy<EquipmentManagerViewModel> _equipmentManager;
 
     [ObservableProperty] private SideNavBarViewModel? _sideNavBar;
     [ObservableProperty] private object? _selectedTab;
@@ -17,11 +19,13 @@ public partial class MainViewModel : ViewModelBase,
     public MainViewModel(
         SideNavBarViewModel sideNavBar,
         Lazy<MainSearchViewModel> mainSearch,
-        Lazy<LibraryManagerViewModel> libraryManager)
+        Lazy<LibraryManagerViewModel> libraryManager,
+        Lazy<EquipmentManagerViewModel> equipmentManager)
     {
         _sideNavBar = sideNavBar;
         _mainSearch = mainSearch;
         _libraryManager = libraryManager;
+        _equipmentManager = equipmentManager;
     }
 
     public void Receive(ChangeSideTabMessage message)
@@ -30,6 +34,7 @@ public partial class MainViewModel : ViewModelBase,
         {
             SideNavBarViewModel.SearchTabName => _mainSearch.Value,
             SideNavBarViewModel.LibraryTabName => _libraryManager.Value,
+            SideNavBarViewModel.EquipmentTabName => _equipmentManager.Value,
             _ => throw new NotImplementedException(),
         };
     }
