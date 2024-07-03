@@ -61,7 +61,10 @@ public class HeaderReader
 
     private ImageType DetermineImageType(ImageHeader header)
     {
-        if (header.GetEntry<string>("IMAGETYP") is { Value: { } } imageTypeEntry)
+        HeaderEntry<string>? imageTypeEntry = header.GetEntry<string>("IMAGETYP");
+        imageTypeEntry ??= header.GetEntry<string>("FRAMETYP");
+
+        if (imageTypeEntry is { Value: { } })
         {
             switch (imageTypeEntry.Value.ToLowerInvariant().Replace(" ", string.Empty))
             {
@@ -160,15 +163,23 @@ public class HeaderReader
         {
             if (header.GetEntry(keyword) is HeaderEntry<TKeyword> and { Value: not null } instrumentEntry)
             {
-                if (instrumentEntry.Value is string s)
+                try
                 {
-                    propInfo.SetValue(imageFile, s.Trim());
+                    if (instrumentEntry.Value is string s)
+                    {
+                        propInfo.SetValue(imageFile, s.Trim());
+                    }
+                    else
+                    {
+                        propInfo.SetValue(imageFile, instrumentEntry.Value);
+                    }
+                    break;
                 }
-                else
+                catch (Exception e)
                 {
-                    propInfo.SetValue(imageFile, instrumentEntry.Value);
+                    Log.Error(e, "Error extracting {Keyword} from {Entry}", keyword, instrumentEntry);
+                    throw;
                 }
-                break;
             }
         }
     }
@@ -190,11 +201,21 @@ public class HeaderReader
             foreach (string keyword in keywords)
             {
                 currentKeyword = keyword;
+
                 if (header.GetEntry(keyword) is HeaderEntry<TKeyword> and { Value: { } } instrumentEntry)
                 {
-                    currentValueStr = instrumentEntry.Value.ToString();
-                    propInfo.SetValue(imageFile, transformFunc(instrumentEntry.Value));
-                    break;
+                    try
+                    {
+
+                        currentValueStr = instrumentEntry.Value.ToString();
+                        propInfo.SetValue(imageFile, transformFunc(instrumentEntry.Value));
+                        break;
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error(e, "Error extracting {Keyword} from {Entry}", keyword, instrumentEntry);
+                        throw;
+                    }
                 }
             }
         }
@@ -225,6 +246,14 @@ public class HeaderReader
             "XPIXSZ");
         ExtractKeyword<string, string?>(header, imageFile, x => x.ReadoutMode!,
             "READOUTM");
+
+        // SHARPCAP may save integer exposures as an integer instead of a float because it is missing the decimal
+        if (imageFile.Exposure.HasValue == false)
+        {
+            ExtractKeyword<int, double?>(header, imageFile, x => x.Exposure,
+                x => (double)x,
+                "EXPOSURE", "EXPTIME");
+        }
     }
 
     private void ExtractFocuserKeywords(ImageHeader header, ImageFile imageFile)
