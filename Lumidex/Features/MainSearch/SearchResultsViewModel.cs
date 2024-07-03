@@ -74,7 +74,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
 
             var query = _dbContext.ImageFiles.AsNoTracking();
 
-            if (message.ObjectName is { })
+            if (message.ObjectName is { Length: >0 })
                 query = query.Where(f => EF.Functions.Like(f.ObjectName, $"%{message.ObjectName}%"));
 
             if (message.ImageType is { } imageType)
@@ -89,20 +89,14 @@ public partial class SearchResultsViewModel : ViewModelBase,
             if (message.ExposureMax is { } max)
                 query = query.Where(f => f.Exposure!.Value <= max.TotalSeconds);
 
-            if (message.Filter is { } filter)
-            {
+            if (message.Filter is { Length: > 0 } filter)
                 query = query.Where(f => f.FilterName == filter);
-            }
 
             if (message.DateBegin is { } dateBegin)
-            {
                 query = query.Where(f => f.ObservationTimestampUtc >= dateBegin);
-            }
 
             if (message.DateEnd is { } dateEnd)
-            {
                 query = query.Where(f => f.ObservationTimestampUtc <= dateEnd);
-            }
 
             var results = await query.ToListAsync(_searchCts.Token);
 
