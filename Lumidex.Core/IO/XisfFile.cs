@@ -20,8 +20,20 @@ public class XisfFile
 
     public ImageHeader ReadHeader()
     {
-        Span<byte> headerBuffer = stackalloc byte[16];
+        const int XisfPreambleSize = 16;
+        
         var fileInfo = new FileInfo(_filename);
+        if (fileInfo.Exists == false)
+        {
+            throw new FileNotFoundException("XISF file not found", fileInfo.FullName);
+        }
+
+        if (fileInfo.Length < XisfPreambleSize)
+        {
+            throw new InvalidOperationException("File is not an XISF");
+        }
+
+        Span<byte> headerBuffer = stackalloc byte[XisfPreambleSize];
         using var fs = new FileStream(_filename, FileMode.Open, FileAccess.Read);
         fs.ReadExactly(headerBuffer);
 
@@ -39,7 +51,7 @@ public class XisfFile
         var buffer = ArrayPool<byte>.Shared.Rent(headerLength);
         try
         {
-            fs.ReadExactly(buffer);
+            fs.ReadExactly(buffer, 0, headerLength);
             MemoryStream ms = new(buffer, 0, headerLength);
             XDocument doc = XDocument.Load(ms);
             XNamespace ns = "http://www.pixinsight.com/xisf";
