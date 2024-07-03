@@ -46,6 +46,13 @@ public class XisfFile
             XElement xisfNode = doc.Nodes().OfType<XElement>().First(x => x.Name == ns + "xisf");
             if (xisfNode.Elements(ns + "Image").FirstOrDefault() is { } imageNode)
             {
+                var geometry = imageNode.Attribute("geometry")?.Value.Split(':');
+                if (geometry is { Length: 3})
+                {
+                    header.Width = int.Parse(geometry[0]);
+                    header.Height= int.Parse(geometry[1]);
+                }
+
                 var keywords = imageNode.Elements(ns + "FITSKeyword");
                 foreach (var item in keywords)
                 {
@@ -56,26 +63,12 @@ public class XisfFile
 
                     try
                     {
-                        if (keyword == "NAXIS1")
-                            header.Width = int.Parse(rawValue);
-                        else if (keyword == "NAXIS2")
-                            header.Height = int.Parse(rawValue);
-
                         if (keyword == "COMMENT" || keyword == "HISTORY")
                         {
                             header.Items.Add(new StringHeaderEntry(keyword, string.Empty, comment));
                         }
-                        // String
-                        else if (rawValue.StartsWith('\''))
-                        {
-                            // Single quotes within the string are escaped with preceding single quote.
-                            rawValue = rawValue.Replace("\'\'", "\'");
-
-                            // Strip the single quote at the beginning and end.
-                            header.Items.Add(new StringHeaderEntry(keyword, rawValue[1..^1], comment));
-                        }
                         // Boolean
-                        else if (rawValueLower == "t" || rawValueLower == "f")
+                        else if (rawValueLower.Length == 1 && (rawValueLower == "t" || rawValueLower == "f"))
                         {
                             header.Items.Add(new BooleanHeaderEntry(keyword, rawValueLower == "t", comment));
                         }
@@ -94,9 +87,24 @@ public class XisfFile
                         {
                             Log.Warning("XISF header {Keyword} = `{Value}` complex type ignored in {Filename}", keyword, rawValue, fileInfo.FullName);
                         }
+                        // String
+                        // NINA saving raws as XISF does not wrap strings in single quotes like FITS.
                         else
                         {
-                            Log.Warning("XISF header {Keyword} = `{Value}` type inference failed in {Filename}", keyword, rawValue, fileInfo.FullName);
+                            // Probably XISF converted from FITS
+                            if (rawValue.StartsWith('\''))
+                            {
+                                // Single quotes within the string are escaped with preceding single quote.
+                                rawValue = rawValue.Replace("\'\'", "\'");
+
+                                // Strip the single quote at the beginning and end.
+                                header.Items.Add(new StringHeaderEntry(keyword, rawValue[1..^1], comment));
+                            }
+                            // Probably XISF created by NINA
+                            else
+                            {
+                                header.Items.Add(new StringHeaderEntry(keyword, rawValue, comment));
+                            }
                         }
                     }
                     catch (Exception e)
