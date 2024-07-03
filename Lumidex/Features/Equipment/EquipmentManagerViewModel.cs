@@ -1,4 +1,6 @@
-﻿using Avalonia.Threading;
+﻿using Avalonia.Controls;
+using Avalonia.Media;
+using Avalonia.Threading;
 using Lumidex.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
@@ -23,6 +25,8 @@ public partial class EquipmentManagerViewModel : ValidatableViewModelBase
     [MaxLength(128, ErrorMessage = "128 character maximum.")]
     [NotifyCanExecuteChangedFor(nameof(AddEquipmentTagCommand))]
     private string? _name;
+
+    [ObservableProperty] private Color _color = Colors.White;
 
     public AvaloniaList<string> CategoryAutoComplete { get; } = new(DefaultCategories);
     public AvaloniaList<EquipmentTag> EquipmentTags { get; } = new();
@@ -53,6 +57,7 @@ public partial class EquipmentManagerViewModel : ValidatableViewModelBase
         var newCategories = new List<string>(DefaultCategories)
             .Concat(await _dbContext
                 .EquipmentTags
+                .AsNoTracking()
                 .Select(tag => tag.Category)
                 .Distinct()
                 .ToListAsync())
@@ -68,6 +73,7 @@ public partial class EquipmentManagerViewModel : ValidatableViewModelBase
     {
         var equpimentTags = await _dbContext
             .EquipmentTags
+            .AsNoTracking()
             .OrderByDescending(tag => tag.Id)
             .ToListAsync();
 
@@ -85,6 +91,7 @@ public partial class EquipmentManagerViewModel : ValidatableViewModelBase
         {
             Category = Category,
             Name = Name,
+            Color = Color.ToUInt32(),
         };
 
         _dbContext.EquipmentTags.Add(equipmentTag);
@@ -95,6 +102,69 @@ public partial class EquipmentManagerViewModel : ValidatableViewModelBase
 
         Category = null;
         Name = null;
+        Color = Colors.White;
         ClearErrors();
+
+        if (View is Control control)
+        {
+            if (control.Find<AutoCompleteBox>("CategoryTextBox") is { } tb)
+            {
+                tb.Focus();
+            }
+        }
+    }
+
+    [RelayCommand]
+    private async Task DeleteEquipmentTag(int id)
+    {
+        var equipmentTag = await _dbContext.EquipmentTags.FirstOrDefaultAsync(tag => tag.Id == id);
+        if (equipmentTag is not null)
+        {
+            _dbContext.EquipmentTags.Remove(equipmentTag);
+            await _dbContext.SaveChangesAsync();
+
+            // Update the categories
+            await GetCategories();
+
+            // Remove the tag from the data grid
+            if (EquipmentTags.FirstOrDefault(tag => tag.Id == id) is { } existingTag)
+            {
+                EquipmentTags.Remove(existingTag);
+            }
+        }
+    }
+
+    [RelayCommand]
+    private async Task EditTagComplete(DataGridCellEditEndedEventArgs e)
+    {
+        if (e.EditAction == DataGridEditAction.Commit &&
+            e.Column.GetCellContent(e.Row)?.DataContext is EquipmentTag cell)
+        {
+            var equipmentTag = await _dbContext.EquipmentTags.FirstOrDefaultAsync(tag => tag.Id == cell.Id);
+            if (equipmentTag is not null)
+            {
+                equipmentTag.Category = cell.Category;
+                equipmentTag.Name = cell.Name;
+                equipmentTag.Color = cell.Color;
+                await _dbContext.SaveChangesAsync();
+            }
+        }
+    }
+
+    [RelayCommand]
+    private void ClearColor()
+    {
+        Color = Colors.White;
+    }
+
+    [RelayCommand]
+    private async Task ChangeTagColor(EquipmentTag tag)
+    {
+        var equipmentTag = await _dbContext.EquipmentTags.FirstOrDefaultAsync(t => t.Id == tag.Id);
+        if (equipmentTag is not null)
+        {
+            equipmentTag.Color = tag.Color;
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }

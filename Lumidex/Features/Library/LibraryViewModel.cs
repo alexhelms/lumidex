@@ -12,6 +12,7 @@ public partial class LibraryViewModel : ValidatableViewModelBase
 {
     private readonly LumidexDbContext _dbContext;
     private readonly Func<LibraryIngestPipeline> _pipelineFactory;
+
     [ObservableProperty] int _id;
     [ObservableProperty] DateTime? _lastScan;
     [ObservableProperty] int _fileCount;

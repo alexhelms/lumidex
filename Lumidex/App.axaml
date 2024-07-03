@@ -43,6 +43,7 @@
                     RegionColor="#ff1e1f22" />
             </FluentTheme.Palettes>
         </FluentTheme>
+        <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
         <StyleInclude Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml" />
     </Application.Styles>

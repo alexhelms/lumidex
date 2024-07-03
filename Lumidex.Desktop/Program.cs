@@ -20,6 +20,7 @@ class Program
         catch (Exception e)
         {
             Log.Fatal(e, "Unhandled application exception");
+            // TODO: Try to open some kind of message box
             Environment.Exit(1);
         }
     }

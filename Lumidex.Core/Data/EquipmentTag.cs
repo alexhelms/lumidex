@@ -11,4 +11,6 @@ public class EquipmentTag
     public string Category { get; set; } = null!;
 
     public string Name { get; set; } = null!;
+
+    public long Color { get; set; }
 }
