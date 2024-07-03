@@ -241,7 +241,7 @@ public class HeaderReader
     {
         ExtractKeyword<string, string?>(header, imageFile, x => x.RotatorName!,
             "ROTNAME");
-        ExtractKeyword<int, int?>(header, imageFile, x => x.RotatorPosition,
+        ExtractKeyword<double, double?>(header, imageFile, x => x.RotatorPosition,
             "ROTATOR", "ROTATANG");
     }
 

@@ -69,7 +69,7 @@ public class ImageFile
     [Column(TypeName = "TEXT COLLATE NOCASE")]
     public string? RotatorName { get; set; }
 
-    public int? RotatorPosition { get; set; }
+    public double? RotatorPosition { get; set; }
 
     #endregion
 
