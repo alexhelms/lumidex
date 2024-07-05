@@ -54,7 +54,6 @@ public partial class LibraryManagerViewModel : ViewModelBase,
         {
             Name = "New Library",
             Path = LumidexPaths.DefaultLibrary,
-            AppSettingsId = _dbContext.AppSettings.First().Id,
         };
         _dbContext.Libraries.Add(library);
         await _dbContext.SaveChangesAsync();

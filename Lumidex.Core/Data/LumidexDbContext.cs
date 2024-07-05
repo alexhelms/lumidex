@@ -17,7 +17,7 @@ public class LumidexDbContext : DbContext
 {
     public DbSet<AppSettings> AppSettings { get; set; }
     public DbSet<Library> Libraries { get; set; }
-    public DbSet<EquipmentTag> EquipmentTags { get; set; }
+    public DbSet<Tag> Tags { get; set; }
     public DbSet<ImageFile> ImageFiles { get; set; }
 
     public string DbPath { get; }
@@ -38,6 +38,10 @@ public class LumidexDbContext : DbContext
         modelBuilder.Entity<ImageFile>()
             .Property(x => x.CreatedOn)
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        modelBuilder.Entity<Tag>()
+            .Property(x => x.Color)
+            .HasDefaultValue("#ffffffff");
     }
 
     public override int SaveChanges()
@@ -69,8 +73,17 @@ public class LumidexDbContext : DbContext
     /// </summary>
     private void ModifyUpdatedOnColumn()
     {
-        var entitiesWithUpdatedOn = ChangeTracker.Entries().Where(c => c.State == EntityState.Modified);
-        foreach (var entity in entitiesWithUpdatedOn)
+        var addedEntities = ChangeTracker.Entries().Where(c => c.State == EntityState.Added);
+        foreach (var entity in addedEntities)
+        {
+            if (entity.Properties.Any(c => c.Metadata.Name == nameof(ImageFile.CreatedOn)))
+            {
+                entity.Property(nameof(ImageFile.CreatedOn)).CurrentValue = DateTime.UtcNow;
+            }
+        }
+
+        var modifiedEntities = ChangeTracker.Entries().Where(c => c.State == EntityState.Modified);
+        foreach (var entity in modifiedEntities)
         {
             if (entity.Properties.Any(c => c.Metadata.Name == nameof(ImageFile.UpdatedOn)))
             {

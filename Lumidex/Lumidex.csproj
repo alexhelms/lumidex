@@ -47,6 +47,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\Tags\TagManagerView.axaml.cs">
+      <DependentUpon>TagManagerView.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Features\Library\LibraryManagerView.axaml.cs">
       <DependentUpon>LibraryManagerView.axaml</DependentUpon>
     </Compile>

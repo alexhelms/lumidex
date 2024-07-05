@@ -5,15 +5,15 @@ using System.Globalization;
 
 namespace Lumidex.Converters;
 
-public class LongToColorConverter : IValueConverter
+public class StringToColorConverter : IValueConverter
 {
-    public static readonly TruncateConverter Instance = new();
+    public static readonly StringToColorConverter Instance = new();
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is long l)
+        if (value is string s && Color.TryParse(s, out var color))
         {
-            return Color.FromUInt32((uint)l);
+            return color;
         }
 
         return new BindingNotification(new InvalidCastException(), BindingErrorType.Error);
@@ -23,7 +23,7 @@ public class LongToColorConverter : IValueConverter
     {
         if (value is Color c)
         {
-            return (long)c.ToUInt32();
+            return c.ToString();
         }
 
         return new BindingNotification(new InvalidCastException(), BindingErrorType.Error);

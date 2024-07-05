@@ -1,22 +1,22 @@
 <UserControl
-    x:Class="Lumidex.Features.Equipment.EquipmentManagerView"
+    x:Class="Lumidex.Features.Tags.TagManagerView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:behavior="using:Lumidex.Behaviors"
     xmlns:converter="using:Lumidex.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:data="using:Lumidex.Core.Data"
-    xmlns:equipment="using:Lumidex.Features.Equipment"
+    xmlns:tags="using:Lumidex.Features.Tags"
     xmlns:i="https://github.com/projektanker/icons.avalonia"
     xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
     xmlns:interactivity="using:Avalonia.Xaml.Interactivity"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="600"
     d:DesignWidth="1000"
-    x:DataType="equipment:EquipmentManagerViewModel"
+    x:DataType="tags:TagManagerViewModel"
     mc:Ignorable="d">
     <UserControl.Resources>
-        <converter:LongToColorConverter x:Key="LongToColor" />
+		<converter:StringToColorConverter x:Key="StringToColor" />
     </UserControl.Resources>
     <Grid Margin="8" ColumnDefinitions="1*,3*">
         <Grid
@@ -24,45 +24,26 @@
             VerticalAlignment="Top"
             ColumnDefinitions="1*,3*"
             DockPanel.Dock="Top"
-            RowDefinitions="1*,12,1*,12,Auto,12,1*,12,1*">
+            RowDefinitions="1*,12,Auto,12,1*,12,1*">
 
             <TextBlock
                 Grid.Row="0"
-                Grid.Column="0"
-                VerticalAlignment="Center"
-                Text="Category" />
-            <AutoCompleteBox
-                x:Name="CategoryTextBox"
-                Grid.Row="0"
-                Grid.Column="1"
-                FilterMode="Contains"
-                IsTextCompletionEnabled="True"
-                ItemsSource="{Binding CategoryAutoComplete}"
-                KeyboardNavigation.TabNavigation="Continue"
-                Text="{Binding Category}">
-                <interactivity:Interaction.Behaviors>
-                    <behavior:AutoCompleteDropdownBehaviour />
-                </interactivity:Interaction.Behaviors>
-            </AutoCompleteBox>
-
-            <TextBlock
-                Grid.Row="2"
                 Grid.Column="0"
                 VerticalAlignment="Center"
                 Text="Name" />
             <TextBox
-                Grid.Row="2"
+                Grid.Row="0"
                 Grid.Column="1"
                 KeyboardNavigation.TabNavigation="Continue"
                 Text="{Binding Name}" />
 
             <TextBlock
-                Grid.Row="4"
+                Grid.Row="2"
                 Grid.Column="0"
                 VerticalAlignment="Center"
                 Text="Color" />
             <ColorView
-                Grid.Row="4"
+                Grid.Row="2"
                 Grid.Column="1"
                 IsAccentColorsVisible="False"
                 IsColorComponentsVisible="False"
@@ -73,7 +54,7 @@
                 Color="{Binding Color}" />
 
             <Button
-                Grid.Row="6"
+                Grid.Row="4"
                 Grid.Column="1"
                 HorizontalAlignment="Stretch"
                 HorizontalContentAlignment="Center"
@@ -82,19 +63,19 @@
                 KeyboardNavigation.TabNavigation="Continue" />
 
             <Button
-                Grid.Row="8"
+                Grid.Row="6"
                 Grid.Column="1"
                 HorizontalAlignment="Stretch"
                 HorizontalContentAlignment="Center"
                 Classes="accent"
-                Command="{Binding AddEquipmentTagCommand}"
-                Content="Add Equipment Tag"
+                Command="{Binding AddTagCommand}"
+                Content="Add Tag"
                 IsDefault="True"
                 KeyboardNavigation.TabNavigation="Continue" />
 
         </Grid>
         <DataGrid
-            x:Name="EquipmentTagsDataGrid"
+            x:Name="TagsDataGrid"
             Grid.Column="1"
             Margin="12,0,0,0"
             Background="#333538"
@@ -103,10 +84,10 @@
             CanUserReorderColumns="True"
             CanUserResizeColumns="True"
             GridLinesVisibility="Horizontal"
-            ItemsSource="{Binding EquipmentTags}"
+            ItemsSource="{Binding Tags}"
             VerticalScrollBarVisibility="Visible">
             <interactivity:Interaction.Behaviors>
-                <ia:EventTriggerBehavior EventName="CellEditEnded" SourceObject="{Binding #EquipmentTagsDataGrid}">
+                <ia:EventTriggerBehavior EventName="CellEditEnded" SourceObject="{Binding #TagsDataGrid}">
                     <ia:InvokeCommandAction Command="{Binding EditTagCompleteCommand}" PassEventArgsToCommand="True" />
                 </ia:EventTriggerBehavior>
             </interactivity:Interaction.Behaviors>
@@ -121,17 +102,12 @@
             <DataGrid.Columns>
                 <DataGridTextColumn
                     Width="300"
-                    x:DataType="data:EquipmentTag"
-                    Binding="{Binding Category}"
-                    Header="Category" />
-                <DataGridTextColumn
-                    Width="300"
-                    x:DataType="data:EquipmentTag"
-                    Binding="{Binding Name}"
+                    x:DataType="tags:TagViewModel"
+                    Binding="{Binding Tag.Name}"
                     Header="Name" />
                 <DataGridTemplateColumn Header="Color">
                     <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="data:EquipmentTag">
+                        <DataTemplate DataType="tags:TagViewModel">
                             <ColorPicker
                                 x:Name="CellColorPicker"
                                 IsAccentColorsVisible="False"
@@ -139,7 +115,7 @@
                                 IsColorPreviewVisible="False"
                                 IsColorSpectrumVisible="True"
                                 SelectedIndex="1"
-                                Color="{Binding Color, Converter={StaticResource LongToColor}}">
+                                Color="{Binding Tag.Color, Converter={StaticResource StringToColor}}">
                                 <interactivity:Interaction.Behaviors>
                                     <ia:EventTriggerBehavior EventName="ColorChanged" SourceObject="{Binding #CellColorPicker}">
                                         <ia:InvokeCommandAction Command="{ReflectionBinding $parent[DataGrid].DataContext.ChangeTagColorCommand}" CommandParameter="{Binding}" />
@@ -149,14 +125,19 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+				<DataGridTextColumn
+                    Width="80"
+                    x:DataType="tags:TagViewModel"
+                    Binding="{Binding Count}"
+                    Header="Count" />
                 <DataGridTemplateColumn>
                     <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="data:EquipmentTag">
+                        <DataTemplate DataType="tags:TagViewModel">
                             <Button
                                 Padding="4,2"
                                 Background="Red"
-                                Command="{ReflectionBinding $parent[DataGrid].DataContext.DeleteEquipmentTagCommand}"
-                                CommandParameter="{Binding Id}"
+                                Command="{ReflectionBinding $parent[DataGrid].DataContext.DeleteTagCommand}"
+                                CommandParameter="{Binding Tag.Id}"
                                 IsTabStop="False">
                                 <TextBlock
                                     VerticalAlignment="Center"

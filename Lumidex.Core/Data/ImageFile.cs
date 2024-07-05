@@ -13,6 +13,8 @@ public class ImageFile
 
     public Library Library { get; set; } = null!;
 
+    public ICollection<Tag> Tags { get; set; } = new List<Tag>();
+
     [Column(TypeName = "TEXT COLLATE NOCASE")]
     public string HeaderHash { get; set; } = null!;
 

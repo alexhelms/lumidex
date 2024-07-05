@@ -44,7 +44,6 @@ public static class DependencyInjection
             {
                 Name = "Default",
                 Path = LumidexPaths.DefaultLibrary,
-                AppSettingsId = dbContext.AppSettings.First().Id,
             });
             dbContext.SaveChanges();
         }

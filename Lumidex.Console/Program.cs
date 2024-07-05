@@ -39,7 +39,6 @@ if (dbContext.Libraries.Count() == 0)
 {
     dbContext.Libraries.Add(new Library
     {
-        AppSettingsId = dbContext.AppSettings.Single().Id,
         Name = libraryName,
         Path = rootDir,
     });
