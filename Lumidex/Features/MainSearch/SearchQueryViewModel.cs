@@ -1,10 +1,16 @@
 ﻿using Lumidex.Core.Data;
 using Lumidex.Features.MainSearch.Messages;
+using Microsoft.EntityFrameworkCore;
 
 namespace Lumidex.Features.MainSearch;
 
 public partial class SearchQueryViewModel : ViewModelBase
 {
+    private readonly LumidexDbContext _dbContext;
+
+    private Core.Data.Library? _prevLibrary;
+
+    [ObservableProperty] Core.Data.Library? _library;
     [ObservableProperty] string? _objectName;
     [ObservableProperty] ImageKind? _selectedImageKind;
     [ObservableProperty] ImageType? _selectedImageType;
@@ -14,8 +20,45 @@ public partial class SearchQueryViewModel : ViewModelBase
     [ObservableProperty] DateTime? _selectedDateBegin;
     [ObservableProperty] DateTime? _selectedDateEnd;
 
+    public AvaloniaList<Core.Data.Library> Libraries { get; set; } = new();
     public List<ImageKind> ImageKinds { get; } = Enum.GetValues<ImageKind>().OrderBy(x => x.ToString()).ToList();
     public List<ImageType> ImageTypes { get; } = Enum.GetValues<ImageType>().OrderBy(x => x.ToString()).ToList();
+
+    public SearchQueryViewModel(LumidexDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    protected override async void OnActivated()
+    {
+        base.OnActivated();
+
+        var libraries = await _dbContext.Libraries
+            .AsNoTracking()
+            .OrderBy(library => library.Name)
+            .ToListAsync();
+
+        Libraries.Clear();
+        Libraries.AddRange(libraries);
+
+        // Select the previously selected library
+        if (_prevLibrary is not null)
+        {
+            Library = Libraries.FirstOrDefault(x => x.Id == _prevLibrary.Id);
+        }
+    }
+
+    protected override void OnDeactivated()
+    {
+        base.OnDeactivated();
+
+        // When the view is deactivated, the binding clears Library so store the previously
+        // selected library in another variable so it can be restored on activation.
+        _prevLibrary = Library;
+    }
+
+    [RelayCommand]
+    private void ClearLibrary() => Library = null;
 
     [RelayCommand]
     private void ClearObjectName() => ObjectName = null;

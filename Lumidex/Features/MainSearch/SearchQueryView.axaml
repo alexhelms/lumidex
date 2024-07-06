@@ -12,8 +12,30 @@
     mc:Ignorable="d">
     <StackPanel>
 
-        <!--  Object Name  -->
+        <!--  Library  -->
         <Grid ColumnDefinitions="1*,2*">
+            <TextBlock
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                Text="Library" />
+            <DockPanel Grid.Column="1">
+                <Button
+                    Margin="5,0,0,0"
+                    VerticalAlignment="Stretch"
+                    i:Attached.Icon="mdi-close"
+                    Command="{Binding ClearLibraryCommand}"
+                    DockPanel.Dock="Right"
+                    ToolTip.Tip="Clear Library" />
+                <ComboBox
+                    HorizontalAlignment="Stretch"
+                    DisplayMemberBinding="{Binding Name}"
+                    ItemsSource="{Binding Libraries}"
+                    SelectedItem="{Binding Library, Mode=TwoWay}" />
+            </DockPanel>
+        </Grid>
+
+        <!--  Object Name  -->
+        <Grid Margin="0,8,0,0" ColumnDefinitions="1*,2*">
             <TextBlock
                 Grid.Column="0"
                 VerticalAlignment="Center"

@@ -4,6 +4,7 @@ namespace Lumidex.Features.MainSearch.Messages;
 
 public class QueryMessage
 {
+    public Core.Data.Library? Library { get; set; }
     public string? ObjectName { get; set; }
     public ImageType? ImageType { get; set; }
     public ImageKind? ImageKind { get; set; }

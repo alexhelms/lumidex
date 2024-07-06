@@ -74,6 +74,9 @@ public partial class SearchResultsViewModel : ViewModelBase,
 
             var query = _dbContext.ImageFiles.AsNoTracking();
 
+            if (message.Library is not null)
+                query = query.Where(f => f.LibraryId == message.Library.Id);
+
             if (message.ObjectName is { Length: >0 })
                 query = query.Where(f => EF.Functions.Like(f.ObjectName, $"%{message.ObjectName}%"));
 
