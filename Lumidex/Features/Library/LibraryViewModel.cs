@@ -14,7 +14,6 @@ public partial class LibraryViewModel : ValidatableViewModelBase
     private readonly Func<LibraryIngestPipeline> _pipelineFactory;
 
     [ObservableProperty] int _id;
-    [ObservableProperty] DateTime? _lastScan;
     [ObservableProperty] int _fileCount;
     [ObservableProperty] bool _scanning;
     [ObservableProperty] bool _progressIndeterminate;
@@ -25,11 +24,16 @@ public partial class LibraryViewModel : ValidatableViewModelBase
     [ObservableProperty] string? _scanSummary;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(QuickScanLibraryCommand))]
+    DateTime? _lastScan;
+
+    [ObservableProperty]
     [NotifyDataErrorInfo]
     [Required(ErrorMessage = "Name is required.")]
     [MinLength(3, ErrorMessage = "3 character minimum.")]
     [MaxLength(128, ErrorMessage = "128 character maximum.")]
     [NotifyCanExecuteChangedFor(nameof(ScanLibraryCommand))]
+    [NotifyCanExecuteChangedFor(nameof(QuickScanLibraryCommand))]
     string _name = string.Empty;
 
     [ObservableProperty]
@@ -37,6 +41,7 @@ public partial class LibraryViewModel : ValidatableViewModelBase
     [Required(ErrorMessage = "Path is required.")]
     [FolderExists]
     [NotifyCanExecuteChangedFor(nameof(ScanLibraryCommand))]
+    [NotifyCanExecuteChangedFor(nameof(QuickScanLibraryCommand))]
     string _path = string.Empty;
 
     public AvaloniaList<FileErrorViewModel> ScanErrors { get; } = new();
@@ -64,6 +69,7 @@ public partial class LibraryViewModel : ValidatableViewModelBase
         }
 
         FileCount = _dbContext.ImageFiles.Count(f => f.LibraryId == Id);
+        OnPropertyChanged(nameof(CanQuickScanLibrary));
     }
 
     partial void OnNameChanged(string? oldValue, string newValue)
@@ -93,30 +99,7 @@ public partial class LibraryViewModel : ValidatableViewModelBase
         }
     }
 
-    [RelayCommand]
-    private async Task ChangeLibraryPath()
-    {
-        // TODO: move file dialog operations into a service.
-        if (TopLevel.GetTopLevel(View) is { } topLevel)
-        {
-            var startLocation = await topLevel.StorageProvider.TryGetFolderFromPathAsync(new Uri(Path));
-            var folder = await topLevel.StorageProvider.OpenFolderPickerAsync(new()
-            {
-                AllowMultiple = false,
-                SuggestedStartLocation = startLocation,
-                Title = $"{Name} Library",
-            });
-
-            if (folder.Count == 1)
-            {
-                Path = Uri.UnescapeDataString(folder[0].Path.AbsolutePath);
-                SaveChanges();
-            }
-        }
-    }
-
-    [RelayCommand(CanExecute = nameof(CanScanLibrary), IncludeCancelCommand = true)]
-    private async Task ScanLibrary(CancellationToken token)
+    private async Task ScanLibraryAsync(bool quickScan, CancellationToken token)
     {
         var library = await _dbContext.Libraries
             .AsNoTracking()
@@ -133,8 +116,8 @@ public partial class LibraryViewModel : ValidatableViewModelBase
             ScanErrors.Clear();
 
             var pipeline = _pipelineFactory();
-            ScanTotalCount = await pipeline.GetEstimatedTotalFiles(Path);
-            
+            ScanTotalCount = await pipeline.GetEstimatedTotalFiles(library);
+
             var progress = new Progress<IngestProgress>(p =>
             {
                 ScanProgressCount += p.TotalCount;
@@ -142,7 +125,10 @@ public partial class LibraryViewModel : ValidatableViewModelBase
 
             ProgressIndeterminate = false;
             Scanning = true;
-            await pipeline.ProcessAsync(library, progress, token);
+            await pipeline.ProcessAsync(library,
+                forceFullScan: quickScan == false,
+                progress: progress,
+                token: token);
 
             var added = pipeline.Added.Count;
             var skipped = pipeline.Skipped.Count;
@@ -174,9 +160,46 @@ public partial class LibraryViewModel : ValidatableViewModelBase
 
         LastScan = library.LastScan;
         FileCount = await _dbContext.ImageFiles.CountAsync(f => f.LibraryId == Id);
+        OnPropertyChanged(nameof(CanQuickScanLibrary));
     }
 
-    private bool CanScanLibrary => !HasErrors && !Scanning;
+    [RelayCommand]
+    private async Task ChangeLibraryPath()
+    {
+        // TODO: move file dialog operations into a service.
+        if (TopLevel.GetTopLevel(View) is { } topLevel)
+        {
+            var startLocation = await topLevel.StorageProvider.TryGetFolderFromPathAsync(new Uri(Path));
+            var folder = await topLevel.StorageProvider.OpenFolderPickerAsync(new()
+            {
+                AllowMultiple = false,
+                SuggestedStartLocation = startLocation,
+                Title = $"{Name} Library",
+            });
+
+            if (folder.Count == 1)
+            {
+                Path = Uri.UnescapeDataString(folder[0].Path.AbsolutePath);
+                SaveChanges();
+            }
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanScanLibrary), IncludeCancelCommand = true)]
+    private async Task ScanLibrary(CancellationToken token)
+    {
+        await ScanLibraryAsync(quickScan: false, token);
+    }
+
+    public bool CanScanLibrary => !HasErrors && !Scanning;
+
+    [RelayCommand(CanExecute = nameof(CanQuickScanLibrary), IncludeCancelCommand = true)]
+    private async Task QuickScanLibrary(CancellationToken token)
+    {
+        await ScanLibraryAsync(quickScan: true, token);
+    }
+
+    public bool CanQuickScanLibrary => !HasErrors && !Scanning && LastScan is not null;
 
     [RelayCommand(CanExecute = nameof(CanDeleteLibrary))]
     private async Task DeleteLibrary()

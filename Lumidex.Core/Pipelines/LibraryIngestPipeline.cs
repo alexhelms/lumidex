@@ -45,18 +45,38 @@ public class LibraryIngestPipeline
     }
 
     /// <summary>
-    /// Get an estimated count of files to be processed.
+    /// Get an estimated count of files to be processed since the last scan date.
+    /// 
+    /// If the library has never been scanned, all files regardless of age are scanned.
     /// 
     /// This count is the number of files with the supported extensions.
     /// Some files may not added to the database for various reasons.
     /// This estimate is intended for progress bars.
     /// </summary>
-    /// <param name="rootDirectory">The root directory to scan.</param>
+    /// <param name="library">The library to scan.</param>
     /// <returns>An estimated count of files to be processed.</returns>
-    public Task<int> GetEstimatedTotalFiles(string rootDirectory) 
-        => Task.Run(() => DirectoryWalker.Walk(_fileSystem, rootDirectory).Count());
+    public Task<int> GetEstimatedTotalFiles(Library library, bool forceFullScan = false) => Task.Run(() =>
+    {
+        DateTime? startDate = forceFullScan ? null : library.LastScan;
 
-    public async Task ProcessAsync(Library library, IProgress<IngestProgress>? progress = null, CancellationToken token = default)
+        return DirectoryWalker.Walk(_fileSystem, library.Path, startDate).Count();
+    });
+
+    /// <summary>
+    /// Scan the library for new image files starting from the last scan date.
+    /// 
+    /// If the library has never been scanned, all files regardless of age are scanned.
+    /// </summary>
+    /// <param name="library">The library to scan.</param>
+    /// <param name="forceFullScan">Ignore the last scan date and force a full scan.</param>
+    /// <param name="progress">Progress.</param>
+    /// <param name="token">Cancellation token.</param>
+    /// <returns>A task.</returns>
+    public async Task ProcessAsync(
+        Library library,
+        bool forceFullScan = false,
+        IProgress<IngestProgress>? progress = null,
+        CancellationToken token = default)
     {
         Added = new();
         Skipped = new();
@@ -84,7 +104,8 @@ public class LibraryIngestPipeline
         // Walk the directories on a background thread
         await Task.Run(async () =>
         {
-            foreach (var fileInfo in DirectoryWalker.Walk(_fileSystem, library.Path))
+            DateTime? startDate = forceFullScan ? null : library.LastScan;
+            foreach (var fileInfo in DirectoryWalker.Walk(_fileSystem, library.Path, startDate))
             {
                 await pipeline.SendAsync(new FileMessage(fileInfo, library.Id));
             }

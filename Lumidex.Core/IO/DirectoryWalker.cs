@@ -7,16 +7,16 @@ public static class DirectoryWalker
 {
     public static readonly string[] SupportedExtensions = ["fit", "fits", "xisf"];
 
-    public static IEnumerable<IFileInfo> Walk(string rootDir)
-        => Walk(new FileSystem(), rootDir, SupportedExtensions);
+    public static IEnumerable<IFileInfo> Walk(string rootDir, DateTime? startDateUtc = null)
+        => Walk(new FileSystem(), rootDir, SupportedExtensions, startDateUtc);
 
-    public static IEnumerable<IFileInfo> Walk(string rootDir, string[] extensions)
-        => Walk(new FileSystem(), rootDir, extensions);
+    public static IEnumerable<IFileInfo> Walk(string rootDir, string[] extensions, DateTime? startDateUtc = null)
+        => Walk(new FileSystem(), rootDir, extensions, startDateUtc);
 
-    public static IEnumerable<IFileInfo> Walk(IFileSystem fs, string rootDir)
-        => Walk(fs, rootDir, SupportedExtensions);
+    public static IEnumerable<IFileInfo> Walk(IFileSystem fs, string rootDir, DateTime? startDateUtc = null)
+        => Walk(fs, rootDir, SupportedExtensions, startDateUtc);
 
-    public static IEnumerable<IFileInfo> Walk(IFileSystem fs, string rootDir, string[] extensions)
+    public static IEnumerable<IFileInfo> Walk(IFileSystem fs, string rootDir, string[] extensions, DateTime? startDateUtc = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(rootDir);
         ArgumentNullException.ThrowIfNull(extensions);
@@ -41,7 +41,17 @@ public static class DirectoryWalker
                 .Where(fileInfo => pattern.IsMatch(fileInfo.Extension));
             foreach (var file in files)
             {
-                yield return file;
+                if (startDateUtc.HasValue)
+                {
+                    if (file.LastWriteTimeUtc >= startDateUtc.Value)
+                    {
+                        yield return file;
+                    }
+                }
+                else
+                {
+                    yield return file;
+                }
             }
 
             foreach (var dir in currentDir.EnumerateDirectories())

@@ -105,6 +105,12 @@
                 ShowProgressText="{Binding !ProgressIndeterminate}"
                 Value="{Binding ScanProgressCount}" />
             <Button
+                Margin="0,0,12,0"
+                Classes="accent"
+                Command="{Binding QuickScanLibraryCommand}"
+                Content="Quick Scan"
+                IsVisible="{Binding CanQuickScanLibrary}" />
+            <Button
                 Classes="accent"
                 Command="{Binding ScanLibraryCommand}"
                 Content="Scan" />
