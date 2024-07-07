@@ -41,7 +41,9 @@ public partial class TagManagerViewModel : ValidatableViewModelBase
             .OrderByDescending(tag => tag.Id)
             .Select(tag => new TagViewModel
             {
-                Tag = tag,
+                Id = tag.Id,
+                Name = tag.Name,
+                Color = tag.Color,
                 Count = tag.TaggedImages.Count(),
             })
             .ToListAsync();
@@ -64,7 +66,12 @@ public partial class TagManagerViewModel : ValidatableViewModelBase
         _dbContext.Tags.Add(tag);
         await _dbContext.SaveChangesAsync();
 
-        await GetTags();
+        Tags.Insert(0, new TagViewModel
+        {
+            Id = tag.Id,
+            Name = tag.Name,
+            Color = tag.Color,
+        });
 
         Name = null;
         Color = Colors.White;
@@ -72,7 +79,7 @@ public partial class TagManagerViewModel : ValidatableViewModelBase
 
         if (View is Control control)
         {
-            if (control.Find<AutoCompleteBox>("CategoryTextBox") is { } tb)
+            if (control.Find<TextBox>("TagNameTextBox") is { } tb)
             {
                 tb.Focus();
             }
@@ -89,7 +96,7 @@ public partial class TagManagerViewModel : ValidatableViewModelBase
             await _dbContext.SaveChangesAsync();
 
             // Remove the tag from the data grid
-            if (Tags.FirstOrDefault(vm => vm.Tag.Id == id) is { } existingTag)
+            if (Tags.FirstOrDefault(vm => vm.Id == id) is { } existingTag)
             {
                 Tags.Remove(existingTag);
             }
@@ -130,8 +137,10 @@ public partial class TagManagerViewModel : ValidatableViewModelBase
     }
 }
 
-public class TagViewModel
+public partial class TagViewModel : ObservableObject
 {
-    public Tag Tag { get; set; } = null!;
-    public int Count { get; set; }
+    [ObservableProperty] int _id;
+    [ObservableProperty] string _name = string.Empty;
+    [ObservableProperty] string _color = Colors.White.ToString();
+    [ObservableProperty] int _count;
 }
