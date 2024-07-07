@@ -116,14 +116,16 @@ public partial class LibraryViewModel : ValidatableViewModelBase
             ScanErrors.Clear();
 
             var pipeline = _pipelineFactory();
-            ScanTotalCount = await pipeline.GetEstimatedTotalFiles(library);
+            ScanTotalCount = await pipeline.GetEstimatedTotalFiles(
+                library: library,
+                forceFullScan: quickScan == false);
 
             var progress = new Progress<IngestProgress>(p =>
             {
+                ProgressIndeterminate = false;
                 ScanProgressCount += p.TotalCount;
             });
-
-            ProgressIndeterminate = false;
+            
             Scanning = true;
             await pipeline.ProcessAsync(library,
                 forceFullScan: quickScan == false,
