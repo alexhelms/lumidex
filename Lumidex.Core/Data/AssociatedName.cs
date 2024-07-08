@@ -2,7 +2,7 @@
 
 namespace Lumidex.Core.Data;
 
-public class Tag
+public class AssociatedName
 {
     public int Id { get; set; }
 
@@ -15,7 +15,5 @@ public class Tag
     [Column(TypeName = "TEXT COLLATE NOCASE")]
     public string Name { get; set; } = null!;
 
-    public string Color { get; set; } = "#ffffffff";
-
-    public ICollection<ImageFile> TaggedImages { get;set; } = new List<ImageFile>();
+    public ICollection<ImageFile> Images { get; set; } = new List<ImageFile>();
 }

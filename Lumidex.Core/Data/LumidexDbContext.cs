@@ -19,6 +19,7 @@ public class LumidexDbContext : DbContext
     public DbSet<Library> Libraries { get; set; }
     public DbSet<Tag> Tags { get; set; }
     public DbSet<ImageFile> ImageFiles { get; set; }
+    public DbSet<AssociatedName> AssociatedNames { get; set; }
 
     public string DbPath { get; }
 
@@ -36,6 +37,18 @@ public class LumidexDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ImageFile>()
+            .Property(x => x.CreatedOn)
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        modelBuilder.Entity<Library>()
+            .Property(x => x.CreatedOn)
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        modelBuilder.Entity<Tag>()
+            .Property(x => x.CreatedOn)
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        modelBuilder.Entity<AssociatedName>()
             .Property(x => x.CreatedOn)
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
 

@@ -15,6 +15,8 @@ public class ImageFile
 
     public ICollection<Tag> Tags { get; set; } = new List<Tag>();
 
+    public ICollection<AssociatedName> AssociatedNames { get; set; } = new List<AssociatedName>();
+
     [Column(TypeName = "TEXT COLLATE NOCASE")]
     public string HeaderHash { get; set; } = null!;
 
@@ -25,7 +27,7 @@ public class ImageFile
     public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 
     [Column(TypeName = "DATETIME")]
-    public DateTime UpdatedOn { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedOn { get; set; }
 
     public ImageType Type { get; set; }
     
