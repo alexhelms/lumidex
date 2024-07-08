@@ -4,7 +4,7 @@ namespace Lumidex.Features.MainSearch.Messages;
 
 public class QueryMessage
 {
-    public Core.Data.Library? Library { get; set; }
+    public LibraryViewModel? Library { get; set; }
     public string? ObjectName { get; set; }
     public ImageType? ImageType { get; set; }
     public ImageKind? ImageKind { get; set; }
@@ -13,4 +13,5 @@ public class QueryMessage
     public string? Filter { get; set; }
     public DateTime? DateBegin { get; set; }
     public DateTime? DateEnd { get; set; }
+    public int[]? TagIds { get; set; }
 }

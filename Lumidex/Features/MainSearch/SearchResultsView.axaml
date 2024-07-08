@@ -2,10 +2,12 @@
     x:Class="Lumidex.Features.MainSearch.SearchResultsView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="using:Lumidex.Behaviors"
+    xmlns:common="using:Lumidex.Common"
     xmlns:converter="using:Lumidex.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:data="using:Lumidex.Core.Data"
     xmlns:i="https://github.com/projektanker/icons.avalonia"
+    xmlns:interactivity="using:Avalonia.Xaml.Interactivity"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:search="using:Lumidex.Features.MainSearch"
     d:DesignHeight="600"
@@ -73,6 +75,7 @@
             </StackPanel>
 
             <DataGrid
+                x:Name="SearchResultsDataGrid"
                 Grid.Column="0"
                 Background="#333538"
                 BorderBrush="#656565"
@@ -82,55 +85,126 @@
                 GridLinesVisibility="Horizontal"
                 IsReadOnly="True"
                 ItemsSource="{Binding SearchResults}"
+                SelectionChanged="DataGrid_SelectionChanged"
+                SelectionMode="Extended"
                 VerticalScrollBarVisibility="Visible">
+                <interactivity:Interaction.Behaviors>
+                    <behaviors:DataGridSelectedItemsBehavior SelectedItems="{Binding SelectedSearchResults}" />
+                </interactivity:Interaction.Behaviors>
                 <DataGrid.Styles>
+                    <Style Selector="ScrollBar">
+                        <Setter Property="AllowAutoHide" Value="False" />
+                    </Style>
                     <Style Selector="DataGridColumnHeader">
                         <Setter Property="Foreground" Value="White" />
                     </Style>
-                    <Style Selector="ScrollBar">
-                        <Setter Property="AllowAutoHide" Value="False" />
+                    <Style Selector="DataGridRow">
+                        <Setter Property="ContextMenu">
+                            <Setter.Value>
+                                <ContextMenu>
+                                    <MenuItem Header="Add Tag" ItemsSource="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).AllTags}">
+                                        <MenuItem.Styles>
+                                            <Style Selector="MenuItem">
+                                                <Setter Property="Command" Value="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).AddTagToSelectionCommand}" />
+                                                <Setter Property="CommandParameter" Value="{ReflectionBinding Id}" />
+                                            </Style>
+                                        </MenuItem.Styles>
+                                        <MenuItem.ItemTemplate>
+                                            <DataTemplate DataType="common:TagViewModel">
+                                                <TextBlock
+                                                    Padding="8,4"
+                                                    HorizontalAlignment="Left"
+                                                    VerticalAlignment="Center"
+                                                    Text="{Binding Name}">
+                                                    <TextBlock.Background>
+                                                        <SolidColorBrush Color="{Binding Color}" />
+                                                    </TextBlock.Background>
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </MenuItem.ItemTemplate>
+                                    </MenuItem>
+                                    <MenuItem Command="{ReflectionBinding #SearchResultsDataGrid.DataContext.RemoveAllTagsFromSelectionCommand}" Header="Remove Tags" />
+                                </ContextMenu>
+                            </Setter.Value>
+                        </Setter>
                     </Style>
                 </DataGrid.Styles>
                 <DataGrid.Columns>
                     <DataGridTextColumn
-                        x:DataType="data:ImageFile"
+                        x:DataType="common:ImageFileViewModel"
+                        Binding="{Binding Library.Name}"
+                        Header="Library" />
+                    <DataGridTextColumn
+                        x:DataType="common:ImageFileViewModel"
                         Binding="{Binding ObjectName}"
                         Header="Object Name" />
                     <DataGridTextColumn
-                        x:DataType="data:ImageFile"
+                        x:DataType="common:ImageFileViewModel"
                         Binding="{Binding Type}"
                         Header="Type" />
                     <DataGridTextColumn
-                        x:DataType="data:ImageFile"
+                        x:DataType="common:ImageFileViewModel"
                         Binding="{Binding Kind}"
                         Header="Kind" />
                     <DataGridTextColumn
-                        x:DataType="data:ImageFile"
+                        x:DataType="common:ImageFileViewModel"
                         Binding="{Binding Exposure, StringFormat={}###0.###}"
                         Header="Exposure (s)" />
                     <DataGridTextColumn
-                        x:DataType="data:ImageFile"
+                        x:DataType="common:ImageFileViewModel"
                         Binding="{Binding FilterName}"
                         Header="Filter" />
                     <DataGridTextColumn
-                        x:DataType="data:ImageFile"
+                        x:DataType="common:ImageFileViewModel"
                         Binding="{Binding Binning}"
                         Header="Binning" />
                     <DataGridTextColumn
-                        x:DataType="data:ImageFile"
+                        x:DataType="common:ImageFileViewModel"
                         Binding="{Binding ObservationTimestampUtc, Converter={StaticResource LocalDateTime}, StringFormat={}yyyy-MM-dd HH:mm:ss, TargetNullValue={}}"
                         Header="Observation (Local)" />
                     <DataGridTextColumn
-                        x:DataType="data:ImageFile"
+                        x:DataType="common:ImageFileViewModel"
                         Binding="{Binding ObservationTimestampUtc, StringFormat={}yyyy-MM-dd HH:mm:ss, TargetNullValue={}}"
                         Header="Observation (UTC)" />
-                    <DataGridTemplateColumn x:DataType="data:ImageFile" Header="Filename">
+                    <DataGridTemplateColumn x:DataType="common:ImageFileViewModel" Header="Filename">
                         <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate DataType="data:ImageFile">
+                            <DataTemplate DataType="common:ImageFileViewModel">
                                 <TextBlock
                                     VerticalAlignment="Center"
                                     Text="{Binding Path, Converter={StaticResource Filename}}"
                                     ToolTip.Tip="{Binding Path}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn x:DataType="common:ImageFileViewModel" Header="Tags">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate DataType="common:ImageFileViewModel">
+                                <ItemsControl ItemsSource="{Binding Tags}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel VerticalAlignment="Center" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="common:TagViewModel">
+                                            <TextBlock
+                                                Margin="4,0,0,0"
+                                                Padding="4,2"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Center"
+                                                Text="{Binding Name}">
+                                                <TextBlock.Background>
+                                                    <SolidColorBrush Color="{Binding Color}" />
+                                                </TextBlock.Background>
+                                                <TextBlock.ContextMenu>
+                                                    <ContextMenu Tag="{Binding $parent[DataGridRow].DataContext}">
+                                                        <MenuItem Click="RemoveTagMenuItem_Click" Header="Remove Tag" />
+                                                    </ContextMenu>
+                                                </TextBlock.ContextMenu>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace Lumidex.Core.Data;
+﻿namespace Lumidex.Core.Data;
 
 public class Tag
 {

@@ -1,4 +1,6 @@
-﻿using Lumidex.Core.Data;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Lumidex.Core.Data;
 using Lumidex.Features.MainSearch.Messages;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,10 +9,12 @@ namespace Lumidex.Features.MainSearch;
 public partial class SearchQueryViewModel : ViewModelBase
 {
     private readonly LumidexDbContext _dbContext;
+    private readonly IMapper _mapper;
 
-    private Core.Data.Library? _prevLibrary;
+    private LibraryViewModel? _prevLibrary;
+    private List<int> _prevSelectedTagIds = new();
 
-    [ObservableProperty] Core.Data.Library? _library;
+    [ObservableProperty] LibraryViewModel? _library;
     [ObservableProperty] string? _objectName;
     [ObservableProperty] ImageKind? _selectedImageKind;
     [ObservableProperty] ImageType? _selectedImageType;
@@ -19,14 +23,20 @@ public partial class SearchQueryViewModel : ViewModelBase
     [ObservableProperty] string? _selectedFilter;
     [ObservableProperty] DateTime? _selectedDateBegin;
     [ObservableProperty] DateTime? _selectedDateEnd;
+    [ObservableProperty] AvaloniaList<LibraryViewModel> _libraries = new();
+    [ObservableProperty] AvaloniaList<TagViewModel> _tags = new();
+    [ObservableProperty] AvaloniaList<TagViewModel> _selectedTags = new();
+    [ObservableProperty] AvaloniaList<TagViewModel> _queryTags = new();
 
-    public AvaloniaList<Core.Data.Library> Libraries { get; set; } = new();
     public List<ImageKind> ImageKinds { get; } = Enum.GetValues<ImageKind>().OrderBy(x => x.ToString()).ToList();
     public List<ImageType> ImageTypes { get; } = Enum.GetValues<ImageType>().OrderBy(x => x.ToString()).ToList();
 
-    public SearchQueryViewModel(LumidexDbContext dbContext)
+    public SearchQueryViewModel(
+        LumidexDbContext dbContext,
+        IMapper mapper)
     {
         _dbContext = dbContext;
+        _mapper = mapper;
     }
 
     protected override async void OnActivated()
@@ -36,15 +46,28 @@ public partial class SearchQueryViewModel : ViewModelBase
         var libraries = await _dbContext.Libraries
             .AsNoTracking()
             .OrderBy(library => library.Name)
+            .ProjectTo<LibraryViewModel>(_mapper.ConfigurationProvider)
             .ToListAsync();
 
-        Libraries.Clear();
-        Libraries.AddRange(libraries);
+        var tags = await _dbContext.Tags
+            .AsNoTracking()
+            .OrderBy(tag => tag.TaggedImages.Count)
+            .ThenBy(tag => tag.Name)
+            .ProjectTo<TagViewModel>(_mapper.ConfigurationProvider)
+            .ToListAsync();
+
+        Libraries = new(libraries);
+        Tags = new(tags);
 
         // Select the previously selected library
         if (_prevLibrary is not null)
         {
             Library = Libraries.FirstOrDefault(x => x.Id == _prevLibrary.Id);
+        }
+        
+        if (_prevSelectedTagIds.Count > 0)
+        {
+            SelectedTags.AddRange(Tags.Where(tag => _prevSelectedTagIds.Contains(tag.Id)));
         }
     }
 
@@ -55,6 +78,9 @@ public partial class SearchQueryViewModel : ViewModelBase
         // When the view is deactivated, the binding clears Library so store the previously
         // selected library in another variable so it can be restored on activation.
         _prevLibrary = Library;
+
+        _prevSelectedTagIds.Clear();
+        _prevSelectedTagIds.AddRange(SelectedTags.Select(x => x.Id));
     }
 
     [RelayCommand]
@@ -86,8 +112,12 @@ public partial class SearchQueryViewModel : ViewModelBase
     private void ClearDateEnd() => SelectedDateEnd = null;
 
     [RelayCommand]
+    private void ClearTags() => QueryTags.Clear();
+
+    [RelayCommand]
     private void Clear()
     {
+        ClearLibrary();
         ClearObjectName();
         ClearSelectedImageType();
         ClearSelectedImageKind();
@@ -95,6 +125,7 @@ public partial class SearchQueryViewModel : ViewModelBase
         ClearSelectedFilter();
         ClearDateBegin();
         ClearDateEnd();
+        ClearTags();
     }
 
     [RelayCommand]
@@ -102,6 +133,7 @@ public partial class SearchQueryViewModel : ViewModelBase
     {
         Messenger.Send(new QueryMessage
         {
+            Library = Library,
             ObjectName = ObjectName,
             ImageType = SelectedImageType,
             ImageKind = SelectedImageKind,
@@ -110,6 +142,7 @@ public partial class SearchQueryViewModel : ViewModelBase
             Filter = SelectedFilter,
             DateBegin = SelectedDateBegin,
             DateEnd = SelectedDateEnd,
+            TagIds = QueryTags.Select(t => t.Id).ToArray(),
         });
     }
 }

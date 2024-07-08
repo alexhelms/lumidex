@@ -1,4 +1,6 @@
-﻿using Avalonia.Threading;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Avalonia.Threading;
 using Lumidex.Core.Data;
 using Lumidex.Features.MainSearch.Messages;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +11,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
     IRecipient<QueryMessage>
 {
     private readonly LumidexDbContext _dbContext;
+    private readonly IMapper _mapper;
 
     private CancellationTokenSource? _searchCts;
 
@@ -21,19 +24,46 @@ public partial class SearchResultsViewModel : ViewModelBase,
     [ObservableProperty] int _biasCount;
     [ObservableProperty] int _unknownCount;
     [ObservableProperty] int _distintObjectNameCount;
-
-    public AvaloniaList<ImageFile> SearchResults { get; } = new();
-    public AvaloniaList<IntegrationStatistic> IntegrationStats { get; } = new();
+    [ObservableProperty] AvaloniaList<TagViewModel> _allTags = new();
+    [ObservableProperty] AvaloniaList<ImageFileViewModel> _searchResults = new();
+    [ObservableProperty] AvaloniaList<ImageFileViewModel> _selectedSearchResults = new();
+    [ObservableProperty] AvaloniaList<IntegrationStatistic> _integrationStats = new();
 
     public SearchResultsViewModel(
-        LumidexDbContext dbContext)
+        LumidexDbContext dbContext,
+        IMapper mapper)
     {
         _dbContext = dbContext;
+        _mapper = mapper;
     }
 
     ~SearchResultsViewModel()
     {
         _searchCts?.Dispose();
+    }
+
+    private async Task<List<ImageFile>> GetSelectedImageFiles()
+    {
+        var imageFileIds = SelectedSearchResults.Select(x => x.Id).ToHashSet();
+        var imageFiles = await _dbContext.ImageFiles
+            .Include(f => f.Tags)
+            .Where(f => imageFileIds.Contains(f.Id))
+            .ToListAsync();
+
+        return imageFiles;
+    }
+
+    protected override async void OnActivated()
+    {
+        base.OnActivated();
+
+        var allTags = await _dbContext.Tags
+            .OrderBy(tag => tag.TaggedImages.Count)
+            .OrderBy(tag => tag.Name)
+            .ProjectTo<TagViewModel>(_mapper.ConfigurationProvider)
+            .ToListAsync();
+
+        AllTags = new(allTags);
     }
 
     public async void Receive(QueryMessage message)
@@ -70,7 +100,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
                 DarkCount = 0;
                 BiasCount = 0;
                 UnknownCount = 0;
-            });
+            }, DispatcherPriority.ApplicationIdle);
 
             var query = _dbContext.ImageFiles.AsNoTracking();
 
@@ -101,11 +131,23 @@ public partial class SearchResultsViewModel : ViewModelBase,
             if (message.DateEnd is { } dateEnd)
                 query = query.Where(f => f.ObservationTimestampUtc <= dateEnd);
 
-            var results = await query.ToListAsync(_searchCts.Token);
+            if (message.TagIds is { Length: > 0})
+            {
+                var tagIds = message.TagIds.ToHashSet();
+                query = query.Where(f => f.Tags.Any(tag => tagIds.Contains(tag.Id)));
+            }
 
+            var results = await Task.Run(async () =>
+                await query
+                    .Include(f => f.Library)
+                    .Include(f => f.Tags)
+                    .ProjectTo<ImageFileViewModel>(_mapper.ConfigurationProvider)
+                    .ToListAsync(_searchCts.Token));
+
+            var stats = ComputeIntegrationStatistics(results);
+            IntegrationStats.AddRange(stats);
             SearchResults.AddRange(results);
-            IntegrationStats.AddRange(ComputeIntegrationStatistics(results));
-            
+
             double totalIntegrationSum = IntegrationStats.Sum(x => x.TotalIntegration.TotalHours);
             TotalIntegration = totalIntegrationSum < 1
                 ? totalIntegrationSum.ToString("F2")
@@ -133,7 +175,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
         }
     }
 
-    private static IEnumerable<IntegrationStatistic> ComputeIntegrationStatistics(List<ImageFile> images)
+    private static IEnumerable<IntegrationStatistic> ComputeIntegrationStatistics(List<ImageFileViewModel> images)
     {
         var results = images
             .Where(img => img.Type == ImageType.Light)
@@ -148,6 +190,85 @@ public partial class SearchResultsViewModel : ViewModelBase,
             });
 
         return new AvaloniaList<IntegrationStatistic>(results);
+    }
+
+    [RelayCommand]
+    private async Task AddTagToSelection(int tagId)
+    {
+        var tag = await _dbContext.Tags.FirstOrDefaultAsync(tag => tag.Id == tagId);
+        if (tag is null) return;
+
+        var imageFiles = await GetSelectedImageFiles();
+
+        foreach (var imageFile in imageFiles)
+        {
+            imageFile.Tags.Add(tag);
+        }
+
+        if (await _dbContext.SaveChangesAsync() > 0)
+        {
+            // Add the item to the UI
+            var tagVm = AllTags.First(tag => tag.Id == tagId);
+            foreach (var item in SelectedSearchResults)
+            {
+                item.Tags.Add(tagVm);
+                item.Tags = new(item.Tags.Distinct());
+            }
+        }
+    }
+
+    public async Task RemoveTag(int imageFileId, int tagId)
+    {
+        // This is not a [RelayCommand] because it requires two parameters.
+        // This function is invoked when the user right clicks an individual
+        // tag on an image file in a row and selects "Remove Tag".
+        
+        var imageFile = await _dbContext.ImageFiles
+            .Include(f => f.Tags)
+            .Where(f => f.Id == imageFileId)
+            .FirstOrDefaultAsync();
+
+        if (imageFile is not null)
+        {
+            var tag = imageFile.Tags.FirstOrDefault(tag => tag.Id == tagId);
+            if (tag is not null)
+            {
+                imageFile.Tags.Remove(tag);
+            }
+        }
+
+        if (await _dbContext.SaveChangesAsync() > 0)
+        {
+            // Remove the item from the UI
+            var imageFileVm = SearchResults.FirstOrDefault(f => f.Id == imageFileId);
+            if (imageFileVm is not null)
+            {
+                var tagVm = imageFileVm.Tags.FirstOrDefault(tag => tag.Id == tagId);
+                if (tagVm is not null)
+                {
+                    imageFileVm.Tags.Remove(tagVm);
+                }
+            }
+        }
+    }
+
+    [RelayCommand]
+    private async Task RemoveAllTagsFromSelection()
+    {
+        var imageFiles = await GetSelectedImageFiles();
+        foreach (var imageFile in imageFiles)
+        {
+            imageFile.Tags.Clear();
+        }
+
+        if (await _dbContext.SaveChangesAsync() > 0)
+        {
+            // Remove tags from the UI
+            foreach (var item in SelectedSearchResults)
+            {
+                item.Tags.Clear();
+            }
+        }
     }
 }
 

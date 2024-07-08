@@ -3,9 +3,9 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:behavior="using:Lumidex.Behaviors"
+    xmlns:common="using:Lumidex.Common"
     xmlns:converter="using:Lumidex.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:data="using:Lumidex.Core.Data"
     xmlns:i="https://github.com/projektanker/icons.avalonia"
     xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
     xmlns:interactivity="using:Avalonia.Xaml.Interactivity"
@@ -15,9 +15,6 @@
     d:DesignWidth="1000"
     x:DataType="tags:TagManagerViewModel"
     mc:Ignorable="d">
-    <UserControl.Resources>
-        <converter:StringToColorConverter x:Key="StringToColor" />
-    </UserControl.Resources>
     <Grid Margin="8" ColumnDefinitions="1*,3*">
         <Grid
             Grid.Column="0"
@@ -103,12 +100,12 @@
             <DataGrid.Columns>
                 <DataGridTextColumn
                     Width="300"
-                    x:DataType="tags:TagViewModel"
+                    x:DataType="common:TagViewModel"
                     Binding="{Binding Name}"
                     Header="Name" />
                 <DataGridTemplateColumn Header="Color">
                     <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="tags:TagViewModel">
+                        <DataTemplate DataType="common:TagViewModel">
                             <ColorPicker
                                 x:Name="CellColorPicker"
                                 IsAccentColorsVisible="False"
@@ -116,10 +113,10 @@
                                 IsColorPreviewVisible="False"
                                 IsColorSpectrumVisible="True"
                                 SelectedIndex="1"
-                                Color="{Binding Color, Converter={StaticResource StringToColor}}">
+                                Color="{Binding Color}">
                                 <interactivity:Interaction.Behaviors>
                                     <ia:EventTriggerBehavior EventName="ColorChanged" SourceObject="{Binding #CellColorPicker}">
-                                        <ia:InvokeCommandAction Command="{ReflectionBinding $parent[DataGrid].DataContext.ChangeTagColorCommand}" CommandParameter="{Binding}" />
+                                        <ia:InvokeCommandAction Command="{Binding #TagsDataGrid.((tags:TagManagerViewModel)DataContext).ChangeTagColorCommand}" CommandParameter="{Binding}" />
                                     </ia:EventTriggerBehavior>
                                 </interactivity:Interaction.Behaviors>
                             </ColorPicker>
@@ -128,12 +125,12 @@
                 </DataGridTemplateColumn>
                 <DataGridTextColumn
                     Width="80"
-                    x:DataType="tags:TagViewModel"
-                    Binding="{Binding Count}"
+                    x:DataType="common:TagViewModel"
+                    Binding="{Binding TaggedImages.Count}"
                     Header="Count" />
                 <DataGridTemplateColumn>
                     <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="tags:TagViewModel">
+                        <DataTemplate DataType="common:TagViewModel">
                             <Button
                                 Padding="4,2"
                                 Background="Red"

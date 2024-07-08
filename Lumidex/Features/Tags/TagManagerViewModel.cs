@@ -1,6 +1,7 @@
-﻿using Avalonia.Controls;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Avalonia.Controls;
 using Avalonia.Media;
-using Avalonia.Threading;
 using Lumidex.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
@@ -9,7 +10,10 @@ namespace Lumidex.Features.Tags;
 
 public partial class TagManagerViewModel : ValidatableViewModelBase
 {
+    private static readonly Color DefaultColor = Colors.Gray;
+
     private readonly IServiceProvider _serviceProvider;
+    private readonly IMapper _mapper;
     private readonly LumidexDbContext _dbContext;
 
     [ObservableProperty]
@@ -19,37 +23,32 @@ public partial class TagManagerViewModel : ValidatableViewModelBase
     [NotifyCanExecuteChangedFor(nameof(AddTagCommand))]
     private string? _name;
 
-    [ObservableProperty] private Color _color = Colors.White;
-
-    public AvaloniaList<TagViewModel> Tags { get; } = new();
+    [ObservableProperty] Color _color = DefaultColor;
+    [ObservableProperty] AvaloniaList<TagViewModel> _tags = new();
 
     public TagManagerViewModel(
         IServiceProvider serviceProvider,
+        IMapper mapper,
         LumidexDbContext dbContext)
     {
         _serviceProvider = serviceProvider;
+        _mapper = mapper;
         _dbContext = dbContext;
-
-        Dispatcher.UIThread.InvokeAsync(GetTags);
     }
 
-    private async Task GetTags()
+    protected override async void OnActivated()
     {
+        base.OnActivated();
+
         var tags = await _dbContext
             .Tags
             .AsNoTracking()
+            .Include(tag => tag.TaggedImages)
             .OrderByDescending(tag => tag.Id)
-            .Select(tag => new TagViewModel
-            {
-                Id = tag.Id,
-                Name = tag.Name,
-                Color = tag.Color,
-                Count = tag.TaggedImages.Count(),
-            })
+            .ProjectTo<TagViewModel>(_mapper.ConfigurationProvider)
             .ToListAsync();
 
-        Tags.Clear();
-        Tags.AddRange(tags);
+        Tags = new(tags);
     }
 
     [RelayCommand]
@@ -66,15 +65,10 @@ public partial class TagManagerViewModel : ValidatableViewModelBase
         _dbContext.Tags.Add(tag);
         await _dbContext.SaveChangesAsync();
 
-        Tags.Insert(0, new TagViewModel
-        {
-            Id = tag.Id,
-            Name = tag.Name,
-            Color = tag.Color,
-        });
+        Tags.Insert(0, _mapper.Map<TagViewModel>(tag));
 
         Name = null;
-        Color = Colors.White;
+        Color = DefaultColor;
         ClearErrors();
 
         if (View is Control control)
@@ -107,13 +101,13 @@ public partial class TagManagerViewModel : ValidatableViewModelBase
     private async Task EditTagComplete(DataGridCellEditEndedEventArgs e)
     {
         if (e.EditAction == DataGridEditAction.Commit &&
-            e.Column.GetCellContent(e.Row)?.DataContext is Tag cell)
+            e.Column.GetCellContent(e.Row)?.DataContext is TagViewModel cell)
         {
             var dbTag = await _dbContext.Tags.FirstOrDefaultAsync(tag => tag.Id == cell.Id);
             if (dbTag is not null)
             {
                 dbTag.Name = cell.Name;
-                dbTag.Color = cell.Color;
+                dbTag.Color = cell.Color.ToString();
                 await _dbContext.SaveChangesAsync();
             }
         }
@@ -122,25 +116,19 @@ public partial class TagManagerViewModel : ValidatableViewModelBase
     [RelayCommand]
     private void ClearColor()
     {
-        Color = Colors.White;
+        Color = DefaultColor;
     }
 
     [RelayCommand]
-    private async Task ChangeTagColor(Tag tag)
+    private async Task ChangeTagColor(TagViewModel? tag)
     {
+        if (tag is null) return;
+
         var dbTag = await _dbContext.Tags.FirstOrDefaultAsync(t => t.Id == tag.Id);
         if (dbTag is not null)
         {
-            dbTag.Color = tag.Color;
+            dbTag.Color = tag.Color.ToString();
             await _dbContext.SaveChangesAsync();
         }
     }
-}
-
-public partial class TagViewModel : ObservableObject
-{
-    [ObservableProperty] int _id;
-    [ObservableProperty] string _name = string.Empty;
-    [ObservableProperty] string _color = Colors.White.ToString();
-    [ObservableProperty] int _count;
 }
