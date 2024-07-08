@@ -4,6 +4,10 @@ using Avalonia.Threading;
 using Lumidex.Core.Data;
 using Lumidex.Features.MainSearch.Messages;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using System.Diagnostics;
+using System.IO.Abstractions;
+using System.Runtime.InteropServices;
 
 namespace Lumidex.Features.MainSearch;
 
@@ -12,6 +16,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
 {
     private readonly LumidexDbContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly IFileSystem _fileSystem;
 
     private CancellationTokenSource? _searchCts;
 
@@ -31,10 +36,12 @@ public partial class SearchResultsViewModel : ViewModelBase,
 
     public SearchResultsViewModel(
         LumidexDbContext dbContext,
-        IMapper mapper)
+        IMapper mapper,
+        IFileSystem fileSystem)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _fileSystem = fileSystem;
     }
 
     ~SearchResultsViewModel()
@@ -268,6 +275,48 @@ public partial class SearchResultsViewModel : ViewModelBase,
             {
                 item.Tags.Clear();
             }
+        }
+    }
+
+    [RelayCommand]
+    private void OpenInExplorer(ImageFileViewModel imageFile)
+    {
+        IFileInfo fileInfo = _fileSystem.FileInfo.New(imageFile.Path);
+        if (fileInfo.Exists)
+        {
+            OpenFileInProcess("explorer.exe", Path.GetDirectoryName(fileInfo.FullName)!);
+        }
+    }
+
+    [RelayCommand]
+    private void OpenInPixInsight(ImageFileViewModel imageFile)
+    {
+        IFileInfo fileInfo = _fileSystem.FileInfo.New(imageFile.Path);
+        if (fileInfo.Exists)
+        {
+            // TODO: Application setting to specify PixInsight.exe path?
+            OpenFileInProcess(@"C:\Program Files\PixInsight\bin\PixInsight.exe", fileInfo.FullName);
+        }
+    }
+
+    private static void OpenFileInProcess(string process, string argument)
+    {
+        // TODO: move file dialog operations into a service.
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            try
+            {
+                Process.Start(process, argument);
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Failed to start {Process} {Argument}", process, argument);
+            }
+        }
+        else
+        {
+            // TODO: show a message box instead of logging...
+            Log.Error("Show In Explorer not implemented for {OS}", RuntimeInformation.OSDescription);
         }
     }
 }

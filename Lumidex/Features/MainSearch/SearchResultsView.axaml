@@ -123,7 +123,16 @@
                                             </DataTemplate>
                                         </MenuItem.ItemTemplate>
                                     </MenuItem>
-                                    <MenuItem Command="{ReflectionBinding #SearchResultsDataGrid.DataContext.RemoveAllTagsFromSelectionCommand}" Header="Remove Tags" />
+                                    <MenuItem Command="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).RemoveAllTagsFromSelectionCommand}" Header="Remove Tags" />
+                                    <Separator />
+                                    <MenuItem
+                                        Command="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).OpenInPixInsightCommand}"
+                                        CommandParameter="{Binding}"
+                                        Header="Open in PixInsight" />
+                                    <MenuItem
+                                        Command="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).OpenInExplorerCommand}"
+                                        CommandParameter="{Binding}"
+                                        Header="Open in Explorer" />
                                 </ContextMenu>
                             </Setter.Value>
                         </Setter>
