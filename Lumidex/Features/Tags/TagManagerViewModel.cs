@@ -3,14 +3,27 @@ using AutoMapper.QueryableExtensions;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Lumidex.Core.Data;
+using Lumidex.Features.Tags.Messages;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace Lumidex.Features.Tags;
 
-public partial class TagManagerViewModel : ValidatableViewModelBase
+public partial class TagManagerViewModel : ValidatableViewModelBase,
+    IRecipient<GetTag>,
+    IRecipient<GetTags>,
+    IRecipient<CreateTag>,
+    IRecipient<DeleteTag>,
+    IRecipient<EditTag>,
+    IRecipient<TagCreated>,
+    IRecipient<TagDeleted>,
+    IRecipient<AddTag>,
+    IRecipient<AddTags>,
+    IRecipient<RemoveTag>,
+    IRecipient<RemoveTags>,
+    IRecipient<ClearTags>
 {
-    private static readonly Color DefaultColor = Colors.Gray;
+    private static readonly Color DefaultColor = Color.Parse(Tag.DefaultColor);
 
     private readonly IServiceProvider _serviceProvider;
     private readonly IMapper _mapper;
@@ -20,7 +33,7 @@ public partial class TagManagerViewModel : ValidatableViewModelBase
     [NotifyDataErrorInfo]
     [Required(ErrorMessage = "Name is required.", AllowEmptyStrings = false)]
     [MaxLength(128, ErrorMessage = "128 character maximum.")]
-    [NotifyCanExecuteChangedFor(nameof(AddTagCommand))]
+    [NotifyCanExecuteChangedFor(nameof(CreateTagCommand))]
     private string? _name;
 
     [ObservableProperty] Color _color = DefaultColor;
@@ -34,38 +47,207 @@ public partial class TagManagerViewModel : ValidatableViewModelBase
         _serviceProvider = serviceProvider;
         _mapper = mapper;
         _dbContext = dbContext;
+
+        Tags = new(
+            _dbContext
+                .Tags
+                .AsNoTracking()
+                .Include(tag => tag.TaggedImages)
+                .OrderByDescending(tag => tag.Id)
+                .ProjectTo<TagViewModel>(_mapper.ConfigurationProvider)
+                .ToList()
+        );
     }
 
-    protected override async void OnActivated()
+    protected override void OnInitialActivated()
     {
-        base.OnActivated();
+        base.OnInitialActivated();
 
-        var tags = await _dbContext
-            .Tags
-            .AsNoTracking()
-            .Include(tag => tag.TaggedImages)
-            .OrderByDescending(tag => tag.Id)
-            .ProjectTo<TagViewModel>(_mapper.ConfigurationProvider)
-            .ToListAsync();
-
-        Tags = new(tags);
+        foreach (var tag in Tags)
+        {
+            Messenger.Send(new TagCreated { Tag = tag });
+        }
     }
 
-    [RelayCommand]
-    private async Task AddTag()
+    public void Receive(GetTag message)
     {
-        if (Name is null or { Length: 0 }) return;
+        var tag = Tags.First(tag => tag.Id == message.Id);
+        message.Reply(tag);
+    }
 
+    public void Receive(GetTags message)
+    {
+        message.Reply(Tags);
+    }
+
+    public void Receive(CreateTag message)
+    {
         var tag = new Tag
         {
-            Name = Name,
-            Color = Color.ToString(),
+            Name = message.Name,
+            Color = $"#{message.Color.ToUInt32():x8}",
         };
 
         _dbContext.Tags.Add(tag);
-        await _dbContext.SaveChangesAsync();
+        if (_dbContext.SaveChanges() > 0)
+        {
+            // Update UI
+            var tagVm = _mapper.Map<TagViewModel>(tag);
+            Tags.Insert(0, tagVm);
 
-        Tags.Insert(0, _mapper.Map<TagViewModel>(tag));
+            Messenger.Send(new TagCreated
+            {
+                Tag = tagVm,
+            });
+        }
+    }
+
+    public void Receive(DeleteTag message)
+    {
+        var tag = _dbContext.Tags.FirstOrDefault(tag => tag.Id == message.Tag.Id);
+        if (tag is not null)
+        {
+            _dbContext.Tags.Remove(tag);
+            if (_dbContext.SaveChanges() > 0)
+            {
+                // Update UI
+                var tagVm = Tags.First(t => t.Id == message.Tag.Id);
+                Tags.Remove(tagVm);
+
+                Messenger.Send(new TagDeleted
+                {
+                    Tag = tagVm,
+                });
+            }
+        }
+    }
+
+    public void Receive(EditTag message)
+    {
+        var tag = _dbContext.Tags.FirstOrDefault(tag => tag.Id == message.Id);
+        if (tag is not null)
+        {
+            tag.Name = message.Name;
+            tag.Color = $"#{message.Color.ToUInt32():x8}";
+
+            if (_dbContext.SaveChanges() > 0)
+            {
+                // Update UI
+                var tagVm = Tags.First(t => t.Id == message.Id);
+                tagVm.Name = tag.Name;
+                tagVm.Color = Color.Parse(tag.Color);
+
+                Messenger.Send(new TagEdited
+                {
+                    Tag = tagVm,
+                });
+            }
+        }
+    }
+
+    public void Receive(AddTag message)
+    {
+        AddTags([message.Tag], message.ImageFiles);
+    }
+
+    public void Receive(AddTags message)
+    {
+        AddTags(message.Tags, message.ImageFiles);
+    }
+
+    private void AddTags(IEnumerable<TagViewModel> tags, IEnumerable<ImageFileViewModel> imageFiles)
+    {
+        if (_dbContext.AddTagsToImageFiles(tags.Select(t => t.Id), imageFiles.Select(f => f.Id)) > 0)
+        {
+            foreach (var tag in tags)
+            {
+                foreach (var imageFile in imageFiles)
+                {
+                    var newTags = new List<TagViewModel>(imageFile.Tags);
+                    newTags.Add(tag);
+                    imageFile.Tags = new(newTags.Distinct());
+                }
+
+                Messenger.Send(new TagAdded
+                {
+                    Tag = tag,
+                    ImageFiles = imageFiles.ToList(),
+                });
+            }
+        }
+    }
+
+    public void Receive(RemoveTag message)
+    {
+        RemoveTags([message.Tag], message.ImageFiles);
+    }
+
+    public void Receive(RemoveTags message)
+    {
+        RemoveTags(message.Tags, message.ImageFiles);
+    }
+
+    private void RemoveTags(IEnumerable<TagViewModel> tags, IEnumerable<ImageFileViewModel> imageFiles)
+    {
+        if (_dbContext.RemoveTagsFromImageFiles(tags.Select(t => t.Id), imageFiles.Select(f => f.Id)) > 0)
+        {
+            var tagsCopy = tags.ToList();
+            var imageFilesCopy = imageFiles.ToList();
+
+            foreach (var tag in tagsCopy)
+            {
+                foreach (var imageFile in imageFilesCopy)
+                {
+                    imageFile.Tags.Remove(tag);
+                }
+
+                Messenger.Send(new TagRemoved
+                {
+                    Tag = tag,
+                    ImageFiles = imageFilesCopy,
+                });
+            }
+        }
+    }
+
+    public void Receive(ClearTags message)
+    {
+        if (_dbContext.ClearTagsFromImageFiles(message.ImageFiles.Select(f => f.Id)) > 0)
+        {
+            // Remove all tags from the UI
+            foreach (var imageFile in message.ImageFiles)
+            {
+                imageFile.Tags.Clear();
+            }
+
+            Messenger.Send(new TagsCleared
+            {
+                ImageFiles = message.ImageFiles.ToList(),
+            });
+        }
+    }
+
+    public void Receive(TagCreated message)
+    {
+        if (!Tags.Contains(message.Tag))
+            Tags.Add(message.Tag);
+    }
+
+    public void Receive(TagDeleted message)
+    {
+        Tags.Remove(message.Tag);
+    }
+
+    [RelayCommand]
+    private void CreateTag()
+    {
+        if (Name is null or { Length: 0 }) return;
+
+        Messenger.Send(new CreateTag
+        {
+            Name = Name,
+            Color = Color,
+        });
 
         Name = null;
         Color = DefaultColor;
@@ -81,35 +263,30 @@ public partial class TagManagerViewModel : ValidatableViewModelBase
     }
 
     [RelayCommand]
-    private async Task DeleteTag(int id)
+    private void DeleteTag(int id)
     {
-        var dbTag = await _dbContext.Tags.FirstOrDefaultAsync(tag => tag.Id == id);
-        if (dbTag is not null)
+        var tag = Tags.FirstOrDefault(tag => tag.Id == id);
+        if (tag is not null)
         {
-            _dbContext.Tags.Remove(dbTag);
-            await _dbContext.SaveChangesAsync();
-
-            // Remove the tag from the data grid
-            if (Tags.FirstOrDefault(vm => vm.Id == id) is { } existingTag)
+            Messenger.Send(new DeleteTag
             {
-                Tags.Remove(existingTag);
-            }
+                Tag = tag,
+            });
         }
     }
 
     [RelayCommand]
-    private async Task EditTagComplete(DataGridCellEditEndedEventArgs e)
+    private void EditTagComplete(DataGridCellEditEndedEventArgs e)
     {
         if (e.EditAction == DataGridEditAction.Commit &&
-            e.Column.GetCellContent(e.Row)?.DataContext is TagViewModel cell)
+            e.Column.GetCellContent(e.Row)?.DataContext is TagViewModel tag)
         {
-            var dbTag = await _dbContext.Tags.FirstOrDefaultAsync(tag => tag.Id == cell.Id);
-            if (dbTag is not null)
+            Messenger.Send(new EditTag
             {
-                dbTag.Name = cell.Name;
-                dbTag.Color = cell.Color.ToString();
-                await _dbContext.SaveChangesAsync();
-            }
+                Id = tag.Id,
+                Name = tag.Name,
+                Color = tag.Color,
+            });
         }
     }
 
@@ -120,15 +297,15 @@ public partial class TagManagerViewModel : ValidatableViewModelBase
     }
 
     [RelayCommand]
-    private async Task ChangeTagColor(TagViewModel? tag)
+    private void ChangeTagColor(TagViewModel? tag)
     {
         if (tag is null) return;
 
-        var dbTag = await _dbContext.Tags.FirstOrDefaultAsync(t => t.Id == tag.Id);
-        if (dbTag is not null)
+        Messenger.Send(new EditTag
         {
-            dbTag.Color = tag.Color.ToString();
-            await _dbContext.SaveChangesAsync();
-        }
+            Id = tag.Id,
+            Name = tag.Name,
+            Color = tag.Color,
+        });
     }
 }

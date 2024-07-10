@@ -1,4 +1,5 @@
-﻿using Lumidex.Core.Data;
+﻿using AutoMapper;
+using Lumidex.Core.Data;
 using Lumidex.Core.IO;
 using Lumidex.Features.Library.Messages;
 using Microsoft.EntityFrameworkCore;
@@ -7,9 +8,11 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Lumidex.Features.Library;
 
 public partial class LibraryManagerViewModel : ViewModelBase,
-    IRecipient<LibraryDeleted>
+    IRecipient<CreateLibrary>,
+    IRecipient<DeleteLibrary>
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly IMapper _mapper;
     private readonly LumidexDbContext _dbContext;
 
     [ObservableProperty] LibraryViewModel? _selectedLibrary;
@@ -18,9 +21,11 @@ public partial class LibraryManagerViewModel : ViewModelBase,
 
     public LibraryManagerViewModel(
         IServiceProvider serviceProvider,
+        IMapper mapper,
         LumidexDbContext dbContext)
     {
         _serviceProvider = serviceProvider;
+        _mapper = mapper;
         _dbContext = dbContext;
 
         var libraries = _dbContext.Libraries
@@ -38,27 +43,88 @@ public partial class LibraryManagerViewModel : ViewModelBase,
         return vm;
     }
 
-    public void Receive(LibraryDeleted message)
+    protected override void OnInitialActivated()
     {
-        var library = Libraries.FirstOrDefault(l => l.Id == message.Id);
+        base.OnInitialActivated();
+
+        foreach (var library in Libraries)
+        {
+            Messenger.Send(new LibraryCreated
+            {
+                Library = new Common.LibraryViewModel
+                {
+                    Id = library.Id,
+                    Name = library.Name,
+                    Path = library.Path,
+                    LastScan = library.LastScan,
+                },
+            });
+        }
+    }
+
+    public void Receive(CreateLibrary message)
+    {
+        var library = new Core.Data.Library
+        {
+            Name = message.Name,
+            Path = message.Path,
+        };
+        _dbContext.Libraries.Add(library);
+
+        if (_dbContext.SaveChanges() > 0)
+        {
+            var vm = _serviceProvider.GetRequiredService<LibraryViewModel>();
+            vm.Id = library.Id;
+            vm.Name = library.Name;
+            Libraries.Add(vm);
+
+            Messenger.Send(new LibraryCreated
+            {
+                Library = new Common.LibraryViewModel
+                {
+                    Id = library.Id,
+                    Name = library.Name,
+                    Path = library.Path,
+                    LastScan = library.LastScan,
+                },
+            });
+        }
+    }
+
+    public void Receive(DeleteLibrary message)
+    {
+        var library = _dbContext.Libraries.FirstOrDefault(l => l.Id == message.Library.Id);
         if (library is not null)
         {
-            Libraries.Remove(library);
+            _dbContext.Libraries.Remove(library);
+            if (_dbContext.SaveChanges() > 0)
+            {
+                var vm = Libraries.First(l => l.Id == library.Id);
+                Libraries.Remove(vm);
+
+                Messenger.Send(new LibraryDeleted
+                {
+                    Library = new Common.LibraryViewModel
+                    {
+                        Id = library.Id,
+                        Name = library.Name,
+                        Path = library.Path,
+                        LastScan = library.LastScan,
+                    },
+                });
+            }
         }
     }
 
     [RelayCommand]
-    private async Task AddLibrary()
+    private void CreateLibrary()
     {
-        var library = new Core.Data.Library
+        Messenger.Send(new CreateLibrary
         {
             Name = "New Library",
             Path = LumidexPaths.DefaultLibrary,
-        };
-        _dbContext.Libraries.Add(library);
-        await _dbContext.SaveChangesAsync();
+        });
 
-        Libraries.Add(ToViewModel(library));
         SelectedLibrary = Libraries.Last();
     }
 }

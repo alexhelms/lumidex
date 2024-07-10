@@ -1,0 +1,24 @@
+<UserControl
+    x:Class="Lumidex.Features.MainSearch.Actions.ActionsContainerView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:actions="using:Lumidex.Features.MainSearch.Actions"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="actions:ActionsContainerViewModel"
+    mc:Ignorable="d">
+    <DockPanel>
+        <ListBox
+            Background="Transparent"
+            BorderBrush="#33656565"
+            BorderThickness="0,0,1,0"
+            DisplayMemberBinding="{Binding DisplayName}"
+            DockPanel.Dock="Left"
+            ItemsSource="{Binding Items}"
+            SelectedItem="{Binding SelectedItem}"
+            SelectionMode="Single" />
+        <ContentControl Margin="8" Content="{Binding SelectedItem}" />
+    </DockPanel>
+</UserControl>

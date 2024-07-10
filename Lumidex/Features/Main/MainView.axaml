@@ -32,7 +32,7 @@
             Fill="#656565" />
 
         <DockPanel>
-            <ContentControl Content="{Binding SideNavBar}" DockPanel.Dock="Left" />
+            <ContentControl Content="{Binding SideNavBarViewModel}" DockPanel.Dock="Left" />
             <ContentControl Content="{Binding SelectedTab}" />
         </DockPanel>
 

@@ -7,10 +7,11 @@
     xmlns:converter="using:Lumidex.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="https://github.com/projektanker/icons.avalonia"
+    xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
     xmlns:interactivity="using:Avalonia.Xaml.Interactivity"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:search="using:Lumidex.Features.MainSearch"
-    d:DesignHeight="600"
+    d:DesignHeight="800"
     d:DesignWidth="1200"
     x:DataType="search:SearchResultsViewModel"
     mc:Ignorable="d">
@@ -22,63 +23,88 @@
     <Grid ColumnDefinitions="3*,Auto,0.75*">
         <DockPanel>
 
-            <StackPanel
-                Margin="6,6,6,0"
-                DockPanel.Dock="Bottom"
-                Orientation="Horizontal">
+            <!--  Actions  -->
+            <Border
+                Height="300"
+                BorderBrush="#33656565"
+                BorderThickness="1,0,1,1"
+                DockPanel.Dock="Bottom">
+                <ContentControl Height="300" Content="{Binding ActionsViewModel}" />
+            </Border>
 
-                <TextBlock Text="Rows" />
-                <TextBlock Margin="8,0,0,0" Text="{Binding SearchResults.Count}" />
-                <TextBlock
-                    Margin="8,0"
-                    Opacity="0.3"
-                    Text="|" />
+            <!--  Result Stats  -->
+            <Border
+                Padding="6"
+                BorderBrush="#55656565"
+                BorderThickness="1,0,1,1"
+                DockPanel.Dock="Bottom">
+                <StackPanel Orientation="Horizontal">
 
-                <TextBlock Text="Objects" />
-                <TextBlock Margin="8,0,0,0" Text="{Binding DistintObjectNameCount}" />
-                <TextBlock
-                    Margin="8,0"
-                    Opacity="0.3"
-                    Text="|" />
+                    <TextBlock Text="Rows" />
+                    <TextBlock Margin="8,0,0,0" Text="{Binding SearchResults.Count, FallbackValue=0}" />
+                    <TextBlock
+                        Margin="8,0"
+                        Opacity="0.3"
+                        Text="|" />
 
-                <TextBlock Text="Lights" />
-                <TextBlock Margin="8,0,0,0" Text="{Binding LightCount}" />
-                <TextBlock
-                    Margin="8,0"
-                    Opacity="0.3"
-                    Text="|" />
+                    <TextBlock Text="Objects" />
+                    <TextBlock Margin="8,0,0,0" Text="{Binding DistinctObjectNameCount, FallbackValue=0}" />
+                    <TextBlock
+                        Margin="8,0"
+                        Opacity="0.3"
+                        Text="|" />
 
-                <TextBlock Text="Flats" />
-                <TextBlock Margin="8,0,0,0" Text="{Binding FlatCount}" />
-                <TextBlock
-                    Margin="8,0"
-                    Opacity="0.3"
-                    Text="|" />
+                    <TextBlock Text="Lights" />
+                    <TextBlock Margin="8,0,0,0" Text="{Binding LightCount, FallbackValue=0}" />
+                    <TextBlock
+                        Margin="8,0"
+                        Opacity="0.3"
+                        Text="|" />
 
-                <TextBlock Text="Darks" />
-                <TextBlock Margin="8,0,0,0" Text="{Binding DarkCount}" />
-                <TextBlock
-                    Margin="8,0"
-                    Opacity="0.3"
-                    Text="|" />
+                    <TextBlock Text="Flats" />
+                    <TextBlock Margin="8,0,0,0" Text="{Binding FlatCount, FallbackValue=0}" />
+                    <TextBlock
+                        Margin="8,0"
+                        Opacity="0.3"
+                        Text="|" />
 
-                <TextBlock Text="Bias" />
-                <TextBlock Margin="8,0,0,0" Text="{Binding BiasCount}" />
-                <TextBlock
-                    Margin="8,0"
-                    Opacity="0.3"
-                    Text="|" />
+                    <TextBlock Text="Darks" />
+                    <TextBlock Margin="8,0,0,0" Text="{Binding DarkCount, FallbackValue=0}" />
+                    <TextBlock
+                        Margin="8,0"
+                        Opacity="0.3"
+                        Text="|" />
 
-                <TextBlock Text="Unknown" />
-                <TextBlock Margin="8,0,0,0" Text="{Binding UnknownCount}" />
+                    <TextBlock Text="Bias" />
+                    <TextBlock Margin="8,0,0,0" Text="{Binding BiasCount, FallbackValue=0}" />
+                    <TextBlock
+                        Margin="8,0"
+                        Opacity="0.3"
+                        Text="|" />
 
-            </StackPanel>
+                    <TextBlock Text="Unknown" />
+                    <TextBlock Margin="8,0,0,0" Text="{Binding UnknownCount, FallbackValue=0}" />
+                    <TextBlock
+                        Margin="8,0"
+                        Opacity="0.3"
+                        Text="|" />
 
+                    <TextBlock Text="Selected" />
+                    <TextBlock Margin="8,0,0,0" Text="{Binding SelectedSearchResults.Count, FallbackValue=0}" />
+                    <TextBlock
+                        Margin="8,0"
+                        Opacity="0.3"
+                        Text="|" />
+
+                </StackPanel>
+            </Border>
+
+            <!--  Search Results  -->
             <DataGrid
                 x:Name="SearchResultsDataGrid"
                 Grid.Column="0"
                 Background="#333538"
-                BorderBrush="#656565"
+                BorderBrush="#33656565"
                 BorderThickness="1"
                 CanUserReorderColumns="True"
                 CanUserResizeColumns="True"
@@ -88,9 +114,6 @@
                 SelectionChanged="DataGrid_SelectionChanged"
                 SelectionMode="Extended"
                 VerticalScrollBarVisibility="Visible">
-                <interactivity:Interaction.Behaviors>
-                    <behaviors:DataGridSelectedItemsBehavior SelectedItems="{Binding SelectedSearchResults}" />
-                </interactivity:Interaction.Behaviors>
                 <DataGrid.Styles>
                     <Style Selector="ScrollBar">
                         <Setter Property="AllowAutoHide" Value="False" />
@@ -102,11 +125,14 @@
                         <Setter Property="ContextMenu">
                             <Setter.Value>
                                 <ContextMenu>
-                                    <MenuItem Header="Add Tag" ItemsSource="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).AllTags}">
+                                    <MenuItem
+                                        Header="Add Tag"
+                                        IsEnabled="{Binding !!#SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).AllTags.Count}"
+                                        ItemsSource="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).AllTags}">
                                         <MenuItem.Styles>
-                                            <Style Selector="MenuItem">
-                                                <Setter Property="Command" Value="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).AddTagToSelectionCommand}" />
-                                                <Setter Property="CommandParameter" Value="{ReflectionBinding Id}" />
+                                            <Style Selector="MenuItem > MenuItem">
+                                                <Setter Property="Command" Value="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).AddTagCommand}" />
+                                                <Setter Property="CommandParameter" Value="{ReflectionBinding}" />
                                             </Style>
                                         </MenuItem.Styles>
                                         <MenuItem.ItemTemplate>
@@ -123,7 +149,10 @@
                                             </DataTemplate>
                                         </MenuItem.ItemTemplate>
                                     </MenuItem>
-                                    <MenuItem Command="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).RemoveAllTagsFromSelectionCommand}" Header="Remove Tags" />
+                                    <MenuItem
+                                        Command="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).RemoveAllTagsFromSelectionCommand}"
+                                        Header="Remove Tags"
+                                        IsEnabled="{ReflectionBinding !!Tags.Count}" />
                                     <Separator />
                                     <MenuItem
                                         Command="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).OpenInPixInsightCommand}"
@@ -234,8 +263,8 @@
 
         <GridSplitter
             Grid.Column="1"
-            MinWidth="4"
-            Margin="8,0"
+            MinWidth="3"
+            Margin="6,0"
             Background="#55656565"
             ResizeDirection="Columns" />
 
@@ -260,14 +289,22 @@
             </Grid>
 
             <DataGrid
+                Height="300"
                 Margin="0,12,0,0"
+                Background="#333538"
+                BorderBrush="#55656565"
+                BorderThickness="1"
                 CanUserReorderColumns="False"
                 CanUserResizeColumns="True"
                 CanUserSortColumns="True"
+                GridLinesVisibility="Horizontal"
                 IsReadOnly="True"
                 ItemsSource="{Binding IntegrationStats}"
                 SelectionMode="Single">
                 <DataGrid.Styles>
+                    <Style Selector="ScrollBar">
+                        <Setter Property="AllowAutoHide" Value="False" />
+                    </Style>
                     <Style Selector="DataGridColumnHeader">
                         <Setter Property="Foreground" Value="White" />
                     </Style>

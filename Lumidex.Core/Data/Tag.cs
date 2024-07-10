@@ -4,6 +4,8 @@ namespace Lumidex.Core.Data;
 
 public class Tag
 {
+    public const string DefaultColor = "#ff808080";
+
     public int Id { get; set; }
 
     [Column(TypeName = "DATETIME")]

@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using AutoMapper;
+using Avalonia.Controls;
 using Lumidex.Core.Data;
 using Lumidex.Core.Pipelines;
 using Lumidex.Features.Library.Messages;
@@ -61,6 +62,7 @@ public partial class LibraryViewModel : ValidatableViewModelBase
         var library = _dbContext.Libraries
             .AsNoTracking()
             .FirstOrDefault(l => l.Id == Id);
+
         if (library is not null)
         {
             Name = library.Name;
@@ -101,9 +103,9 @@ public partial class LibraryViewModel : ValidatableViewModelBase
 
     private async Task ScanLibraryAsync(bool quickScan, CancellationToken token)
     {
-        var library = await _dbContext.Libraries
+        var library = _dbContext.Libraries
             .AsNoTracking()
-            .FirstAsync(l => l.Id == Id);
+            .First(l => l.Id == Id);
 
         try
         {
@@ -156,12 +158,12 @@ public partial class LibraryViewModel : ValidatableViewModelBase
         }
 
         // Refresh basic library stats
-        library = await _dbContext.Libraries
+        library = _dbContext.Libraries
             .AsNoTracking()
-            .FirstAsync(l => l.Id == Id);
+            .First(l => l.Id == Id);
 
         LastScan = library.LastScan;
-        FileCount = await _dbContext.ImageFiles.CountAsync(f => f.LibraryId == Id);
+        FileCount = _dbContext.ImageFiles.Count(f => f.LibraryId == Id);
         OnPropertyChanged(nameof(CanQuickScanLibrary));
     }
 
@@ -201,17 +203,23 @@ public partial class LibraryViewModel : ValidatableViewModelBase
         await ScanLibraryAsync(quickScan: true, token);
     }
 
-    public bool CanQuickScanLibrary => !HasErrors && !Scanning && LastScan is not null;
+    public bool CanQuickScanLibrary => !HasErrors && !Scanning && LastScan is not null; 
 
     [RelayCommand(CanExecute = nameof(CanDeleteLibrary))]
-    private async Task DeleteLibrary()
+    private void DeleteLibrary()
     {
         // TODO: Confirmation dialog since this is a destructive action.
 
-        var library = await _dbContext.Libraries.FirstAsync(l => l.Id == Id);
-        _dbContext.Libraries.Remove(library);
-        await _dbContext.SaveChangesAsync();
-        Messenger.Send(new LibraryDeleted { Id = Id });
+        Messenger.Send(new DeleteLibrary
+        { 
+            Library = new Common.LibraryViewModel
+            {
+                Id = Id,
+                Name = Name,
+                Path = Path,
+                LastScan = LastScan,
+            },
+        });
     }
 
     public bool CanDeleteLibrary => _dbContext.Libraries.Count() > 1;

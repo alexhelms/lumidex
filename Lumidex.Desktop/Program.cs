@@ -21,6 +21,7 @@ class Program
         {
             Log.Fatal(e, "Unhandled application exception");
             // TODO: Try to open some kind of message box
+            Log.CloseAndFlush();
             Environment.Exit(1);
         }
     }
@@ -37,3 +38,4 @@ class Program
                 .LogToTrace();
     }
 }
+    

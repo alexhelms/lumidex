@@ -1,19 +1,16 @@
-﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using Lumidex.Core.Data;
+﻿using Lumidex.Core.Data;
+using Lumidex.Features.Library.Messages;
 using Lumidex.Features.MainSearch.Messages;
-using Microsoft.EntityFrameworkCore;
+using Lumidex.Features.Tags.Messages;
 
 namespace Lumidex.Features.MainSearch;
 
-public partial class SearchQueryViewModel : ViewModelBase
+public partial class SearchQueryViewModel : ViewModelBase,
+    IRecipient<LibraryCreated>,
+    IRecipient<LibraryDeleted>,
+    IRecipient<TagCreated>,
+    IRecipient<TagDeleted>
 {
-    private readonly LumidexDbContext _dbContext;
-    private readonly IMapper _mapper;
-
-    private LibraryViewModel? _prevLibrary;
-    private List<int> _prevSelectedTagIds = new();
-
     [ObservableProperty] LibraryViewModel? _library;
     [ObservableProperty] string? _objectName;
     [ObservableProperty] ImageKind? _selectedImageKind;
@@ -23,64 +20,34 @@ public partial class SearchQueryViewModel : ViewModelBase
     [ObservableProperty] string? _selectedFilter;
     [ObservableProperty] DateTime? _selectedDateBegin;
     [ObservableProperty] DateTime? _selectedDateEnd;
-    [ObservableProperty] AvaloniaList<LibraryViewModel> _libraries = new();
-    [ObservableProperty] AvaloniaList<TagViewModel> _tags = new();
-    [ObservableProperty] AvaloniaList<TagViewModel> _selectedTags = new();
-    [ObservableProperty] AvaloniaList<TagViewModel> _queryTags = new();
+    [ObservableProperty] AvaloniaList<LibraryViewModel> _libraries =new ();
+    [ObservableProperty] AvaloniaList<TagViewModel> _tags =new ();
+    [ObservableProperty] AvaloniaList<TagViewModel> _selectedTags =new ();
+    [ObservableProperty] AvaloniaList<TagViewModel> _queryTags =new ();
 
     public List<ImageKind> ImageKinds { get; } = Enum.GetValues<ImageKind>().OrderBy(x => x.ToString()).ToList();
     public List<ImageType> ImageTypes { get; } = Enum.GetValues<ImageType>().OrderBy(x => x.ToString()).ToList();
 
-    public SearchQueryViewModel(
-        LumidexDbContext dbContext,
-        IMapper mapper)
+    public void Receive(LibraryCreated message)
     {
-        _dbContext = dbContext;
-        _mapper = mapper;
+        if (!Libraries.Contains(message.Library))
+            Libraries.Add(message.Library);
     }
 
-    protected override async void OnActivated()
+    public void Receive(LibraryDeleted message)
     {
-        base.OnActivated();
-
-        var libraries = await _dbContext.Libraries
-            .AsNoTracking()
-            .OrderBy(library => library.Name)
-            .ProjectTo<LibraryViewModel>(_mapper.ConfigurationProvider)
-            .ToListAsync();
-
-        var tags = await _dbContext.Tags
-            .AsNoTracking()
-            .OrderBy(tag => tag.TaggedImages.Count)
-            .ThenBy(tag => tag.Name)
-            .ProjectTo<TagViewModel>(_mapper.ConfigurationProvider)
-            .ToListAsync();
-
-        Libraries = new(libraries);
-        Tags = new(tags);
-
-        // Select the previously selected library
-        if (_prevLibrary is not null)
-        {
-            Library = Libraries.FirstOrDefault(x => x.Id == _prevLibrary.Id);
-        }
-        
-        if (_prevSelectedTagIds.Count > 0)
-        {
-            SelectedTags.AddRange(Tags.Where(tag => _prevSelectedTagIds.Contains(tag.Id)));
-        }
+        Libraries.Remove(message.Library);
     }
 
-    protected override void OnDeactivated()
+    public void Receive(TagCreated message)
     {
-        base.OnDeactivated();
+        if (!Tags.Contains(message.Tag))
+            Tags.Add(message.Tag);
+    }
 
-        // When the view is deactivated, the binding clears Library so store the previously
-        // selected library in another variable so it can be restored on activation.
-        _prevLibrary = Library;
-
-        _prevSelectedTagIds.Clear();
-        _prevSelectedTagIds.AddRange(SelectedTags.Select(x => x.Id));
+    public void Receive(TagDeleted message)
+    {
+        Tags.Remove(message.Tag);
     }
 
     [RelayCommand]
@@ -131,18 +98,21 @@ public partial class SearchQueryViewModel : ViewModelBase
     [RelayCommand]
     private void Search()
     {
-        Messenger.Send(new QueryMessage
+        Messenger.Send(new SearchMessage
         {
-            Library = Library,
-            ObjectName = ObjectName,
-            ImageType = SelectedImageType,
-            ImageKind = SelectedImageKind,
-            ExposureMin = ExposureMin.HasValue ? TimeSpan.FromSeconds((double)ExposureMin.Value) : null,
-            ExposureMax = ExposureMax.HasValue ? TimeSpan.FromSeconds((double)ExposureMax.Value) : null,
-            Filter = SelectedFilter,
-            DateBegin = SelectedDateBegin,
-            DateEnd = SelectedDateEnd,
-            TagIds = QueryTags.Select(t => t.Id).ToArray(),
+            Filters = new ImageFileFilters
+            {
+                LibraryId = Library?.Id,
+                ObjectName = ObjectName,
+                ImageType = SelectedImageType,
+                ImageKind = SelectedImageKind,
+                ExposureMin = ExposureMin.HasValue ? TimeSpan.FromSeconds((double)ExposureMin.Value) : null,
+                ExposureMax = ExposureMax.HasValue ? TimeSpan.FromSeconds((double)ExposureMax.Value) : null,
+                Filter = SelectedFilter,
+                DateBegin = SelectedDateBegin,
+                DateEnd = SelectedDateEnd,
+                TagIds = QueryTags.Select(t => t.Id).ToArray(),
+            }
         });
     }
 }

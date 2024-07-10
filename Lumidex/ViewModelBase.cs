@@ -7,9 +7,21 @@ public interface IViewModelBase { }
 
 public class ViewModelBase : ObservableRecipient, IViewModelBase, IActivatable, IViewAware, IRequestClose
 {
+    private bool _hasRegisteredAllMessages = false;
     private bool _initialActivate = true;
 
+    /// <summary>
+    /// When true, the messenger is unregistered when the view model is deactivated.
+    /// </summary>
+    public bool UnregisterMessengerWhenDeactivated { get; protected set; }
+
     public Control? View { get; private set; }
+
+    protected ViewModelBase()
+    {
+        Messenger.RegisterAll(this);
+        _hasRegisteredAllMessages = true;
+    }
 
     public void AttachView(Control view)
     {
@@ -20,12 +32,25 @@ public class ViewModelBase : ObservableRecipient, IViewModelBase, IActivatable, 
 
     protected override void OnActivated()
     {
-        base.OnActivated();
+        if (!_hasRegisteredAllMessages)
+        {
+            base.OnActivated();
+            _hasRegisteredAllMessages = true;
+        }
 
         if (_initialActivate)
         {
             OnInitialActivated();
             _initialActivate = false;
+        }
+    }
+
+    protected override void OnDeactivated()
+    {
+        if (UnregisterMessengerWhenDeactivated)
+        {
+            base.OnDeactivated();
+            _hasRegisteredAllMessages = false;
         }
     }
 
@@ -46,14 +71,22 @@ public class ViewModelBase : ObservableRecipient, IViewModelBase, IActivatable, 
 
 public class ValidatableViewModelBase : ObservableValidator, IViewModelBase, IActivatable, IViewAware, IRequestClose
 {
+    private bool _hasRegisteredAllMessages = false;
     private bool _initialActivate = true;
     private bool _isActive;
 
     protected IMessenger Messenger { get; }
 
+    /// <summary>
+    /// When true, the messenger is unregistered when the view model is deactivated.
+    /// </summary>
+    public bool UnregisterMessengerWhenDeactivated { get; protected set; }
+
     protected ValidatableViewModelBase()
         : this(WeakReferenceMessenger.Default)
     {
+        Messenger.RegisterAll(this);
+        _hasRegisteredAllMessages = true;
     }
 
     protected ValidatableViewModelBase(IMessenger messenger)
@@ -67,12 +100,20 @@ public class ValidatableViewModelBase : ObservableValidator, IViewModelBase, IAc
 
     protected virtual void OnActivated()
     {
-        Messenger.RegisterAll(this);
+        if (!_hasRegisteredAllMessages)
+        {
+            Messenger.RegisterAll(this);
+            _hasRegisteredAllMessages = true;
+        }
     }
 
     protected virtual void OnDeactivated()
     {
-        Messenger.UnregisterAll(this);
+        if (UnregisterMessengerWhenDeactivated)
+        {
+            Messenger.UnregisterAll(this);
+            _hasRegisteredAllMessages = false;
+        }
     }
 
     protected virtual void Broadcast<T>(T oldValue, T newValue, string? propertyName)

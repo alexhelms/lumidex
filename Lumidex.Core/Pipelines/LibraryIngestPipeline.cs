@@ -238,9 +238,9 @@ public class LibraryIngestPipeline
                 {
                     var fileInfos = successes.Select(x => x.Item1);
                     var imageFiles = successes.Select(x => x.Item2);
-                    await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-                    await dbContext.ImageFiles.AddRangeAsync(imageFiles);
-                    await dbContext.SaveChangesAsync();
+                    using var dbContext = _dbContextFactory.CreateDbContext();
+                    dbContext.ImageFiles.AddRange(imageFiles);
+                    dbContext.SaveChanges();
                     await addedProgressBlock.SendAsync(
                         fileInfos
                             .Select(fileInfo => new IngestStatus(fileInfo, "Added"))

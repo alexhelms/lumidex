@@ -17,7 +17,7 @@
                 HorizontalAlignment="Right"
                 DockPanel.Dock="Bottom"
                 Orientation="Horizontal">
-                <Button Classes="accent" Command="{Binding AddLibraryCommand}">
+                <Button Classes="accent" Command="{Binding CreateLibraryCommand}">
                     <StackPanel Orientation="Horizontal">
                         <i:Icon FontSize="20" Value="mdi-plus" />
                         <TextBlock

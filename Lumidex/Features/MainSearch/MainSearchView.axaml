@@ -14,12 +14,12 @@
         <ContentControl
             Grid.Column="0"
             Padding="8,8,0,8"
-            Content="{Binding SearchQuery}" />
+            Content="{Binding SearchQueryViewModel}" />
 
         <ContentControl
             Grid.Column="1"
             Padding="8"
-            Content="{Binding SearchResults}" />
+            Content="{Binding SearchResultsViewModel}" />
 
     </Grid>
 </UserControl>

@@ -1,6 +1,6 @@
 ﻿namespace Lumidex.Features.Library.Messages;
 
-public class LibraryDeleted
+public class LibraryCreated
 {
     public required Common.LibraryViewModel Library { get; init; }
 }
