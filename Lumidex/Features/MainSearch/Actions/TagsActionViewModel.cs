@@ -98,4 +98,14 @@ public partial class TagsActionViewModel : ActionViewModelBase,
             ImageFiles = SelectedItems,
         });
     }
+
+    [RelayCommand]
+    private void RemoveTag(TagViewModel tag)
+    {
+        Messenger.Send(new RemoveTag
+        {
+            Tag = tag,
+            ImageFiles = SelectedItems,
+        });
+    }
 }

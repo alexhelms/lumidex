@@ -98,6 +98,8 @@
                                     Height="24"
                                     Padding="0"
                                     i:Attached.Icon="mdi-close"
+                                    Command="{Binding $parent[ItemsControl].((actions:TagsActionViewModel)DataContext).RemoveTagCommand}"
+                                    CommandParameter="{Binding}"
                                     DockPanel.Dock="Right"
                                     ToolTip.Tip="Remove Tag" />
                                 <TextBlock
