@@ -29,6 +29,28 @@ public class MainSearchViewModel : ViewModelBase,
     {
         bool success = true;
 
+        Log.Information("New search: " +
+            "Library ID = {LibraryId}, " +
+            "Object Name = {ObjectName}, " +
+            "Image Type = {ImageType}, " +
+            "Image Kind = {ImageKind}, " +
+            "Exposure Min = {ExposureMin}, " +
+            "Exposure Max = {ExposureMax}, " +
+            "Filter = {Filter}, " +
+            "Date Begin = {DateBegin}, " +
+            "Date End = {DateEnd}, " +
+            "Tag IDs = {TagIds} ",
+        message.Filters.LibraryId,
+        message.Filters.ObjectName,
+        message.Filters.ImageType,
+        message.Filters.ImageKind,
+        message.Filters.ExposureMin,
+        message.Filters.ExposureMax,
+        message.Filters.Filter,
+        message.Filters.DateBegin,
+        message.Filters.DateEnd,
+        message.Filters.TagIds);
+
         Messenger.Send(new SearchStarting());
 
         try

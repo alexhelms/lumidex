@@ -6,3 +6,4 @@ global using CommunityToolkit.Mvvm.Messaging;
 global using Lumidex.Common;
 global using Projektanker.Icons.Avalonia;
 global using Projektanker.Icons.Avalonia.MaterialDesign;
+global using Serilog;

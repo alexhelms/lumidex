@@ -74,6 +74,8 @@ public partial class LibraryManagerViewModel : ViewModelBase,
             vm.Name = library.Name;
             Libraries.Add(vm);
 
+            Log.Information("Library created ({Id})", library.Id);
+
             Messenger.Send(new LibraryCreated
             {
                 Library = new Common.LibraryViewModel
@@ -97,6 +99,8 @@ public partial class LibraryManagerViewModel : ViewModelBase,
             {
                 var vm = Libraries.First(l => l.Id == library.Id);
                 Libraries.Remove(vm);
+
+                Log.Information("Library deleted ({Id}) {Name}", library.Id, library.Name);
 
                 Messenger.Send(new LibraryDeleted
                 {

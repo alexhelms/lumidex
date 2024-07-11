@@ -105,6 +105,8 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
             var tagVm = TagMapper.ToViewModel(tag);
             Tags.Insert(0, tagVm);
 
+            Log.Information("Tag created ({Id}) {Name} {Color}", tag.Id, tag.Name, tag.Color);
+
             Messenger.Send(new TagCreated
             {
                 Tag = tagVm,
@@ -123,6 +125,8 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
                 // Update UI
                 var tagVm = Tags.First(t => t.Id == message.Tag.Id);
                 Tags.Remove(tagVm);
+
+                Log.Information("Tag deleted ({Id})", tag.Id);
 
                 Messenger.Send(new TagDeleted
                 {
@@ -147,6 +151,8 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
                 tagVm.Name = tag.Name;
                 tagVm.Color = Color.Parse(tag.Color);
 
+                Log.Information("Tag edited ({Id}) {Name} {Color}", tag.Id, tag.Name, tag.Color);
+
                 Messenger.Send(new TagEdited
                 {
                     Tag = tagVm,
@@ -169,6 +175,10 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
     {
         if (_dbContext.AddTagsToImageFiles(tags.Select(t => t.Id), imageFiles.Select(f => f.Id)) > 0)
         {
+            var numTags = tags.Count();
+            var numImageFiles = imageFiles.Count();
+            var messages = new List<TagAdded>(numTags * numImageFiles);
+
             foreach (var tag in tags)
             {
                 foreach (var imageFile in imageFiles)
@@ -184,12 +194,18 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
                     .Where(t => t.Id == tag.Id)
                     .Count();
 
-                Messenger.Send(new TagAdded
+                Log.Information("Added ({Id}) {Name} tag to {Count} images",
+                    tag.Id, tag.Name, numImageFiles);
+
+                messages.Add(new TagAdded
                 {
                     Tag = tag,
                     ImageFiles = imageFiles.ToList(),
                 });
             }
+
+            foreach (var message in messages)
+                Messenger.Send(message);
         }
     }
 
@@ -207,8 +223,11 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
     {
         if (_dbContext.RemoveTagsFromImageFiles(tags.Select(t => t.Id), imageFiles.Select(f => f.Id)) > 0)
         {
+            var numTags = tags.Count();
+            var numImageFiles = imageFiles.Count();
             var tagsCopy = tags.ToList();
             var imageFilesCopy = imageFiles.ToList();
+            var messages = new List<TagRemoved>(numTags * numImageFiles);
 
             foreach (var tag in tagsCopy)
             {
@@ -223,12 +242,18 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
                     .Where(t => t.Id == tag.Id)
                     .Count();
 
-                Messenger.Send(new TagRemoved
+                Log.Information("Removed ({Id}) {Name} tag from {Count} images",
+                    tag.Id, tag.Name, numImageFiles);
+
+                messages.Add(new TagRemoved
                 {
                     Tag = tag,
                     ImageFiles = imageFilesCopy,
                 });
             }
+
+            foreach (var message in messages)
+                Messenger.Send(message);
         }
     }
 
@@ -236,11 +261,15 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
     {
         if (_dbContext.ClearTagsFromImageFiles(message.ImageFiles.Select(f => f.Id)) > 0)
         {
+            var numImageFiles = message.ImageFiles.Count();
+
             // Remove all tags from the UI
             foreach (var imageFile in message.ImageFiles)
             {
                 imageFile.Tags.Clear();
             }
+
+            Log.Information("Cleared tags on {Count} images", numImageFiles);
 
             Messenger.Send(new TagsCleared
             {
