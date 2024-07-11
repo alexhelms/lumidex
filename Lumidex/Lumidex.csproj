@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" />
     <PackageReference Include="Avalonia" />
     <PackageReference Include="Avalonia.Controls.ColorPicker" />
     <PackageReference Include="Avalonia.Controls.DataGrid" />
@@ -32,8 +31,10 @@
     <PackageReference Include="Avalonia.Xaml.Interactivity" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="Humanizer" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
     <PackageReference Include="Projektanker.Icons.Avalonia.MaterialDesign" />
     <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" />
+    <PackageReference Include="Serilog" />
 
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" />

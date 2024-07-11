@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Lumidex.Core.Data;
+﻿using Lumidex.Core.Data;
 
 namespace Lumidex.Common;
 
@@ -48,10 +47,25 @@ public partial class ImageFileViewModel : ObservableObject, IEquatable<ImageFile
     #endregion
 }
 
-public class ImageFileProfile : Profile
+public static class ImageFileMapper
 {
-    public ImageFileProfile()
+    public static ImageFileViewModel ToViewModel(ImageFile imageFile)
     {
-        CreateMap<ImageFile, ImageFileViewModel>();
+        var imageFileViewModel = new ImageFileViewModel
+        {
+            Id = imageFile.Id,
+            Library = LibraryMapper.ToViewModel(imageFile.Library),
+            Tags = new(imageFile.Tags.Select(TagMapper.ToViewModel)),
+            Path = imageFile.Path,
+            Type = imageFile.Type,
+            Kind = imageFile.Kind,
+            ObjectName = imageFile.ObjectName,
+            Exposure = imageFile.Exposure,
+            FilterName = imageFile.FilterName,
+            Binning = imageFile.Binning,
+            ObservationTimestampUtc = imageFile.ObservationTimestampUtc,
+        };
+
+        return imageFileViewModel;
     }
 }

@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Lumidex.Core.Data;
 using Lumidex.Core.Pipelines;
 using Lumidex.Features.Library.Messages;

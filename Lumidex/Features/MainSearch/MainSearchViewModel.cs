@@ -33,7 +33,7 @@ public class MainSearchViewModel : ViewModelBase,
 
         try
         {
-            var results = await Task.Run(() => _dbContext.SearchImageFilesAndProject<ImageFileViewModel>(message.Filters));
+            var results = await Task.Run(() => _dbContext.SearchImageFilesAndProject(message.Filters, ImageFileMapper.ToViewModel));
             SearchResults.Clear();
             SearchResults.AddRange(results);
 

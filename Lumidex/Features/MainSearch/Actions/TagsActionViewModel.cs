@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Avalonia.Threading;
+﻿using Avalonia.Threading;
 using Lumidex.Core.Data;
 using Lumidex.Features.Tags.Messages;
 
@@ -13,18 +12,14 @@ public partial class TagsActionViewModel : ActionViewModelBase,
     IRecipient<TagsCleared>
 {
     private readonly LumidexDbContext _dbContext;
-    private readonly IMapper _mapper;
 
     [ObservableProperty] AvaloniaList<TagViewModel> _allTags = new();
     [ObservableProperty] AvaloniaList<TagViewModel> _selectedTags = new();
     [ObservableProperty] AvaloniaList<TagViewModel> _tagsOfSelectedItems = new();
 
-    public TagsActionViewModel(
-        LumidexDbContext dbContext,
-        IMapper mapper)
+    public TagsActionViewModel(LumidexDbContext dbContext)
     {
         _dbContext = dbContext;
-        _mapper = mapper;
 
         DisplayName = "Tags";
     }

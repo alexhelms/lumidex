@@ -6,8 +6,6 @@ public static class DependencyInjection
 {
     public static void AddLumidexUi(this IServiceCollection services)
     {
-        services.AddAutoMapper(typeof(App).Assembly);
-
         RegisterAllDerivedTypes<IViewModelBase>(services);
         RegisterLazyForType<IViewModelBase>(services);
 

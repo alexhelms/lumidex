@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Lumidex.Core.Data;
+﻿using Lumidex.Core.Data;
 
 namespace Lumidex.Common;
 
@@ -41,10 +40,18 @@ public partial class LibraryViewModel : ObservableObject, IEquatable<LibraryView
     #endregion
 }
 
-public class LibraryProfile : Profile
+public static class LibraryMapper
 {
-    public LibraryProfile()
+    public static LibraryViewModel ToViewModel(Library library)
     {
-        CreateMap<Library, LibraryViewModel>();
+        var libraryViewModel = new LibraryViewModel
+        {
+            Id = library.Id,
+            Name = library.Name,
+            Path = library.Path,
+            LastScan = library.LastScan,
+        };
+
+        return libraryViewModel;
     }
 }

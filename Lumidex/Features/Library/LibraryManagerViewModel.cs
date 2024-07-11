@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Lumidex.Core.Data;
+﻿using Lumidex.Core.Data;
 using Lumidex.Core.IO;
 using Lumidex.Features.Library.Messages;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +11,6 @@ public partial class LibraryManagerViewModel : ViewModelBase,
     IRecipient<DeleteLibrary>
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly IMapper _mapper;
     private readonly LumidexDbContext _dbContext;
 
     [ObservableProperty] LibraryViewModel? _selectedLibrary;
@@ -21,11 +19,9 @@ public partial class LibraryManagerViewModel : ViewModelBase,
 
     public LibraryManagerViewModel(
         IServiceProvider serviceProvider,
-        IMapper mapper,
         LumidexDbContext dbContext)
     {
         _serviceProvider = serviceProvider;
-        _mapper = mapper;
         _dbContext = dbContext;
 
         var libraries = _dbContext.Libraries

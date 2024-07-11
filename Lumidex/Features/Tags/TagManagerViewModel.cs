@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Media;
 using Lumidex.Core.Data;
 using Lumidex.Features.Tags.Messages;
@@ -26,7 +24,6 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
     private static readonly Color DefaultColor = Color.Parse(Tag.DefaultColor);
 
     private readonly IServiceProvider _serviceProvider;
-    private readonly IMapper _mapper;
     private readonly LumidexDbContext _dbContext;
 
     [ObservableProperty]
@@ -41,22 +38,35 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
 
     public TagManagerViewModel(
         IServiceProvider serviceProvider,
-        IMapper mapper,
         LumidexDbContext dbContext)
     {
         _serviceProvider = serviceProvider;
-        _mapper = mapper;
         _dbContext = dbContext;
 
         Tags = new(
             _dbContext
                 .Tags
                 .AsNoTracking()
-                .Include(tag => tag.TaggedImages)
                 .OrderByDescending(tag => tag.Id)
-                .ProjectTo<TagViewModel>(_mapper.ConfigurationProvider)
+                .Select(TagMapper.ToViewModel)
                 .ToList()
         );
+
+        var usageLookup = _dbContext
+            .ImageFiles
+            .SelectMany(f => f.Tags)
+            .GroupBy(tag => tag, (k, g) => new
+            {
+                TagId = k.Id,
+                Count = g.Count(),
+            })
+            .ToDictionary(x => x.TagId, x => x.Count);
+
+        // Get the tag usage count
+        foreach (var tag in Tags)
+        {
+            tag.TaggedImageCount = usageLookup[tag.Id];
+        }
     }
 
     protected override void OnInitialActivated()
@@ -92,7 +102,7 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
         if (_dbContext.SaveChanges() > 0)
         {
             // Update UI
-            var tagVm = _mapper.Map<TagViewModel>(tag);
+            var tagVm = TagMapper.ToViewModel(tag);
             Tags.Insert(0, tagVm);
 
             Messenger.Send(new TagCreated
@@ -168,6 +178,12 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
                     imageFile.Tags = new(newTags.Distinct());
                 }
 
+                tag.TaggedImageCount = _dbContext
+                    .ImageFiles
+                    .SelectMany(f => f.Tags)
+                    .Where(t => t.Id == tag.Id)
+                    .Count();
+
                 Messenger.Send(new TagAdded
                 {
                     Tag = tag,
@@ -200,6 +216,12 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
                 {
                     imageFile.Tags.Remove(tag);
                 }
+
+                tag.TaggedImageCount = _dbContext
+                    .ImageFiles
+                    .SelectMany(f => f.Tags)
+                    .Where(t => t.Id == tag.Id)
+                    .Count();
 
                 Messenger.Send(new TagRemoved
                 {

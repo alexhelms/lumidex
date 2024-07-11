@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using Lumidex.Core.IO;
+﻿using Lumidex.Core.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using System.IO.Abstractions;
@@ -12,16 +10,13 @@ public class LumidexDbContextFactory : IDesignTimeDbContextFactory<LumidexDbCont
 {
     public LumidexDbContext CreateDbContext(string[] args)
     {
-        return new LumidexDbContext(
-            new FileSystem(),
-            new Mapper(new MapperConfiguration(x => { })));
+        return new LumidexDbContext(new FileSystem());
     }
 }
 
 public class LumidexDbContext : DbContext
 {
     private readonly IFileSystem _fileSystem;
-    private readonly IMapper _mapper;
 
     public DbSet<AppSettings> AppSettings { get; set; }
     public DbSet<Library> Libraries { get; set; }
@@ -32,11 +27,9 @@ public class LumidexDbContext : DbContext
     public string DbPath { get; }
 
     public LumidexDbContext(
-        IFileSystem fileSystem,
-        IMapper mapper)
+        IFileSystem fileSystem)
     {
         _fileSystem = fileSystem;
-        _mapper = mapper;
 
         DbPath = fileSystem.Path.Combine(LumidexPaths.AppData, "lumidex-data.db");
         fileSystem.Directory.CreateDirectory(LumidexPaths.AppData);
@@ -44,7 +37,13 @@ public class LumidexDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
-        options.UseSqlite($"Data Source={DbPath}");
+#if DEBUG
+        //ILoggerFactory factory = new LoggerFactory().AddSerilog();
+        //options.UseLoggerFactory(factory);
+#endif
+
+        options.UseSqlite($"Data Source={DbPath}", config => config
+            .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -68,6 +67,10 @@ public class LumidexDbContext : DbContext
         modelBuilder.Entity<Tag>()
             .Property(x => x.Color)
             .HasDefaultValue("#ffffffff");
+
+        modelBuilder.Entity<ImageFile>()
+            .HasMany(e => e.Tags)
+            .WithMany();
     }
 
     public override int SaveChanges()
@@ -174,17 +177,17 @@ public class LumidexDbContext : DbContext
             .ToList();
     }
 
-    public List<T> SearchImageFilesAndProject<T>(ImageFileFilters filters)
-        => SearchImageFilesAndProject<T>(filters, false);
+    public List<T> SearchImageFilesAndProject<T>(ImageFileFilters filters, Func<ImageFile, T> mapper)
+        => SearchImageFilesAndProject<T>(filters, false, mapper);
 
-    public List<T> SearchImageFilesAndProject<T>(ImageFileFilters filters, bool tracking)
+    public List<T> SearchImageFilesAndProject<T>(ImageFileFilters filters, bool tracking, Func<ImageFile, T> mapper)
     {
         var query = SearchImageFilesQuery(filters, tracking);
         return query
             .Include(f => f.Library)
             .Include(f => f.Tags)
             .Include(f => f.AssociatedNames)
-            .ProjectTo<T>(_mapper.ConfigurationProvider)
+            .Select(mapper)
             .ToList();
     }
 

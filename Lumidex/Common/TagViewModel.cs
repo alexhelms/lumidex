@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Avalonia.Media;
+﻿using Avalonia.Media;
 using Lumidex.Core.Data;
 
 namespace Lumidex.Common;
@@ -9,7 +8,8 @@ public partial class TagViewModel : ObservableObject, IEquatable<TagViewModel?>
     [ObservableProperty] int _id;
     [ObservableProperty] string _name = string.Empty;
     [ObservableProperty] Color _color = Colors.Gray;
-    [ObservableProperty] AvaloniaList<ImageFileViewModel> _taggedImages = new();
+
+    [ObservableProperty] int _taggedImageCount = new();
     [ObservableProperty] bool _isSelected;
 
     #region Equality
@@ -43,11 +43,25 @@ public partial class TagViewModel : ObservableObject, IEquatable<TagViewModel?>
     #endregion
 }
 
-public class TagProfile : Profile
+public static class TagMapper
 {
-    public TagProfile()
+    private static Dictionary<string, Color> _colorCache = new();
+
+    public static TagViewModel ToViewModel(Tag tag)
     {
-        CreateMap<Tag, TagViewModel>()
-            .ForMember(vm => vm.Color, opt => opt.MapFrom(src => Color.Parse(src.Color)));
+        if (!_colorCache.TryGetValue(tag.Color, out var color))
+        {
+            color = Color.Parse(tag.Color);
+            _colorCache[tag.Color] = color;
+        }
+
+        var tagViewModel = new TagViewModel
+        {
+            Id = tag.Id,
+            Name = tag.Name,
+            Color = color,
+        };
+
+        return tagViewModel;
     }
 }

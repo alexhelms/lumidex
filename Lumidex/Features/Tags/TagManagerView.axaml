@@ -128,7 +128,7 @@
                 <DataGridTextColumn
                     Width="80"
                     x:DataType="common:TagViewModel"
-                    Binding="{Binding TaggedImages.Count}"
+                    Binding="{Binding TaggedImageCount}"
                     Header="Count" />
                 <DataGridTemplateColumn>
                     <DataGridTemplateColumn.CellTemplate>

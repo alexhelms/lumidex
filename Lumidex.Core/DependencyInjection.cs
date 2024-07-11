@@ -11,8 +11,6 @@ public static class DependencyInjection
 {
     public static void AddLumidexCore(this IServiceCollection services)
     {
-        services.AddAutoMapper(typeof(Core.Bootstrapper).Assembly);
-
         services.AddTransient<IFileSystem, FileSystem>();
         services.AddTransient<LibraryIngestPipeline>();
         services.AddTransient<Func<LibraryIngestPipeline>>(provider => () => provider.GetRequiredService<LibraryIngestPipeline>());
