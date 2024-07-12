@@ -240,7 +240,6 @@ public class LibraryIngestPipeline
                 var imageFiles = successes.Select(x => x.Item2);
                 var comparer = StringComparer.InvariantCultureIgnoreCase;
                 Dictionary<string, AlternateName> alternateNames = new();
-                HashSet<string> existingAlternateNames = new();
 
                 try
                 {
@@ -261,12 +260,8 @@ public class LibraryIngestPipeline
                         .ToDictionary(alt => alt.Name, alt => alt, comparer);
 
                     // Add any new alternate names
-                    existingAlternateNames = dbContext.AlternateNames
-                        .Select(alt => alt.Name)
-                        .ToHashSet(comparer);
-                    dbContext.AlternateNames.AddRange(alternateNames
-                        .Where(kvp => !existingAlternateNames.Contains(kvp.Key))
-                        .Select(kvp => kvp.Value));
+                    dbContext.AlternateNames.AddRange(
+                        alternateNames.Values.Where(alt => alt.Id == 0));
 
                     // Apply the alternate names to the image files
                     foreach (var imageFile in imageFiles.Where(f => f.ObjectName != null))
@@ -287,7 +282,7 @@ public class LibraryIngestPipeline
                 }
                 catch (DbUpdateException de) when (de.InnerException is SqliteException sle && sle.SqliteErrorCode == 19)
                 {
-                    Log.Error(de, "Foreigh key constraint failed");
+                    Log.Error(de, "Foreign key constraint failed");
                     
                     Log.Information("Alternate names in database and new names being added:");
                     foreach (var item in alternateNames)
