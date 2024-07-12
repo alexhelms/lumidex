@@ -49,6 +49,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\MainSearch\Actions\AlternateNamesActionView.axaml.cs">
+      <DependentUpon>AlternateNamesActionView.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Features\Tags\TagManagerView.axaml.cs">
       <DependentUpon>TagManagerView.axaml</DependentUpon>
     </Compile>

@@ -82,6 +82,7 @@
             BorderThickness="1"
             CanUserReorderColumns="True"
             CanUserResizeColumns="True"
+			SelectedItem="{Binding SelectedTag}"
             GridLinesVisibility="Horizontal"
             ItemsSource="{Binding Tags}"
             VerticalScrollBarVisibility="Visible">
@@ -118,7 +119,7 @@
                                 Color="{Binding Color}">
                                 <interactivity:Interaction.Behaviors>
                                     <ia:EventTriggerBehavior EventName="ColorChanged" SourceObject="{Binding #CellColorPicker}">
-                                        <ia:InvokeCommandAction Command="{Binding #TagsDataGrid.((tags:TagManagerViewModel)DataContext).ChangeTagColorCommand}" CommandParameter="{Binding}" />
+                                        <ia:InvokeCommandAction Command="{Binding #TagsDataGrid.((tags:TagManagerViewModel)DataContext).ChangeTagColorCommand}" PassEventArgsToCommand="True" />
                                     </ia:EventTriggerBehavior>
                                 </interactivity:Interaction.Behaviors>
                             </ColorPicker>

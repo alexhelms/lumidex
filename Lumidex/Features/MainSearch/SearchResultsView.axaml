@@ -47,13 +47,6 @@
                         Opacity="0.3"
                         Text="|" />
 
-                    <TextBlock Text="Objects" />
-                    <TextBlock Margin="8,0,0,0" Text="{Binding DistinctObjectNameCount, FallbackValue=0}" />
-                    <TextBlock
-                        Margin="8,0"
-                        Opacity="0.3"
-                        Text="|" />
-
                     <TextBlock Text="Lights" />
                     <TextBlock Margin="8,0,0,0" Text="{Binding LightCount, FallbackValue=0}" />
                     <TextBlock
@@ -175,7 +168,7 @@
                     <DataGridTextColumn
                         x:DataType="common:ImageFileViewModel"
                         Binding="{Binding ObjectName}"
-                        Header="Object Name" />
+                        Header="Name" />
                     <DataGridTextColumn
                         x:DataType="common:ImageFileViewModel"
                         Binding="{Binding Type}"

@@ -1,9 +1,9 @@
 using Avalonia.Controls;
 
 namespace Lumidex.Features.MainSearch.Actions;
-public partial class AssociatedNamesActionView : UserControl
+public partial class AlternateNamesActionView : UserControl
 {
-    public AssociatedNamesActionView()
+    public AlternateNamesActionView()
     {
         InitializeComponent();
     }

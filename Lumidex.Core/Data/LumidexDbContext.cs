@@ -1,6 +1,8 @@
 ﻿using Lumidex.Core.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Logging;
+using Serilog;
 using System.IO.Abstractions;
 
 namespace Lumidex.Core.Data;
@@ -22,7 +24,7 @@ public class LumidexDbContext : DbContext
     public DbSet<Library> Libraries { get; set; }
     public DbSet<Tag> Tags { get; set; }
     public DbSet<ImageFile> ImageFiles { get; set; }
-    public DbSet<AssociatedName> AssociatedNames { get; set; }
+    public DbSet<AlternateName> AlternateNames { get; set; }
 
     public string DbPath { get; }
 
@@ -43,7 +45,8 @@ public class LumidexDbContext : DbContext
 #endif
 
         options.UseSqlite($"Data Source={DbPath}", config => config
-            .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
+            .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+            .EnableSensitiveDataLogging(false);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -60,7 +63,7 @@ public class LumidexDbContext : DbContext
             .Property(x => x.CreatedOn)
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-        modelBuilder.Entity<AssociatedName>()
+        modelBuilder.Entity<AlternateName>()
             .Property(x => x.CreatedOn)
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
@@ -70,6 +73,10 @@ public class LumidexDbContext : DbContext
 
         modelBuilder.Entity<ImageFile>()
             .HasMany(e => e.Tags)
+            .WithMany();
+
+        modelBuilder.Entity<ImageFile>()
+            .HasMany(e => e.AlternateNames)
             .WithMany();
     }
 
@@ -123,16 +130,24 @@ public class LumidexDbContext : DbContext
 
     public IQueryable<ImageFile> SearchImageFilesQuery(ImageFileFilters filters, bool tracking)
     {
-        IQueryable<ImageFile> query = ImageFiles.AsQueryable();
+        IQueryable<ImageFile> query = ImageFiles
+            .Include(f => f.AlternateNames)
+            .AsQueryable();
 
         if (tracking)
             query = query.AsNoTracking();
 
+        if (filters.Name is { Length: > 0 })
+        {
+            query = query.Where(f => f
+                .AlternateNames
+                .Select(alt => alt.Name)
+                .Any(name => EF.Functions.Like(name, $"%{filters.Name}%"))
+            );
+        }
+
         if (filters.LibraryId.HasValue)
             query = query.Where(f => f.LibraryId == filters.LibraryId);
-
-        if (filters.ObjectName is { Length: > 0 })
-            query = query.Where(f => EF.Functions.Like(f.ObjectName, $"%{filters.ObjectName}%"));
 
         if (filters.ImageType is { } imageType)
             query = query.Where(f => f.Type == imageType);
@@ -173,7 +188,6 @@ public class LumidexDbContext : DbContext
         return query
             .Include(f => f.Library)
             .Include(f => f.Tags)
-            .Include(f => f.AssociatedNames)
             .ToList();
     }
 
@@ -186,7 +200,7 @@ public class LumidexDbContext : DbContext
         return query
             .Include(f => f.Library)
             .Include(f => f.Tags)
-            .Include(f => f.AssociatedNames)
+            .Include(f => f.AlternateNames)
             .Select(mapper)
             .ToList();
     }

@@ -2,8 +2,8 @@
 
 public class ImageFileFilters
 {
+    public string? Name { get; init; }
     public int? LibraryId { get; init; }
-    public string? ObjectName { get; init; }
     public ImageType? ImageType { get; init; }
     public ImageKind? ImageKind { get; init; }
     public TimeSpan? ExposureMin { get; init; }

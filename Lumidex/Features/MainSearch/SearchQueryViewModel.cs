@@ -103,7 +103,7 @@ public partial class SearchQueryViewModel : ViewModelBase,
             Filters = new ImageFileFilters
             {
                 LibraryId = Library?.Id,
-                ObjectName = ObjectName,
+                Name = ObjectName,
                 ImageType = SelectedImageType,
                 ImageKind = SelectedImageKind,
                 ExposureMin = ExposureMin.HasValue ? TimeSpan.FromSeconds((double)ExposureMin.Value) : null,

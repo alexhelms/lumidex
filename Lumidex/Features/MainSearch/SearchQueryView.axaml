@@ -15,8 +15,26 @@
 
         <StackPanel>
 
-            <!--  Library  -->
+            <!--  Name  -->
             <Grid ColumnDefinitions="1*,2*">
+                <TextBlock
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    Text="Name" />
+                <DockPanel Grid.Column="1">
+                    <Button
+                        Margin="5,0,0,0"
+                        VerticalAlignment="Stretch"
+                        i:Attached.Icon="mdi-close"
+                        Command="{Binding ClearObjectNameCommand}"
+                        DockPanel.Dock="Right"
+                        ToolTip.Tip="Clear Object Name" />
+                    <TextBox Text="{Binding ObjectName}" />
+                </DockPanel>
+            </Grid>
+
+            <!--  Library  -->
+            <Grid Margin="0,8,0,0" ColumnDefinitions="1*,2*">
                 <TextBlock
                     Grid.Column="0"
                     VerticalAlignment="Center"
@@ -34,24 +52,6 @@
                         DisplayMemberBinding="{Binding Name}"
                         ItemsSource="{Binding Libraries}"
                         SelectedItem="{Binding Library, Mode=TwoWay}" />
-                </DockPanel>
-            </Grid>
-
-            <!--  Object Name  -->
-            <Grid Margin="0,8,0,0" ColumnDefinitions="1*,2*">
-                <TextBlock
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Text="Object Name" />
-                <DockPanel Grid.Column="1">
-                    <Button
-                        Margin="5,0,0,0"
-                        VerticalAlignment="Stretch"
-                        i:Attached.Icon="mdi-close"
-                        Command="{Binding ClearObjectNameCommand}"
-                        DockPanel.Dock="Right"
-                        ToolTip.Tip="Clear Object Name" />
-                    <TextBox Text="{Binding ObjectName}" />
                 </DockPanel>
             </Grid>
 

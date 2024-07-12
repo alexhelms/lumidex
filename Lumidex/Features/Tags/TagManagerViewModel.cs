@@ -24,7 +24,7 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
     private static readonly Color DefaultColor = Color.Parse(Tag.DefaultColor);
 
     private readonly IServiceProvider _serviceProvider;
-    private readonly LumidexDbContext _dbContext;
+    private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
 
     [ObservableProperty]
     [NotifyDataErrorInfo]
@@ -35,16 +35,18 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
 
     [ObservableProperty] Color _color = DefaultColor;
     [ObservableProperty] AvaloniaList<TagViewModel> _tags = new();
+    [ObservableProperty] TagViewModel? _selectedTag;
 
     public TagManagerViewModel(
         IServiceProvider serviceProvider,
-        LumidexDbContext dbContext)
+        IDbContextFactory<LumidexDbContext> dbContextFactory)
     {
         _serviceProvider = serviceProvider;
-        _dbContext = dbContext;
+        _dbContextFactory = dbContextFactory;
 
+        using var dbContext = _dbContextFactory.CreateDbContext();
         Tags = new(
-            _dbContext
+            dbContext
                 .Tags
                 .AsNoTracking()
                 .OrderByDescending(tag => tag.Id)
@@ -52,7 +54,7 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
                 .ToList()
         );
 
-        var usageLookup = _dbContext
+        var usageLookup = dbContext
             .ImageFiles
             .SelectMany(f => f.Tags)
             .GroupBy(tag => tag, (k, g) => new
@@ -92,14 +94,15 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
 
     public void Receive(CreateTag message)
     {
+        using var dbContext = _dbContextFactory.CreateDbContext();
         var tag = new Tag
         {
             Name = message.Name,
             Color = $"#{message.Color.ToUInt32():x8}",
         };
 
-        _dbContext.Tags.Add(tag);
-        if (_dbContext.SaveChanges() > 0)
+        dbContext.Tags.Add(tag);
+        if (dbContext.SaveChanges() > 0)
         {
             // Update UI
             var tagVm = TagMapper.ToViewModel(tag);
@@ -116,11 +119,12 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
 
     public void Receive(DeleteTag message)
     {
-        var tag = _dbContext.Tags.FirstOrDefault(tag => tag.Id == message.Tag.Id);
+        using var dbContext = _dbContextFactory.CreateDbContext();
+        var tag = dbContext.Tags.FirstOrDefault(tag => tag.Id == message.Tag.Id);
         if (tag is not null)
         {
-            _dbContext.Tags.Remove(tag);
-            if (_dbContext.SaveChanges() > 0)
+            dbContext.Tags.Remove(tag);
+            if (dbContext.SaveChanges() > 0)
             {
                 // Update UI
                 var tagVm = Tags.First(t => t.Id == message.Tag.Id);
@@ -138,13 +142,15 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
 
     public void Receive(EditTag message)
     {
-        var tag = _dbContext.Tags.FirstOrDefault(tag => tag.Id == message.Id);
+        using var dbContext = _dbContextFactory.CreateDbContext();
+        var tag = dbContext.Tags.FirstOrDefault(tag => tag.Id == message.Id);
         if (tag is not null)
         {
             tag.Name = message.Name;
             tag.Color = $"#{message.Color.ToUInt32():x8}";
+            dbContext.Tags.Update(tag);
 
-            if (_dbContext.SaveChanges() > 0)
+            if (dbContext.SaveChanges() > 0)
             {
                 // Update UI
                 var tagVm = Tags.First(t => t.Id == message.Id);
@@ -173,7 +179,8 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
 
     private void AddTags(IEnumerable<TagViewModel> tags, IEnumerable<ImageFileViewModel> imageFiles)
     {
-        if (_dbContext.AddTagsToImageFiles(tags.Select(t => t.Id), imageFiles.Select(f => f.Id)) > 0)
+        using var dbContext = _dbContextFactory.CreateDbContext();
+        if (dbContext.AddTagsToImageFiles(tags.Select(t => t.Id), imageFiles.Select(f => f.Id)) > 0)
         {
             var numTags = tags.Count();
             var numImageFiles = imageFiles.Count();
@@ -188,7 +195,7 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
                     imageFile.Tags = new(newTags.Distinct());
                 }
 
-                tag.TaggedImageCount = _dbContext
+                tag.TaggedImageCount = dbContext
                     .ImageFiles
                     .SelectMany(f => f.Tags)
                     .Where(t => t.Id == tag.Id)
@@ -221,7 +228,8 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
 
     private void RemoveTags(IEnumerable<TagViewModel> tags, IEnumerable<ImageFileViewModel> imageFiles)
     {
-        if (_dbContext.RemoveTagsFromImageFiles(tags.Select(t => t.Id), imageFiles.Select(f => f.Id)) > 0)
+        using var dbContext = _dbContextFactory.CreateDbContext();
+        if (dbContext.RemoveTagsFromImageFiles(tags.Select(t => t.Id), imageFiles.Select(f => f.Id)) > 0)
         {
             var numTags = tags.Count();
             var numImageFiles = imageFiles.Count();
@@ -236,7 +244,7 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
                     imageFile.Tags.Remove(tag);
                 }
 
-                tag.TaggedImageCount = _dbContext
+                tag.TaggedImageCount = dbContext
                     .ImageFiles
                     .SelectMany(f => f.Tags)
                     .Where(t => t.Id == tag.Id)
@@ -259,7 +267,8 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
 
     public void Receive(ClearTags message)
     {
-        if (_dbContext.ClearTagsFromImageFiles(message.ImageFiles.Select(f => f.Id)) > 0)
+        using var dbContext = _dbContextFactory.CreateDbContext();
+        if (dbContext.ClearTagsFromImageFiles(message.ImageFiles.Select(f => f.Id)) > 0)
         {
             var numImageFiles = message.ImageFiles.Count();
 
@@ -348,15 +357,16 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
     }
 
     [RelayCommand]
-    private void ChangeTagColor(TagViewModel? tag)
+    private void ChangeTagColor(ColorChangedEventArgs e)
     {
-        if (tag is null) return;
-
-        Messenger.Send(new EditTag
+        if (SelectedTag is not null)
         {
-            Id = tag.Id,
-            Name = tag.Name,
-            Color = tag.Color,
-        });
+            Messenger.Send(new EditTag
+            {
+                Id = SelectedTag.Id,
+                Name = SelectedTag.Name,
+                Color = e.NewColor,
+            });
+        }
     }
 }

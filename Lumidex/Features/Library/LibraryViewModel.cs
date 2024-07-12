@@ -10,7 +10,7 @@ namespace Lumidex.Features.Library;
 
 public partial class LibraryViewModel : ValidatableViewModelBase
 {
-    private readonly LumidexDbContext _dbContext;
+    private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
     private readonly Func<LibraryIngestPipeline> _pipelineFactory;
 
     [ObservableProperty] int _id;
@@ -47,10 +47,10 @@ public partial class LibraryViewModel : ValidatableViewModelBase
     public AvaloniaList<FileErrorViewModel> ScanErrors { get; } = new();
 
     public LibraryViewModel(
-        LumidexDbContext dbContext,
+        IDbContextFactory<LumidexDbContext> dbContextFactory,
         Func<LibraryIngestPipeline> pipelineFactory)
     {
-        _dbContext = dbContext;
+        _dbContextFactory = dbContextFactory;
         _pipelineFactory = pipelineFactory;
     }
 
@@ -58,7 +58,8 @@ public partial class LibraryViewModel : ValidatableViewModelBase
     {
         base.OnActivated();
 
-        var library = _dbContext.Libraries
+        using var dbContext = _dbContextFactory.CreateDbContext();
+        var library = dbContext.Libraries
             .AsNoTracking()
             .FirstOrDefault(l => l.Id == Id);
 
@@ -69,7 +70,7 @@ public partial class LibraryViewModel : ValidatableViewModelBase
             Path = library.Path;
         }
 
-        FileCount = _dbContext.ImageFiles.Count(f => f.LibraryId == Id);
+        FileCount = dbContext.ImageFiles.Count(f => f.LibraryId == Id);
         OnPropertyChanged(nameof(CanQuickScanLibrary));
     }
 
@@ -91,18 +92,20 @@ public partial class LibraryViewModel : ValidatableViewModelBase
 
     private void SaveChanges()
     {
-        var library = _dbContext.Libraries.FirstOrDefault(l => l.Id == Id);
+        using var dbContext = _dbContextFactory.CreateDbContext();
+        var library = dbContext.Libraries.FirstOrDefault(l => l.Id == Id);
         if (library is not null)
         {
             library.Name = Name;
             library.Path = Path;
-            _dbContext.SaveChanges();
+            dbContext.SaveChanges();
         }
     }
 
     private async Task ScanLibraryAsync(bool quickScan, CancellationToken token)
     {
-        var library = _dbContext.Libraries
+        using var dbContext = _dbContextFactory.CreateDbContext();
+        var library = dbContext.Libraries
             .AsNoTracking()
             .First(l => l.Id == Id);
 
@@ -144,6 +147,11 @@ public partial class LibraryViewModel : ValidatableViewModelBase
                     Path = error.FileInfo.FullName,
                     Error = error.Message,
                 }));
+
+            Messenger.Send(new LibraryScanned
+            {
+                Library = LibraryMapper.ToViewModel(library),
+            });
         }
         catch (OperationCanceledException)
         {
@@ -157,12 +165,12 @@ public partial class LibraryViewModel : ValidatableViewModelBase
         }
 
         // Refresh basic library stats
-        library = _dbContext.Libraries
+        library = dbContext.Libraries
             .AsNoTracking()
             .First(l => l.Id == Id);
 
         LastScan = library.LastScan;
-        FileCount = _dbContext.ImageFiles.Count(f => f.LibraryId == Id);
+        FileCount = dbContext.ImageFiles.Count(f => f.LibraryId == Id);
         OnPropertyChanged(nameof(CanQuickScanLibrary));
     }
 
@@ -221,7 +229,14 @@ public partial class LibraryViewModel : ValidatableViewModelBase
         });
     }
 
-    public bool CanDeleteLibrary => _dbContext.Libraries.Count() > 1;
+    public bool CanDeleteLibrary
+    {
+        get
+        {
+            using var dbContext = _dbContextFactory.CreateDbContext();
+            return dbContext.Libraries.Count() > 1;
+        }
+    }
 }
 
 public partial class FileErrorViewModel : ViewModelBase

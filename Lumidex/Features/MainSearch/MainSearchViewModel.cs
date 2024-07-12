@@ -1,28 +1,28 @@
 ﻿using Lumidex.Core.Data;
 using Lumidex.Features.MainSearch.Messages;
+using Lumidex.Features.Tags.Messages;
+using Microsoft.EntityFrameworkCore;
 
 namespace Lumidex.Features.MainSearch;
 
 public class MainSearchViewModel : ViewModelBase,
-    IRecipient<SearchMessage>
-
+    IRecipient<SearchMessage>,
+    IRecipient<TagEdited>
 {
-    private readonly LumidexDbContext _dbContext;
-    private readonly Lazy<SearchQueryViewModel> _searchQuery;
-    private readonly Lazy<SearchResultsViewModel> _searchResults;
+    private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
 
-    public SearchQueryViewModel SearchQueryViewModel => _searchQuery.Value;
-    public SearchResultsViewModel SearchResultsViewModel => _searchResults.Value;
+    public SearchQueryViewModel SearchQueryViewModel { get; }
+    public SearchResultsViewModel SearchResultsViewModel { get; }
     public AvaloniaList<ImageFileViewModel> SearchResults { get; } = new();
 
     public MainSearchViewModel(
-        LumidexDbContext dbContext,
-        Lazy<SearchQueryViewModel> searchQuery,
-        Lazy<SearchResultsViewModel> searchResults)
+        IDbContextFactory<LumidexDbContext> dbContextFactory,
+        SearchQueryViewModel searchQueryViewModel,
+        SearchResultsViewModel searchResultsViewModel)
     {
-        _dbContext = dbContext;
-        _searchQuery = searchQuery;
-        _searchResults = searchResults;
+        _dbContextFactory = dbContextFactory;
+        SearchQueryViewModel = searchQueryViewModel;
+        SearchResultsViewModel = searchResultsViewModel;
     }
 
     public async void Receive(SearchMessage message)
@@ -30,8 +30,8 @@ public class MainSearchViewModel : ViewModelBase,
         bool success = true;
 
         Log.Information("New search: " +
+            "Name = {ObjectName}, " +
             "Library ID = {LibraryId}, " +
-            "Object Name = {ObjectName}, " +
             "Image Type = {ImageType}, " +
             "Image Kind = {ImageKind}, " +
             "Exposure Min = {ExposureMin}, " +
@@ -41,7 +41,7 @@ public class MainSearchViewModel : ViewModelBase,
             "Date End = {DateEnd}, " +
             "Tag IDs = {TagIds} ",
         message.Filters.LibraryId,
-        message.Filters.ObjectName,
+        message.Filters.Name,
         message.Filters.ImageType,
         message.Filters.ImageKind,
         message.Filters.ExposureMin,
@@ -55,7 +55,8 @@ public class MainSearchViewModel : ViewModelBase,
 
         try
         {
-            var results = await Task.Run(() => _dbContext.SearchImageFilesAndProject(message.Filters, ImageFileMapper.ToViewModel));
+            using var dbContext = _dbContextFactory.CreateDbContext();
+            var results = await Task.Run(() => dbContext.SearchImageFilesAndProject(message.Filters, ImageFileMapper.ToViewModel));
             SearchResults.Clear();
             SearchResults.AddRange(results);
 
@@ -68,6 +69,19 @@ public class MainSearchViewModel : ViewModelBase,
         finally
         {
             Messenger.Send(new SearchComplete { IsSuccess = success });
+        }
+    }
+
+    public void Receive(TagEdited message)
+    {
+        var tags = SearchResults
+            .SelectMany(f => f.Tags)
+            .Where(t => t.Id == message.Tag.Id);
+
+        foreach (var tag in tags)
+        {
+            tag.Name = message.Tag.Name;
+            tag.Color = message.Tag.Color;
         }
     }
 }

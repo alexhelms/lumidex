@@ -1,8 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Lumidex.Core.Data;
 
-public class AssociatedName
+[Index(nameof(Name), IsUnique = true)]
+public class AlternateName
 {
     public int Id { get; set; }
 
@@ -12,8 +14,6 @@ public class AssociatedName
     [Column(TypeName = "DATETIME")]
     public DateTime? UpdatedOn { get; set; }
 
-    [Column(TypeName = "TEXT COLLATE NOCASE")]
+    [Column(TypeName = "TEXT COLLATE NOCASE UNIQUE")]
     public string Name { get; set; } = null!;
-
-    public ICollection<ImageFile> Images { get; set; } = new List<ImageFile>();
 }

@@ -1,5 +1,4 @@
 ﻿using Avalonia.Threading;
-using Lumidex.Core.Data;
 using Lumidex.Features.Tags.Messages;
 
 namespace Lumidex.Features.MainSearch.Actions;
@@ -8,19 +7,16 @@ public partial class TagsActionViewModel : ActionViewModelBase,
     IRecipient<TagCreated>,
     IRecipient<TagDeleted>,
     IRecipient<TagAdded>,
+    IRecipient<TagEdited>,
     IRecipient<TagRemoved>,
     IRecipient<TagsCleared>
 {
-    private readonly LumidexDbContext _dbContext;
-
     [ObservableProperty] AvaloniaList<TagViewModel> _allTags = new();
     [ObservableProperty] AvaloniaList<TagViewModel> _selectedTags = new();
     [ObservableProperty] AvaloniaList<TagViewModel> _tagsOfSelectedItems = new();
 
-    public TagsActionViewModel(LumidexDbContext dbContext)
+    public TagsActionViewModel()
     {
-        _dbContext = dbContext;
-
         DisplayName = "Tags";
     }
 
@@ -49,6 +45,24 @@ public partial class TagsActionViewModel : ActionViewModelBase,
         if (message.ImageFiles.Any(f => SelectedIds.Contains(f.Id)))
         {
             Dispatcher.UIThread.Invoke(OnSelectedItemsChanged);
+        }
+    }
+
+    public void Receive(TagEdited message)
+    {
+        UpdateTag(AllTags, message);
+        UpdateTag(TagsOfSelectedItems, message);
+
+        static void UpdateTag(IEnumerable<TagViewModel> tags, TagEdited message)
+        {
+            if (tags.FirstOrDefault(t => t.Id == message.Tag.Id) is { } tag)
+            {
+                Dispatcher.UIThread.Invoke(() =>
+                {
+                    tag.Name = message.Tag.Name;
+                    tag.Color = message.Tag.Color;
+                });
+            }
         }
     }
 

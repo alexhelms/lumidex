@@ -7,6 +7,7 @@ public partial class ImageFileViewModel : ObservableObject, IEquatable<ImageFile
     [ObservableProperty] int _id;
     [ObservableProperty] LibraryViewModel _library = null!;
     [ObservableProperty] AvaloniaList<TagViewModel> _tags = new();
+    [ObservableProperty] AvaloniaList<AlternateNameViewModel> _alternateNames = new();
     [ObservableProperty] string _path = null!;
     [ObservableProperty] ImageType _type;
     [ObservableProperty] ImageKind _kind;
@@ -56,6 +57,7 @@ public static class ImageFileMapper
             Id = imageFile.Id,
             Library = LibraryMapper.ToViewModel(imageFile.Library),
             Tags = new(imageFile.Tags.Select(TagMapper.ToViewModel)),
+            AlternateNames = new(imageFile.AlternateNames.Select(AlternateNameMapper.ToViewModel)),
             Path = imageFile.Path,
             Type = imageFile.Type,
             Kind = imageFile.Kind,

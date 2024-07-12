@@ -6,12 +6,12 @@ public partial class ActionsContainerViewModel : ViewModelBase
     [ObservableProperty] ActionViewModelBase? _selectedItem;
 
     public ActionsContainerViewModel(
-        AssociatedNamesActionViewModel associatedNames,
-        TagsActionViewModel tags)
+        AlternateNamesActionViewModel alternateNamesViewModel,
+        TagsActionViewModel tagsViewModel)
     {
         _items.AddRange([
-            associatedNames,
-            tags,
+            alternateNamesViewModel,
+            tagsViewModel,
         ]);
 
         // HACK: activate each item so the messenger can be registered
@@ -21,6 +21,6 @@ public partial class ActionsContainerViewModel : ViewModelBase
             item.IsActive = false;
         }
 
-        SelectedItem = associatedNames;
+        SelectedItem = alternateNamesViewModel;
     }
 }

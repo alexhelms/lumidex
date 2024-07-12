@@ -11,7 +11,7 @@ public partial class LibraryManagerViewModel : ViewModelBase,
     IRecipient<DeleteLibrary>
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly LumidexDbContext _dbContext;
+    private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
 
     [ObservableProperty] LibraryViewModel? _selectedLibrary;
 
@@ -19,12 +19,13 @@ public partial class LibraryManagerViewModel : ViewModelBase,
 
     public LibraryManagerViewModel(
         IServiceProvider serviceProvider,
-        LumidexDbContext dbContext)
+        IDbContextFactory<LumidexDbContext> dbContextFactory)
     {
         _serviceProvider = serviceProvider;
-        _dbContext = dbContext;
+        _dbContextFactory = dbContextFactory;
 
-        var libraries = _dbContext.Libraries
+        using var dbContext = _dbContextFactory.CreateDbContext();
+        var libraries = dbContext.Libraries
             .AsNoTracking()
             .ToList();
 
@@ -60,14 +61,15 @@ public partial class LibraryManagerViewModel : ViewModelBase,
 
     public void Receive(CreateLibrary message)
     {
+        using var dbContext = _dbContextFactory.CreateDbContext();
         var library = new Core.Data.Library
         {
             Name = message.Name,
             Path = message.Path,
         };
-        _dbContext.Libraries.Add(library);
+        dbContext.Libraries.Add(library);
 
-        if (_dbContext.SaveChanges() > 0)
+        if (dbContext.SaveChanges() > 0)
         {
             var vm = _serviceProvider.GetRequiredService<LibraryViewModel>();
             vm.Id = library.Id;
@@ -91,11 +93,12 @@ public partial class LibraryManagerViewModel : ViewModelBase,
 
     public void Receive(DeleteLibrary message)
     {
-        var library = _dbContext.Libraries.FirstOrDefault(l => l.Id == message.Library.Id);
+        using var dbContext = _dbContextFactory.CreateDbContext();
+        var library = dbContext.Libraries.FirstOrDefault(l => l.Id == message.Library.Id);
         if (library is not null)
         {
-            _dbContext.Libraries.Remove(library);
-            if (_dbContext.SaveChanges() > 0)
+            dbContext.Libraries.Remove(library);
+            if (dbContext.SaveChanges() > 0)
             {
                 var vm = Libraries.First(l => l.Id == library.Id);
                 Libraries.Remove(vm);

@@ -8,7 +8,7 @@
     xmlns:i="https://github.com/projektanker/icons.avalonia"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="450"
-    d:DesignWidth="800"
+    d:DesignWidth="1440"
     x:DataType="actions:TagsActionViewModel"
     mc:Ignorable="d">
     <Grid ColumnDefinitions="1*,1*,1*">
@@ -51,7 +51,10 @@
             Grid.Column="1"
             HorizontalAlignment="Center"
             VerticalAlignment="Center">
-            <Button Width="100" Command="{Binding AddTagsCommand}">
+            <Button
+                Width="100"
+                Classes="accent"
+                Command="{Binding AddTagsCommand}">
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                     <TextBlock
                         Margin="0,0,8,0"
@@ -60,16 +63,6 @@
                     <i:Icon Value="fa-solid fa-arrow-right" />
                 </StackPanel>
             </Button>
-            <Rectangle
-                Width="100"
-                Height="1"
-                Margin="0,8"
-                Fill="#77656565" />
-            <Button
-                Width="100"
-                HorizontalContentAlignment="Center"
-                Command="{Binding RemoveAllTagsCommand}"
-                Content="Remove All" />
         </StackPanel>
 
         <DockPanel Grid.Column="2">
@@ -77,44 +70,54 @@
                 DockPanel.Dock="Top"
                 Text="Selected Tags"
                 TextAlignment="Center" />
-            <ItemsControl
-                Margin="0,8,0,0"
-                Background="#333538"
-                ItemsSource="{Binding TagsOfSelectedItems}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel Margin="4" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="common:TagViewModel">
-                        <Border
-                            Margin="8"
-                            BorderBrush="#656565"
-                            BorderThickness="1">
-                            <DockPanel>
-                                <Button
-                                    Width="24"
-                                    Height="24"
-                                    Padding="0"
-                                    i:Attached.Icon="mdi-close"
-                                    Command="{Binding $parent[ItemsControl].((actions:TagsActionViewModel)DataContext).RemoveTagCommand}"
-                                    CommandParameter="{Binding}"
-                                    DockPanel.Dock="Right"
-                                    ToolTip.Tip="Remove Tag" />
-                                <TextBlock
-                                    Padding="8,4"
-                                    VerticalAlignment="Stretch"
-                                    Text="{Binding Name}">
-                                    <TextBlock.Background>
-                                        <SolidColorBrush Color="{Binding Color}" />
-                                    </TextBlock.Background>
-                                </TextBlock>
-                            </DockPanel>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <Button
+                Margin="0,5,0,0"
+                HorizontalAlignment="Right"
+                Command="{Binding RemoveAllTagsCommand}"
+                Content="Remove All"
+                DockPanel.Dock="Bottom" />
+            <ScrollViewer Margin="0,8,0,0">
+                <ScrollViewer.Styles>
+                    <Style Selector="ScrollBar">
+                        <Setter Property="AllowAutoHide" Value="False" />
+                    </Style>
+                </ScrollViewer.Styles>
+                <ItemsControl Background="#333538" ItemsSource="{Binding TagsOfSelectedItems}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Margin="4" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="common:TagViewModel">
+                            <Border
+                                Margin="8"
+                                BorderBrush="#656565"
+                                BorderThickness="1">
+                                <DockPanel>
+                                    <Button
+                                        Width="24"
+                                        Height="24"
+                                        Padding="0"
+                                        i:Attached.Icon="mdi-close"
+                                        Command="{Binding $parent[ItemsControl].((actions:TagsActionViewModel)DataContext).RemoveTagCommand}"
+                                        CommandParameter="{Binding}"
+                                        DockPanel.Dock="Right"
+                                        ToolTip.Tip="Remove Tag" />
+                                    <TextBlock
+                                        Padding="8,4"
+                                        VerticalAlignment="Stretch"
+                                        Text="{Binding Name}">
+                                        <TextBlock.Background>
+                                            <SolidColorBrush Color="{Binding Color}" />
+                                        </TextBlock.Background>
+                                    </TextBlock>
+                                </DockPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
         </DockPanel>
 
     </Grid>

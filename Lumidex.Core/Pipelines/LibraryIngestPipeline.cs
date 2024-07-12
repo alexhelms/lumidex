@@ -7,6 +7,7 @@ using Serilog;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Threading.Tasks.Dataflow;
 
 namespace Lumidex.Core.Pipelines;
@@ -238,7 +239,41 @@ public class LibraryIngestPipeline
                 {
                     var fileInfos = successes.Select(x => x.Item1);
                     var imageFiles = successes.Select(x => x.Item2);
+                    var comparer = StringComparer.InvariantCultureIgnoreCase;
                     using var dbContext = _dbContextFactory.CreateDbContext();
+
+                    // Create a lookup with all existing alternate names and any potential new ones
+                    Dictionary<string, AlternateName> alternateNames = dbContext
+                        .AlternateNames
+                        .ToList()
+                        .Concat(imageFiles
+                            .Where(f => f.ObjectName != null)
+                            .Select(f => f.ObjectName)
+                            
+                            .Select(name => new AlternateName
+                            {
+                                Name = name!,
+                            }))
+                        .DistinctBy(alt => alt.Name, comparer)
+                        .ToDictionary(alt => alt.Name, alt => alt, comparer);
+
+                    // Add any new alternate names
+                    var existingAlternateNames = dbContext.AlternateNames
+                        .Select(alt => alt.Name)
+                        .ToHashSet(comparer);
+                    dbContext.AlternateNames.AddRange(alternateNames
+                        .Where(kvp => !existingAlternateNames.Contains(kvp.Key))
+                        .Select(kvp => kvp.Value));
+
+                    // Apply the alternate names to the image files
+                    foreach (var imageFile in imageFiles.Where(f => f.ObjectName != null))
+                    {
+                        if (alternateNames.TryGetValue(imageFile.ObjectName!, out var alternateName))
+                        {
+                            imageFile.AlternateNames.Add(alternateName);
+                        }
+                    }
+
                     dbContext.ImageFiles.AddRange(imageFiles);
                     dbContext.SaveChanges();
                     await addedProgressBlock.SendAsync(
