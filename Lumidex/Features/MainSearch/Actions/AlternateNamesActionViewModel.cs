@@ -17,8 +17,8 @@ public partial class AlternateNamesActionViewModel : ActionViewModelBase,
     private HashSet<string> _alternateNameLookup = new();
 
     [ObservableProperty] string? _newAlternateName;
-    [ObservableProperty] AvaloniaList<AlternateNameViewModel> _alternateNames = new();
-    [ObservableProperty] AvaloniaList<AlternateNameViewModel> _alternateNamesOfSelectedItems = new();
+    [ObservableProperty] ObservableCollectionEx<AlternateNameViewModel> _alternateNames = new();
+    [ObservableProperty] ObservableCollectionEx<AlternateNameViewModel> _alternateNamesOfSelectedItems = new();
 
     public AlternateNamesActionViewModel(
         IDbContextFactory<LumidexDbContext> dbContextFactory)

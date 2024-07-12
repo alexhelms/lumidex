@@ -44,7 +44,7 @@ public partial class LibraryViewModel : ValidatableViewModelBase
     [NotifyCanExecuteChangedFor(nameof(QuickScanLibraryCommand))]
     string _path = string.Empty;
 
-    public AvaloniaList<FileErrorViewModel> ScanErrors { get; } = new();
+    public ObservableCollectionEx<FileErrorViewModel> ScanErrors { get; } = new();
 
     public LibraryViewModel(
         IDbContextFactory<LumidexDbContext> dbContextFactory,

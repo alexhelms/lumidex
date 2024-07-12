@@ -2,5 +2,5 @@
 
 public class SearchResultsReady
 {
-    public AvaloniaList<ImageFileViewModel> SearchResults { get; init; } = new();
+    public ObservableCollectionEx<ImageFileViewModel> SearchResults { get; init; } = new();
 }

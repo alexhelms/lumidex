@@ -2,9 +2,9 @@
 
 public class SelectedSearchResultsChanged
 {
-    public AvaloniaList<ImageFileViewModel> Items { get; }
+    public ObservableCollectionEx<ImageFileViewModel> Items { get; }
 
-    public SelectedSearchResultsChanged(AvaloniaList<ImageFileViewModel> items)
+    public SelectedSearchResultsChanged(ObservableCollectionEx<ImageFileViewModel> items)
     {
         Items = items;
     }

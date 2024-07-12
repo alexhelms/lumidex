@@ -15,7 +15,7 @@ public partial class LibraryManagerViewModel : ViewModelBase,
 
     [ObservableProperty] LibraryViewModel? _selectedLibrary;
 
-    public AvaloniaList<LibraryViewModel> Libraries { get; } = new();
+    public ObservableCollectionEx<LibraryViewModel> Libraries { get; } = new();
 
     public LibraryManagerViewModel(
         IServiceProvider serviceProvider,

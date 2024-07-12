@@ -2,7 +2,7 @@
 
 public partial class ActionsContainerViewModel : ViewModelBase
 {
-    [ObservableProperty] AvaloniaList<ActionViewModelBase> _items = new();
+    [ObservableProperty] ObservableCollectionEx<ActionViewModelBase> _items = new();
     [ObservableProperty] ActionViewModelBase? _selectedItem;
 
     public ActionsContainerViewModel(

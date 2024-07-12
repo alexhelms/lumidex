@@ -8,7 +8,7 @@ public abstract partial class ActionViewModelBase : ValidatableViewModelBase,
     protected HashSet<int> SelectedIds { get; private set; } = new();
 
     [ObservableProperty] string _displayName = typeof(ActionViewModelBase).Name;
-    [ObservableProperty] AvaloniaList<ImageFileViewModel> _selectedItems = new();
+    [ObservableProperty] ObservableCollectionEx<ImageFileViewModel> _selectedItems = new();
 
     public void Receive(SelectedSearchResultsChanged message)
     {

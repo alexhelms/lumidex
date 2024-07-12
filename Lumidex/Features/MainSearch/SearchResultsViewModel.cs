@@ -3,7 +3,6 @@ using Lumidex.Core.Data;
 using Lumidex.Features.MainSearch.Actions;
 using Lumidex.Features.MainSearch.Messages;
 using Lumidex.Features.Tags.Messages;
-using Serilog;
 using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Runtime.InteropServices;
@@ -28,10 +27,10 @@ public partial class SearchResultsViewModel : ViewModelBase,
     [ObservableProperty] int _biasCount;
     [ObservableProperty] int _unknownCount;
     [ObservableProperty] int _distinctObjectNameCount;
-    [ObservableProperty] AvaloniaList<TagViewModel> _allTags = new();
-    [ObservableProperty] AvaloniaList<ImageFileViewModel> _searchResults = new();
-    [ObservableProperty] AvaloniaList<ImageFileViewModel> _selectedSearchResults = new();
-    [ObservableProperty] AvaloniaList<IntegrationStatistic> _integrationStats = new();
+    [ObservableProperty] ObservableCollectionEx<TagViewModel> _allTags = new();
+    [ObservableProperty] ObservableCollectionEx<ImageFileViewModel> _searchResults = new();
+    [ObservableProperty] ObservableCollectionEx<ImageFileViewModel> _selectedSearchResults = new();
+    [ObservableProperty] ObservableCollectionEx<IntegrationStatistic> _integrationStats = new();
 
     public ActionsContainerViewModel ActionsViewModel { get; }
     
@@ -76,9 +75,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
     {
         Dispatcher.UIThread.Invoke(() =>
         {
-            SearchResults = message.SearchResults;
-
-            var stats = ComputeIntegrationStatistics(SearchResults);
+            var stats = ComputeIntegrationStatistics(message.SearchResults);
             IntegrationStats.AddRange(stats);
 
             double totalIntegrationSum = IntegrationStats.Sum(x => x.TotalIntegration.TotalHours);
@@ -86,7 +83,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
                 ? totalIntegrationSum.ToString("F2")
                 : totalIntegrationSum.ToString("F1");
 
-            foreach (var item in SearchResults)
+            foreach (var item in message.SearchResults)
             {
                 if (item.Type == ImageType.Light) LightCount++;
                 else if (item.Type == ImageType.Flat) FlatCount++;
@@ -95,11 +92,13 @@ public partial class SearchResultsViewModel : ViewModelBase,
                 else UnknownCount++;
             }
             TypeAggregate = string.Join('/', LightCount, FlatCount, DarkCount, BiasCount, UnknownCount);
-            DistinctObjectNameCount = SearchResults
+            DistinctObjectNameCount = message.SearchResults
                 .Select(x => x.ObjectName)
                 .Where(x => x is not null)
                 .Distinct()
                 .Count();
+
+            SearchResults = message.SearchResults;
         });
 
         static IEnumerable<IntegrationStatistic> ComputeIntegrationStatistics(IEnumerable<ImageFileViewModel> images)
@@ -116,7 +115,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
 
             });
 
-            return new AvaloniaList<IntegrationStatistic>(results);
+            return new ObservableCollectionEx<IntegrationStatistic>(results);
         }
     }
 

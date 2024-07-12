@@ -11,9 +11,9 @@ public partial class TagsActionViewModel : ActionViewModelBase,
     IRecipient<TagRemoved>,
     IRecipient<TagsCleared>
 {
-    [ObservableProperty] AvaloniaList<TagViewModel> _allTags = new();
-    [ObservableProperty] AvaloniaList<TagViewModel> _selectedTags = new();
-    [ObservableProperty] AvaloniaList<TagViewModel> _tagsOfSelectedItems = new();
+    [ObservableProperty] ObservableCollectionEx<TagViewModel> _allTags = new();
+    [ObservableProperty] ObservableCollectionEx<TagViewModel> _selectedTags = new();
+    [ObservableProperty] ObservableCollectionEx<TagViewModel> _tagsOfSelectedItems = new();
 
     public TagsActionViewModel()
     {

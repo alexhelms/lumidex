@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace Lumidex.Features.MainSearch;
 
-public class MainSearchViewModel : ViewModelBase,
+public partial class MainSearchViewModel : ViewModelBase,
     IRecipient<SearchMessage>,
     IRecipient<TagEdited>
 {
@@ -14,7 +14,8 @@ public class MainSearchViewModel : ViewModelBase,
 
     public SearchQueryViewModel SearchQueryViewModel { get; }
     public SearchResultsViewModel SearchResultsViewModel { get; }
-    public AvaloniaList<ImageFileViewModel> SearchResults { get; } = new();
+
+    [ObservableProperty] ObservableCollectionEx<ImageFileViewModel> _searchResults = new();
 
     public MainSearchViewModel(
         IDbContextFactory<LumidexDbContext> dbContextFactory,
@@ -64,8 +65,7 @@ public class MainSearchViewModel : ViewModelBase,
             var elapsed = Stopwatch.GetElapsedTime(start);
             Log.Information($"Query completed in {elapsed.TotalSeconds:F3} seconds");
 
-            SearchResults.Clear();
-            SearchResults.AddRange(results);
+            SearchResults = new(results);
 
             Messenger.Send(new SearchResultsReady { SearchResults = SearchResults });
         }

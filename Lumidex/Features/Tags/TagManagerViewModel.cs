@@ -34,7 +34,7 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
     private string? _name;
 
     [ObservableProperty] Color _color = DefaultColor;
-    [ObservableProperty] AvaloniaList<TagViewModel> _tags = new();
+    [ObservableProperty] ObservableCollectionEx<TagViewModel> _tags = new();
     [ObservableProperty] TagViewModel? _selectedTag;
 
     public TagManagerViewModel(

@@ -21,6 +21,7 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.6" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageVersion Include="ObservableCollectionEx" Version="1.4.57" />
     <PackageVersion Include="Projektanker.Icons.Avalonia.FontAwesome" Version="9.3.0" />
     <PackageVersion Include="Projektanker.Icons.Avalonia.MaterialDesign" Version="9.3.0" />
     <PackageVersion Include="Serilog" Version="4.0.0" />

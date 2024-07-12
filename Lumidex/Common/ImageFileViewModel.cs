@@ -6,8 +6,8 @@ public partial class ImageFileViewModel : ObservableObject, IEquatable<ImageFile
 {
     [ObservableProperty] int _id;
     [ObservableProperty] LibraryViewModel _library = null!;
-    [ObservableProperty] AvaloniaList<TagViewModel> _tags = new();
-    [ObservableProperty] AvaloniaList<AlternateNameViewModel> _alternateNames = new();
+    [ObservableProperty] ObservableCollectionEx<TagViewModel> _tags = new();
+    [ObservableProperty] ObservableCollectionEx<AlternateNameViewModel> _alternateNames = new();
     [ObservableProperty] string _path = null!;
     [ObservableProperty] ImageType _type;
     [ObservableProperty] ImageKind _kind;

@@ -32,6 +32,7 @@
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="Humanizer" />
     <PackageReference Include="Microsoft.Extensions.Logging" />
+    <PackageReference Include="ObservableCollectionEx" />
     <PackageReference Include="Projektanker.Icons.Avalonia.MaterialDesign" />
     <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" />
     <PackageReference Include="Serilog" />

@@ -20,10 +20,10 @@ public partial class SearchQueryViewModel : ViewModelBase,
     [ObservableProperty] string? _selectedFilter;
     [ObservableProperty] DateTime? _selectedDateBegin;
     [ObservableProperty] DateTime? _selectedDateEnd;
-    [ObservableProperty] AvaloniaList<LibraryViewModel> _libraries =new ();
-    [ObservableProperty] AvaloniaList<TagViewModel> _tags =new ();
-    [ObservableProperty] AvaloniaList<TagViewModel> _selectedTags = new ();
-    [ObservableProperty] AvaloniaList<TagViewModel> _queryTags = new ();
+    [ObservableProperty] ObservableCollectionEx<LibraryViewModel> _libraries = new ();
+    [ObservableProperty] ObservableCollectionEx<TagViewModel> _tags = new ();
+    [ObservableProperty] ObservableCollectionEx<TagViewModel> _selectedTags = new ();
+    [ObservableProperty] ObservableCollectionEx<TagViewModel> _queryTags = new ();
 
     public List<ImageKind> ImageKinds { get; } = Enum.GetValues<ImageKind>().OrderBy(x => x.ToString()).ToList();
     public List<ImageType> ImageTypes { get; } = Enum.GetValues<ImageType>().OrderBy(x => x.ToString()).ToList();

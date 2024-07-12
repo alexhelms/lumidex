@@ -8,7 +8,7 @@ public partial class SideNavBarViewModel : ViewModelBase
     public const string LibraryTabName = "Library";
     public const string TagsTabName = "Tags";
 
-    public AvaloniaList<SideNavBarItemViewModel> Tabs { get; }
+    public ObservableCollectionEx<SideNavBarItemViewModel> Tabs { get; }
 
     public SideNavBarViewModel()
     {
