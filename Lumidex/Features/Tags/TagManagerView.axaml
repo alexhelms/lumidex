@@ -4,7 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:behavior="using:Lumidex.Behaviors"
     xmlns:common="using:Lumidex.Common"
-    xmlns:converter="using:Lumidex.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="https://github.com/projektanker/icons.avalonia"
     xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
@@ -82,9 +81,9 @@
             BorderThickness="1"
             CanUserReorderColumns="True"
             CanUserResizeColumns="True"
-			SelectedItem="{Binding SelectedTag}"
             GridLinesVisibility="Horizontal"
             ItemsSource="{Binding Tags}"
+            SelectedItem="{Binding SelectedTag}"
             VerticalScrollBarVisibility="Visible">
             <interactivity:Interaction.Behaviors>
                 <ia:EventTriggerBehavior EventName="CellEditEnded" SourceObject="{Binding #TagsDataGrid}">

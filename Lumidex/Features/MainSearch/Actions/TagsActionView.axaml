@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:actions="using:Lumidex.Features.MainSearch.Actions"
     xmlns:common="using:Lumidex.Common"
+    xmlns:converter="using:Lumidex.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="https://github.com/projektanker/icons.avalonia"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -11,6 +12,9 @@
     d:DesignWidth="1440"
     x:DataType="actions:TagsActionViewModel"
     mc:Ignorable="d">
+    <UserControl.Resources>
+        <converter:ColorToBrushConverter x:Key="ColorToBrush" />
+    </UserControl.Resources>
     <Grid ColumnDefinitions="1*,1*,1*">
 
         <DockPanel Grid.Column="0">
@@ -37,11 +41,8 @@
                             Padding="8,4"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center"
-                            Text="{Binding Name}">
-                            <TextBlock.Background>
-                                <SolidColorBrush Color="{Binding Color}" />
-                            </TextBlock.Background>
-                        </TextBlock>
+                            Background="{Binding Color, Mode=OneWay, Converter={StaticResource ColorToBrush}}"
+                            Text="{Binding Name}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
@@ -107,11 +108,8 @@
                                     <TextBlock
                                         Padding="8,4"
                                         VerticalAlignment="Stretch"
-                                        Text="{Binding Name}">
-                                        <TextBlock.Background>
-                                            <SolidColorBrush Color="{Binding Color}" />
-                                        </TextBlock.Background>
-                                    </TextBlock>
+                                        Background="{Binding Color, Mode=OneWay, Converter={StaticResource ColorToBrush}}"
+                                        Text="{Binding Name}" />
                                 </DockPanel>
                             </Border>
                         </DataTemplate>

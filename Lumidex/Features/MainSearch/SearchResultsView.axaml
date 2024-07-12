@@ -19,6 +19,7 @@
         <converter:TimeSpanToTotalSecondsConverter x:Key="TimeSpanToTotalSeconds" />
         <converter:LocalDateTimeConverter x:Key="LocalDateTime" />
         <converter:FilenameConverter x:Key="Filename" />
+        <converter:ColorToBrushConverter x:Key="ColorToBrush" />
     </UserControl.Resources>
     <Grid ColumnDefinitions="3*,Auto,0.75*">
         <DockPanel>
@@ -134,11 +135,8 @@
                                                     Padding="8,4"
                                                     HorizontalAlignment="Left"
                                                     VerticalAlignment="Center"
-                                                    Text="{Binding Name}">
-                                                    <TextBlock.Background>
-                                                        <SolidColorBrush Color="{Binding Color}" />
-                                                    </TextBlock.Background>
-                                                </TextBlock>
+                                                    Background="{Binding Color, Mode=OneWay, Converter={StaticResource ColorToBrush}}"
+                                                    Text="{Binding Name}" />
                                             </DataTemplate>
                                         </MenuItem.ItemTemplate>
                                     </MenuItem>
@@ -179,7 +177,7 @@
                         Header="Kind" />
                     <DataGridTextColumn
                         x:DataType="common:ImageFileViewModel"
-                        Binding="{Binding Exposure, StringFormat={}###0.###}"
+                        Binding="{Binding Exposure, Mode=OneWay, StringFormat={}###0.###}"
                         Header="Exposure (s)" />
                     <DataGridTextColumn
                         x:DataType="common:ImageFileViewModel"
@@ -191,11 +189,11 @@
                         Header="Binning" />
                     <DataGridTextColumn
                         x:DataType="common:ImageFileViewModel"
-                        Binding="{Binding ObservationTimestampUtc, Converter={StaticResource LocalDateTime}, StringFormat={}yyyy-MM-dd HH:mm:ss, TargetNullValue={}}"
+                        Binding="{Binding ObservationTimestampUtc, Mode=OneWay, Converter={StaticResource LocalDateTime}, StringFormat={}yyyy-MM-dd HH:mm:ss, TargetNullValue={}}"
                         Header="Observation (Local)" />
                     <DataGridTextColumn
                         x:DataType="common:ImageFileViewModel"
-                        Binding="{Binding ObservationTimestampUtc, StringFormat={}yyyy-MM-dd HH:mm:ss, TargetNullValue={}}"
+                        Binding="{Binding ObservationTimestampUtc, Mode=OneWay, StringFormat={}yyyy-MM-dd HH:mm:ss, TargetNullValue={}}"
                         Header="Observation (UTC)" />
                     <DataGridTemplateColumn x:DataType="common:ImageFileViewModel" Header="Filename">
                         <DataGridTemplateColumn.CellTemplate>
@@ -223,10 +221,8 @@
                                                 Padding="4,2"
                                                 HorizontalAlignment="Left"
                                                 VerticalAlignment="Center"
+                                                Background="{Binding Color, Mode=OneWay, Converter={StaticResource ColorToBrush}}"
                                                 Text="{Binding Name}">
-                                                <TextBlock.Background>
-                                                    <SolidColorBrush Color="{Binding Color}" />
-                                                </TextBlock.Background>
                                                 <TextBlock.ContextMenu>
                                                     <ContextMenu Tag="{Binding $parent[DataGridRow].DataContext}">
                                                         <MenuItem Click="RemoveTagMenuItem_Click" Header="Remove Tag" />
