@@ -7,6 +7,7 @@ Organize your astrophotography library.
 > For the time being you must build Lumidex to use it.
 
 ## Features
+- Windows only for now, Linux and MacOS support soon
 - .FITS and .XISF files
 - Multiple libraries
 - Search -> Search your library to find the images you're looking for
