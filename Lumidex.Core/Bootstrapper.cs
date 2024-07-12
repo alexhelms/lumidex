@@ -9,6 +9,8 @@ namespace Lumidex.Core;
 
 public static class Bootstrapper
 {
+    private static string LogPath = Path.Combine(LumidexPaths.Logs, "lumidex.log");
+
 #pragma warning disable CA2255 // The 'ModuleInitializer' attribute should not be used in libraries
     [ModuleInitializer]
 #pragma warning restore CA2255 // The 'ModuleInitializer' attribute should not be used in libraries
@@ -34,7 +36,7 @@ public static class Bootstrapper
             .MinimumLevel.Information()
             .WriteTo.Async(wt => wt.Debug())
             .WriteTo.Async(wt => wt.Console())
-            .WriteTo.Async(wt => wt.File(Path.Combine(LumidexPaths.Logs, "lumidex.log"),
+            .WriteTo.Async(wt => wt.File(LogPath,
                 rollingInterval: RollingInterval.Day,
                 retainedFileCountLimit: 7))
             .Enrich.FromLogContext()
@@ -54,5 +56,7 @@ public static class Bootstrapper
         Log.Information("Launched at {TimestampUtc:s} UTC ({TimestampLocal:s} Local)", launchTimeUtc, launchTimeUtc.ToLocalTime());
         Log.Information("{OS} {Architecture}", RuntimeInformation.OSDescription, osArch);
         Log.Information("{Dotnet} {RuntimeIdentifier}", RuntimeInformation.FrameworkDescription, RuntimeInformation.RuntimeIdentifier);
+        Log.Information("Logs located at {Path}", LogPath);
+        Log.Information(LumidexPaths.DefaultLibrary);
     }
 }
