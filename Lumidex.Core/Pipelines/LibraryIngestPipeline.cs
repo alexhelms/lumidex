@@ -2,6 +2,7 @@
 using Lumidex.Core.Data;
 using Lumidex.Core.Detection;
 using Lumidex.Core.IO;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Collections.Concurrent;
@@ -235,21 +236,23 @@ public class LibraryIngestPipeline
 
             if (successes.Count > 0)
             {
+                var fileInfos = successes.Select(x => x.Item1);
+                var imageFiles = successes.Select(x => x.Item2);
+                var comparer = StringComparer.InvariantCultureIgnoreCase;
+                Dictionary<string, AlternateName> alternateNames = new();
+                HashSet<string> existingAlternateNames = new();
+
                 try
                 {
-                    var fileInfos = successes.Select(x => x.Item1);
-                    var imageFiles = successes.Select(x => x.Item2);
-                    var comparer = StringComparer.InvariantCultureIgnoreCase;
                     using var dbContext = _dbContextFactory.CreateDbContext();
 
                     // Create a lookup with all existing alternate names and any potential new ones
-                    Dictionary<string, AlternateName> alternateNames = dbContext
+                    alternateNames = dbContext
                         .AlternateNames
                         .ToList()
                         .Concat(imageFiles
                             .Where(f => f.ObjectName != null)
                             .Select(f => f.ObjectName)
-                            
                             .Select(name => new AlternateName
                             {
                                 Name = name!,
@@ -258,7 +261,7 @@ public class LibraryIngestPipeline
                         .ToDictionary(alt => alt.Name, alt => alt, comparer);
 
                     // Add any new alternate names
-                    var existingAlternateNames = dbContext.AlternateNames
+                    existingAlternateNames = dbContext.AlternateNames
                         .Select(alt => alt.Name)
                         .ToHashSet(comparer);
                     dbContext.AlternateNames.AddRange(alternateNames
@@ -281,6 +284,22 @@ public class LibraryIngestPipeline
                             .Select(fileInfo => new IngestStatus(fileInfo, "Added"))
                             .ToList()
                     );
+                }
+                catch (DbUpdateException de) when (de.InnerException is SqliteException sle && sle.SqliteErrorCode == 19)
+                {
+                    Log.Error(de, "Foreigh key constraint failed");
+                    
+                    Log.Information("Alternate names in database and new names being added:");
+                    foreach (var item in alternateNames)
+                    {
+                        Log.Information("Id: {Id}, Name: {Name}", item.Value.Id, item.Key);
+                    }
+
+                    Log.Information("Files in batch:");
+                    foreach(var item in imageFiles)
+                    {
+                        Log.Information("Filename: {Filename}", item.Path);
+                    }
                 }
                 catch (Exception ex)
                 {
