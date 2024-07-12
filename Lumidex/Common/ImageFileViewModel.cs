@@ -56,8 +56,12 @@ public static class ImageFileMapper
         {
             Id = imageFile.Id,
             Library = LibraryMapper.ToViewModel(imageFile.Library),
-            Tags = new(imageFile.Tags.Select(TagMapper.ToViewModel)),
-            AlternateNames = new(imageFile.AlternateNames.Select(AlternateNameMapper.ToViewModel)),
+            Tags = new(imageFile.Tags
+                .Select(TagMapper.ToViewModel)
+                .OrderBy(tag => tag.Name)),
+            AlternateNames = new(imageFile.AlternateNames
+                .Select(AlternateNameMapper.ToViewModel)
+                .OrderBy(alt => alt.Name)),
             Path = imageFile.Path,
             Type = imageFile.Type,
             Kind = imageFile.Kind,
