@@ -67,7 +67,8 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
         // Get the tag usage count
         foreach (var tag in Tags)
         {
-            tag.TaggedImageCount = usageLookup[tag.Id];
+            usageLookup.TryGetValue(tag.Id, out var count);
+            tag.TaggedImageCount = count;
         }
     }
 
