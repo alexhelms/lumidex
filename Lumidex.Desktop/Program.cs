@@ -9,11 +9,11 @@ class Program
     public static void Main(string[] args)
     {
         // TODO: Consider a splash screen that is shown immediately and before bootstrap.
-
-        Bootstrapper.Start();
-
+        
         try
         {
+            Bootstrapper.Start();
+
             BuildAvaloniaApp()
                 .StartWithClassicDesktopLifetime(args);
         }
@@ -21,8 +21,10 @@ class Program
         {
             Log.Fatal(e, "Unhandled application exception");
             // TODO: Try to open some kind of message box
+        }
+        finally
+        {
             Log.CloseAndFlush();
-            Environment.Exit(1);
         }
     }
 

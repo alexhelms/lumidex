@@ -16,7 +16,6 @@ Organize your astrophotography library.
 - Quick Scan -> only scan files added since the last scan
 - Statistics -> See your total integration time and breakdown by filter
 
-
 ## Screenshots
 
 ![Search](/assets/lumidex_search.png?raw=true "Search")
