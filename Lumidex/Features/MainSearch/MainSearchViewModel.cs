@@ -2,6 +2,7 @@
 using Lumidex.Features.MainSearch.Messages;
 using Lumidex.Features.Tags.Messages;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace Lumidex.Features.MainSearch;
 
@@ -56,7 +57,13 @@ public class MainSearchViewModel : ViewModelBase,
         try
         {
             using var dbContext = _dbContextFactory.CreateDbContext();
+            var start = Stopwatch.GetTimestamp();
+            
             var results = await Task.Run(() => dbContext.SearchImageFilesAndProject(message.Filters, ImageFileMapper.ToViewModel));
+            
+            var elapsed = Stopwatch.GetElapsedTime(start);
+            Log.Information($"Query completed in {elapsed.TotalSeconds:F3} seconds");
+
             SearchResults.Clear();
             SearchResults.AddRange(results);
 
