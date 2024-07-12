@@ -95,7 +95,7 @@ public class XisfFile
                             header.Items.Add(new IntegerHeaderEntry(keyword, i, comment));
                         }
                         // Complex
-                        else if (rawValue.StartsWith('('))
+                        else if (rawValue.StartsWith('(') && rawValue.EndsWith(')') && rawValue.Contains(','))
                         {
                             Log.Warning("XISF header {Keyword} = `{Value}` complex type ignored in {Filename}", keyword, rawValue, fileInfo.FullName);
                         }
