@@ -57,6 +57,5 @@ public static class Bootstrapper
         Log.Information("{OS} {Architecture}", RuntimeInformation.OSDescription, osArch);
         Log.Information("{Dotnet} {RuntimeIdentifier}", RuntimeInformation.FrameworkDescription, RuntimeInformation.RuntimeIdentifier);
         Log.Information("Logs located at {Path}", LogPath);
-        Log.Information(LumidexPaths.DefaultLibrary);
     }
 }
