@@ -23,7 +23,6 @@ public static class DependencyInjection
         var fileSystem = services.GetRequiredService<IFileSystem>();
         using var scope = services.CreateScope();
         using var dbContext = scope.ServiceProvider.GetRequiredService<LumidexDbContext>();
-        dbContext.Database.EnsureCreated();
         if (dbContext.Database.GetPendingMigrations().Any())
         {
             dbContext.Database.Migrate();
