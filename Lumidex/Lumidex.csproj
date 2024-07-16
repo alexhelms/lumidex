@@ -50,8 +50,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Features\MainSearch\Actions\AlternateNamesActionView.axaml.cs">
-      <DependentUpon>AlternateNamesActionView.axaml</DependentUpon>
+    <Compile Update="Features\Aliases\AliasManagerView.axaml.cs">
+      <DependentUpon>AliasManagerView.axaml</DependentUpon>
     </Compile>
     <Compile Update="Features\Tags\TagManagerView.axaml.cs">
       <DependentUpon>TagManagerView.axaml</DependentUpon>

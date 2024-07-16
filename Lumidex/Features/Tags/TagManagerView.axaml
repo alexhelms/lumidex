@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:behavior="using:Lumidex.Behaviors"
     xmlns:common="using:Lumidex.Common"
+    xmlns:converter="using:Lumidex.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="https://github.com/projektanker/icons.avalonia"
     xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
@@ -14,12 +15,14 @@
     d:DesignWidth="1000"
     x:DataType="tags:TagManagerViewModel"
     mc:Ignorable="d">
+    <UserControl.Resources>
+        <converter:StringToColorConverter x:Key="StringToColor" />
+    </UserControl.Resources>
     <Grid Margin="8" ColumnDefinitions="1*,3*">
         <Grid
             Grid.Column="0"
             VerticalAlignment="Top"
             ColumnDefinitions="1*,3*"
-            DockPanel.Dock="Top"
             RowDefinitions="1*,12,Auto,12,1*,12,1*">
 
             <TextBlock
@@ -115,7 +118,7 @@
                                 IsColorPreviewVisible="False"
                                 IsColorSpectrumVisible="True"
                                 SelectedIndex="1"
-                                Color="{Binding Color}">
+                                Color="{Binding Color, Converter={StaticResource StringToColor}}">
                                 <interactivity:Interaction.Behaviors>
                                     <ia:EventTriggerBehavior EventName="ColorChanged" SourceObject="{Binding #CellColorPicker}">
                                         <ia:InvokeCommandAction Command="{Binding #TagsDataGrid.((tags:TagManagerViewModel)DataContext).ChangeTagColorCommand}" PassEventArgsToCommand="True" />

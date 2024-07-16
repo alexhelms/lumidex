@@ -6,5 +6,5 @@ public class EditTag
 {
     public required int Id { get; init; }
     public required string Name { get; init; }
-    public Color Color { get; init; } = Colors.Gray;
+    public string Color { get; init; } = "#ff808080";
 }

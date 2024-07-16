@@ -135,7 +135,7 @@
                                                     Padding="8,4"
                                                     HorizontalAlignment="Left"
                                                     VerticalAlignment="Center"
-                                                    Background="{Binding Color, Mode=OneWay, Converter={StaticResource ColorToBrush}}"
+                                                    Background="{Binding Brush}"
                                                     Text="{Binding Name}" />
                                             </DataTemplate>
                                         </MenuItem.ItemTemplate>
@@ -161,7 +161,7 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn
                         x:DataType="common:ImageFileViewModel"
-                        Binding="{Binding Library.Name}"
+                        Binding="{Binding LibraryName}"
                         Header="Library" />
                     <DataGridTextColumn
                         x:DataType="common:ImageFileViewModel"
@@ -221,7 +221,7 @@
                                                 Padding="4,2"
                                                 HorizontalAlignment="Left"
                                                 VerticalAlignment="Center"
-                                                Background="{Binding Color, Mode=OneWay, Converter={StaticResource ColorToBrush}}"
+                                                Background="{Binding Brush}"
                                                 Text="{Binding Name}">
                                                 <TextBlock.ContextMenu>
                                                     <ContextMenu Tag="{Binding $parent[DataGridRow].DataContext}">

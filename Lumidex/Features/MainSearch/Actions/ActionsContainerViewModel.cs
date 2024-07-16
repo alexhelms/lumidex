@@ -6,11 +6,9 @@ public partial class ActionsContainerViewModel : ViewModelBase
     [ObservableProperty] ActionViewModelBase? _selectedItem;
 
     public ActionsContainerViewModel(
-        AlternateNamesActionViewModel alternateNamesViewModel,
         TagsActionViewModel tagsViewModel)
     {
         _items.AddRange([
-            alternateNamesViewModel,
             tagsViewModel,
         ]);
 
@@ -21,6 +19,6 @@ public partial class ActionsContainerViewModel : ViewModelBase
             item.IsActive = false;
         }
 
-        SelectedItem = alternateNamesViewModel;
+        SelectedItem = tagsViewModel;
     }
 }

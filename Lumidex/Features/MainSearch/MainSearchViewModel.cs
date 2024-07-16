@@ -3,6 +3,7 @@ using Lumidex.Features.MainSearch.Messages;
 using Lumidex.Features.Tags.Messages;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Security.AccessControl;
 
 namespace Lumidex.Features.MainSearch;
 
@@ -25,6 +26,89 @@ public partial class MainSearchViewModel : ViewModelBase,
         _dbContextFactory = dbContextFactory;
         SearchQueryViewModel = searchQueryViewModel;
         SearchResultsViewModel = searchResultsViewModel;
+    }
+
+    private IList<ImageFileViewModel> Search(ImageFileFilters filters)
+    {
+        using var dbContext = _dbContextFactory.CreateDbContext();
+
+        IQueryable<ImageFile> query = dbContext.ImageFiles
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (filters.Name is { Length: > 0 })
+        {
+            // Create a set that contains the user's filter, any matching alias, and any matching object name
+            var aliases = new HashSet<string>([filters.Name], StringComparer.InvariantCultureIgnoreCase);
+
+            aliases.UnionWith(dbContext.ObjectAliases
+                .Where(a => EF.Functions.Like(a.Alias, $"%{filters.Name}%"))
+                .Select(a => a.ObjectName));
+
+            aliases.UnionWith(dbContext.ImageFiles
+                .Where(f => f.ObjectName != null)
+                .Select(f => f.ObjectName)
+                .Where(objectName => EF.Functions.Like(objectName, $"%{filters.Name}%"))!);
+
+            query = query
+                .Where(f => f.ObjectName != null)
+                .Where(f => aliases.Contains(f.ObjectName!));
+        }
+
+        if (filters.LibraryId.HasValue)
+            query = query.Where(f => f.LibraryId == filters.LibraryId);
+
+        if (filters.ImageType is { } imageType)
+            query = query.Where(f => f.Type == imageType);
+
+        if (filters.ImageKind is { } imageKind)
+            query = query.Where(f => f.Kind == imageKind);
+
+        if (filters.ExposureMin is { } min)
+            query = query.Where(f => f.Exposure!.Value >= min.TotalSeconds);
+
+        if (filters.ExposureMax is { } max)
+            query = query.Where(f => f.Exposure!.Value <= max.TotalSeconds);
+
+        if (filters.Filter is { Length: > 0 } filter)
+            query = query.Where(f => f.FilterName == filter);
+
+        if (filters.DateBegin is { } dateBegin)
+            query = query.Where(f => f.ObservationTimestampUtc >= dateBegin);
+
+        if (filters.DateEnd is { } dateEnd)
+            query = query.Where(f => f.ObservationTimestampUtc <= dateEnd);
+
+        if (filters.TagIds is not null && filters.TagIds.Any())
+        {
+            var tagIds = filters.TagIds.ToHashSet();
+            query = query.Where(f => f.Tags.Any(tag => tagIds.Contains(tag.Id)));
+        }
+
+        var imageFiles = query
+            .Select(f => new ImageFileViewModel
+            {
+                Id = f.Id,
+                LibraryName = f.Library.Name,
+                Tags = new (f.Tags
+                    .Select(tag => new TagViewModel
+                    {
+                        Id = tag.Id,
+                        Name = tag.Name,
+                        Color = tag.Color,
+                    })),
+                Path = f.Path,
+                Type = f.Type,
+                Kind = f.Kind,
+                ObjectName = f.ObjectName,
+                Exposure = f.Exposure,
+                FilterName = f.FilterName,
+                Binning = f.Binning,
+                ObservationTimestampUtc = f.ObservationTimestampUtc,
+            })
+            .ToList();
+
+        return imageFiles;
     }
 
     public async void Receive(SearchMessage message)
@@ -57,10 +141,9 @@ public partial class MainSearchViewModel : ViewModelBase,
 
         try
         {
-            using var dbContext = _dbContextFactory.CreateDbContext();
             var start = Stopwatch.GetTimestamp();
             
-            var results = await Task.Run(() => dbContext.SearchImageFilesAndProject(message.Filters, ImageFileMapper.ToViewModel));
+            var results = await Task.Run(() => Search(message.Filters));
             
             var elapsed = Stopwatch.GetElapsedTime(start);
             Log.Information($"Query completed in {elapsed.TotalSeconds:F3} seconds");

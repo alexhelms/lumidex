@@ -150,7 +150,13 @@ public partial class LibraryViewModel : ValidatableViewModelBase
 
             Messenger.Send(new LibraryScanned
             {
-                Library = LibraryMapper.ToViewModel(library),
+                Library = new Common.LibraryViewModel
+                {
+                    Id = library.Id,
+                    Name = library.Name,
+                    Path = library.Path,
+                    LastScan = library.LastScan,
+                }
             });
         }
         catch (OperationCanceledException)

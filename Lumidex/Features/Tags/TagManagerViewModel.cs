@@ -23,7 +23,6 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
 {
     private static readonly Color DefaultColor = Color.Parse(Tag.DefaultColor);
 
-    private readonly IServiceProvider _serviceProvider;
     private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
 
     [ObservableProperty]
@@ -38,10 +37,8 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
     [ObservableProperty] TagViewModel? _selectedTag;
 
     public TagManagerViewModel(
-        IServiceProvider serviceProvider,
         IDbContextFactory<LumidexDbContext> dbContextFactory)
     {
-        _serviceProvider = serviceProvider;
         _dbContextFactory = dbContextFactory;
 
         using var dbContext = _dbContextFactory.CreateDbContext();
@@ -50,12 +47,18 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
                 .Tags
                 .AsNoTracking()
                 .OrderByDescending(tag => tag.Id)
-                .Select(TagMapper.ToViewModel)
+                .Select(tag => new TagViewModel
+                {
+                    Id = tag.Id,
+                    Name = tag.Name,
+                    Color = tag.Color,
+                })
                 .ToList()
         );
 
         var usageLookup = dbContext
             .ImageFiles
+            .AsNoTracking()
             .SelectMany(f => f.Tags)
             .GroupBy(tag => tag, (k, g) => new
             {
@@ -82,6 +85,72 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
         }
     }
 
+    private int AddTagsToImageFiles(LumidexDbContext dbContext, IEnumerable<int> tagIds, IEnumerable<int> imageFileIds)
+    {
+        int count = 0;
+        var tagIdLookup = tagIds.ToHashSet();
+        var idLookup = imageFileIds.ToHashSet();
+
+        var tags = dbContext.Tags.Where(tag => tagIdLookup.Contains(tag.Id)).ToList();
+        foreach (var tag in tags)
+        {
+            var imageFiles = dbContext.ImageFiles
+                .Include(f => f.Tags)
+                .Where(f => idLookup.Contains(f.Id))
+                .ToList();
+
+            foreach (var imageFile in imageFiles)
+            {
+                imageFile.Tags.Add(tag);
+            }
+
+            count += dbContext.SaveChanges();
+        }
+
+        return count;
+    }
+
+    private int RemoveTagsFromImageFiles(LumidexDbContext dbContext, IEnumerable<int> tagIds, IEnumerable<int> imageFileIds)
+    {
+        int count = 0;
+        var tagIdLookup = tagIds.ToHashSet();
+        var idLookup = imageFileIds.ToHashSet();
+
+        var tags = dbContext.Tags.Where(tag => tagIdLookup.Contains(tag.Id)).ToList();
+        foreach (var tag in tags)
+        {
+            var imageFiles = dbContext.ImageFiles
+                .Include(f => f.Tags)
+                .Where(f => idLookup.Contains(f.Id))
+                .ToList();
+
+            foreach (var imageFile in imageFiles)
+            {
+                imageFile.Tags.Remove(tag);
+            }
+
+            count += dbContext.SaveChanges();
+        }
+
+        return count;
+    }
+
+    private int ClearTagsFromImageFiles(LumidexDbContext dbContext, IEnumerable<int> imageFileIds)
+    {
+        var idLookup = imageFileIds.ToHashSet();
+        var imageFiles = dbContext.ImageFiles
+                .Include(f => f.Tags)
+                .Where(f => idLookup.Contains(f.Id))
+                .ToList();
+
+        foreach (var imageFile in imageFiles)
+        {
+            imageFile.Tags.Clear();
+        }
+
+        return dbContext.SaveChanges();
+    }
+
     public void Receive(GetTag message)
     {
         var tag = Tags.First(tag => tag.Id == message.Id);
@@ -106,7 +175,12 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
         if (dbContext.SaveChanges() > 0)
         {
             // Update UI
-            var tagVm = TagMapper.ToViewModel(tag);
+            var tagVm = new TagViewModel
+            {
+                Id = tag.Id,
+                Name = tag.Name,
+                Color = tag.Color,
+            };
             Tags.Insert(0, tagVm);
 
             Log.Information("Tag created ({Id}) {Name} {Color}", tag.Id, tag.Name, tag.Color);
@@ -148,7 +222,7 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
         if (tag is not null)
         {
             tag.Name = message.Name;
-            tag.Color = $"#{message.Color.ToUInt32():x8}";
+            tag.Color = message.Color;
             dbContext.Tags.Update(tag);
 
             if (dbContext.SaveChanges() > 0)
@@ -156,7 +230,7 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
                 // Update UI
                 var tagVm = Tags.First(t => t.Id == message.Id);
                 tagVm.Name = tag.Name;
-                tagVm.Color = Color.Parse(tag.Color);
+                tagVm.Color = tag.Color;
 
                 Log.Information("Tag edited ({Id}) {Name} {Color}", tag.Id, tag.Name, tag.Color);
 
@@ -181,7 +255,7 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
     private void AddTags(IEnumerable<TagViewModel> tags, IEnumerable<ImageFileViewModel> imageFiles)
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
-        if (dbContext.AddTagsToImageFiles(tags.Select(t => t.Id), imageFiles.Select(f => f.Id)) > 0)
+        if (AddTagsToImageFiles(dbContext, tags.Select(t => t.Id), imageFiles.Select(f => f.Id)) > 0)
         {
             var numTags = tags.Count();
             var numImageFiles = imageFiles.Count();
@@ -230,7 +304,7 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
     private void RemoveTags(IEnumerable<TagViewModel> tags, IEnumerable<ImageFileViewModel> imageFiles)
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
-        if (dbContext.RemoveTagsFromImageFiles(tags.Select(t => t.Id), imageFiles.Select(f => f.Id)) > 0)
+        if (RemoveTagsFromImageFiles(dbContext, tags.Select(t => t.Id), imageFiles.Select(f => f.Id)) > 0)
         {
             var numTags = tags.Count();
             var numImageFiles = imageFiles.Count();
@@ -269,7 +343,7 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
     public void Receive(ClearTags message)
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
-        if (dbContext.ClearTagsFromImageFiles(message.ImageFiles.Select(f => f.Id)) > 0)
+        if (ClearTagsFromImageFiles(dbContext, message.ImageFiles.Select(f => f.Id)) > 0)
         {
             var numImageFiles = message.ImageFiles.Count();
 
@@ -366,7 +440,7 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
             {
                 Id = SelectedTag.Id,
                 Name = SelectedTag.Name,
-                Color = e.NewColor,
+                Color = $"#{e.NewColor.ToUInt32():x8}",
             });
         }
     }

@@ -24,7 +24,7 @@ public class LumidexDbContext : DbContext
     public DbSet<Library> Libraries { get; set; }
     public DbSet<Tag> Tags { get; set; }
     public DbSet<ImageFile> ImageFiles { get; set; }
-    public DbSet<AlternateName> AlternateNames { get; set; }
+    public DbSet<ObjectAlias> ObjectAliases { get; set; }
 
     public string DbPath { get; }
 
@@ -63,21 +63,10 @@ public class LumidexDbContext : DbContext
             .Property(x => x.CreatedOn)
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-        modelBuilder.Entity<AlternateName>()
-            .Property(x => x.CreatedOn)
-            .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
         modelBuilder.Entity<Tag>()
             .Property(x => x.Color)
             .HasDefaultValue("#ffffffff");
-
-        modelBuilder.Entity<ImageFile>()
-            .HasMany(e => e.Tags)
-            .WithMany();
-
-        modelBuilder.Entity<ImageFile>()
-            .HasMany(e => e.AlternateNames)
-            .WithMany();
+            
     }
 
     public override int SaveChanges()
@@ -126,196 +115,5 @@ public class LumidexDbContext : DbContext
                 entity.Property(nameof(ImageFile.UpdatedOn)).CurrentValue = DateTime.UtcNow;
             }
         }
-    }
-
-    public IQueryable<ImageFile> SearchImageFilesQuery(ImageFileFilters filters, bool tracking)
-    {
-        IQueryable<ImageFile> query = ImageFiles
-            .Include(f => f.AlternateNames)
-            .AsQueryable();
-
-        if (tracking)
-            query = query.AsNoTracking();
-
-        if (filters.Name is { Length: > 0 })
-        {
-            query = query.Where(f => f
-                .AlternateNames
-                .Select(alt => alt.Name)
-                .Any(name => EF.Functions.Like(name, $"%{filters.Name}%"))
-            );
-        }
-
-        if (filters.LibraryId.HasValue)
-            query = query.Where(f => f.LibraryId == filters.LibraryId);
-
-        if (filters.ImageType is { } imageType)
-            query = query.Where(f => f.Type == imageType);
-
-        if (filters.ImageKind is { } imageKind)
-            query = query.Where(f => f.Kind == imageKind);
-
-        if (filters.ExposureMin is { } min)
-            query = query.Where(f => f.Exposure!.Value >= min.TotalSeconds);
-
-        if (filters.ExposureMax is { } max)
-            query = query.Where(f => f.Exposure!.Value <= max.TotalSeconds);
-
-        if (filters.Filter is { Length: > 0 } filter)
-            query = query.Where(f => f.FilterName == filter);
-
-        if (filters.DateBegin is { } dateBegin)
-            query = query.Where(f => f.ObservationTimestampUtc >= dateBegin);
-
-        if (filters.DateEnd is { } dateEnd)
-            query = query.Where(f => f.ObservationTimestampUtc <= dateEnd);
-
-        if (filters.TagIds is not null && filters.TagIds.Any())
-        {
-            var tagIds = filters.TagIds.ToHashSet();
-            query = query.Where(f => f.Tags.Any(tag => tagIds.Contains(tag.Id)));
-        }
-
-        return query;
-    }
-
-    public List<ImageFile> SearchImageFiles(ImageFileFilters filters)
-        => SearchImageFiles(filters, false);
-
-    public List<ImageFile> SearchImageFiles(ImageFileFilters filters, bool tracking)
-    {
-        var query = SearchImageFilesQuery(filters, tracking);
-        return query
-            .Include(f => f.Library)
-            .Include(f => f.Tags)
-            .ToList();
-    }
-
-    public List<T> SearchImageFilesAndProject<T>(ImageFileFilters filters, Func<ImageFile, T> mapper)
-        => SearchImageFilesAndProject<T>(filters, false, mapper);
-
-    public List<T> SearchImageFilesAndProject<T>(ImageFileFilters filters, bool tracking, Func<ImageFile, T> mapper)
-    {
-        var query = SearchImageFilesQuery(filters, tracking);
-        return query
-            .Include(f => f.Library)
-            .Include(f => f.Tags)
-            .Include(f => f.AlternateNames)
-            .Select(mapper)
-            .ToList();
-    }
-
-    public int AddTagToImageFiles(int tagId, IEnumerable<int> imageFileIds)
-    {
-        ArgumentOutOfRangeException.ThrowIfLessThan(tagId, 1);
-
-        var tag = Tags.FirstOrDefault(tag => tag.Id == tagId);
-        if (tag is not null)
-        {
-            var idLookup = imageFileIds.ToHashSet();
-            var imageFiles = ImageFiles
-                .Include(f => f.Tags)
-                .Where(f => idLookup.Contains(f.Id))
-                .ToList();
-
-            foreach (var imageFile in imageFiles)
-            {
-                imageFile.Tags.Add(tag);
-            }
-
-            return SaveChanges();
-        }
-
-        return 0;
-    }
-
-    public int AddTagsToImageFiles(IEnumerable<int> tagIds, IEnumerable<int> imageFileIds)
-    {
-        int count = 0;
-        var tagIdLookup = tagIds.ToHashSet();
-        var idLookup = imageFileIds.ToHashSet();
-
-        var tags = Tags.Where(tag => tagIdLookup.Contains(tag.Id)).ToList();
-        foreach (var tag in tags)
-        {
-            var imageFiles = ImageFiles
-                .Include(f => f.Tags)
-                .Where(f => idLookup.Contains(f.Id))
-                .ToList();
-
-            foreach (var imageFile in imageFiles)
-            {
-                imageFile.Tags.Add(tag);
-            }
-
-            count += SaveChanges();
-        }
-
-        return count;
-    }
-
-    public int RemoveTagFromImageFiles(int tagId, IEnumerable<int> imageFileIds)
-    {
-        ArgumentOutOfRangeException.ThrowIfLessThan(tagId, 1);
-
-        var tag = Tags.FirstOrDefault(tag => tag.Id == tagId);
-        if (tag is not null)
-        {
-            var idLookup = imageFileIds.ToHashSet();
-            var imageFiles = ImageFiles
-                .Include(f => f.Tags)
-                .Where(f => idLookup.Contains(f.Id))
-                .ToList();
-
-            foreach (var imageFile in imageFiles)
-            {
-                imageFile.Tags.Remove(tag);
-            }
-
-            return SaveChanges();
-        }
-
-        return 0;
-    }
-
-    public int RemoveTagsFromImageFiles(IEnumerable<int> tagIds, IEnumerable<int> imageFileIds)
-    {
-        int count = 0;
-        var tagIdLookup = tagIds.ToHashSet();
-        var idLookup = imageFileIds.ToHashSet();
-
-        var tags = Tags.Where(tag => tagIdLookup.Contains(tag.Id)).ToList();
-        foreach (var tag in tags)
-        {
-            var imageFiles = ImageFiles
-                .Include(f => f.Tags)
-                .Where(f => idLookup.Contains(f.Id))
-                .ToList();
-
-            foreach (var imageFile in imageFiles)
-            {
-                imageFile.Tags.Remove(tag);
-            }
-
-            count += SaveChanges();
-        }
-
-        return count;
-    }
-
-    public int ClearTagsFromImageFiles(IEnumerable<int> imageFileIds)
-    {
-        var idLookup = imageFileIds.ToHashSet();
-        var imageFiles = ImageFiles
-                .Include(f => f.Tags)
-                .Where(f => idLookup.Contains(f.Id))
-                .ToList();
-
-        foreach (var imageFile in imageFiles)
-        {
-            imageFile.Tags.Clear();
-        }
-
-        return SaveChanges();
     }
 }

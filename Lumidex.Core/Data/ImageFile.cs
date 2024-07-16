@@ -15,8 +15,6 @@ public class ImageFile
 
     public ICollection<Tag> Tags { get; set; } = new List<Tag>();
 
-    public ICollection<AlternateName> AlternateNames { get; set; } = new List<AlternateName>();
-
     [Column(TypeName = "TEXT COLLATE NOCASE")]
     public string HeaderHash { get; set; } = null!;
 

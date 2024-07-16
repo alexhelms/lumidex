@@ -18,4 +18,6 @@ public class Tag
     public string Name { get; set; } = null!;
 
     public string Color { get; set; } = "#ffffffff";
+
+    public ICollection<ImageFile> ImageFiles { get; set; } = new List<ImageFile>();
 }

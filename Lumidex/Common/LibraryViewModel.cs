@@ -1,6 +1,4 @@
-﻿using Lumidex.Core.Data;
-
-namespace Lumidex.Common;
+﻿namespace Lumidex.Common;
 
 public partial class LibraryViewModel : ObservableObject, IEquatable<LibraryViewModel?>
 {
@@ -38,20 +36,4 @@ public partial class LibraryViewModel : ObservableObject, IEquatable<LibraryView
     }
 
     #endregion
-}
-
-public static class LibraryMapper
-{
-    public static LibraryViewModel ToViewModel(Library library)
-    {
-        var libraryViewModel = new LibraryViewModel
-        {
-            Id = library.Id,
-            Name = library.Name,
-            Path = library.Path,
-            LastScan = library.LastScan,
-        };
-
-        return libraryViewModel;
-    }
 }

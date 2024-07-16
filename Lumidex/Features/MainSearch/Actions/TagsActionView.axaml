@@ -41,7 +41,7 @@
                             Padding="8,4"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center"
-                            Background="{Binding Color, Mode=OneWay, Converter={StaticResource ColorToBrush}}"
+                            Background="{Binding Brush}"
                             Text="{Binding Name}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -108,7 +108,7 @@
                                     <TextBlock
                                         Padding="8,4"
                                         VerticalAlignment="Stretch"
-                                        Background="{Binding Color, Mode=OneWay, Converter={StaticResource ColorToBrush}}"
+                                        Background="{Binding Brush}"
                                         Text="{Binding Name}" />
                                 </DockPanel>
                             </Border>

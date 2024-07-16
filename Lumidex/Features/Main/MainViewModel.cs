@@ -3,6 +3,7 @@ using Lumidex.Features.Library;
 using Lumidex.Features.MainSearch;
 using Lumidex.Features.SideNavBar;
 using Lumidex.Messages;
+using Lumidex.Features.Aliases;
 
 namespace Lumidex.Features.Main;
 
@@ -10,8 +11,9 @@ public partial class MainViewModel : ViewModelBase,
     IRecipient<ChangeSideTabMessage>
 {
     private readonly MainSearchViewModel _mainSearchViewModel;
-    private readonly LibraryManagerViewModel _libraryManagerViewModel;
+    private readonly AliasManagerViewModel _aliasManagerViewModel;
     private readonly TagManagerViewModel _tagManagerViewModel;
+    private readonly LibraryManagerViewModel _libraryManagerViewModel;
 
     [ObservableProperty] private SideNavBarViewModel _sideNavBarViewModel = null!;
     [ObservableProperty] private object? _selectedTab;
@@ -19,13 +21,15 @@ public partial class MainViewModel : ViewModelBase,
     public MainViewModel(
         SideNavBarViewModel sideNavBarViewModel,
         MainSearchViewModel mainSearchViewModel,
-        LibraryManagerViewModel libraryManagerViewModel,
-        TagManagerViewModel tagManagerViewModel)
+        AliasManagerViewModel aliasManagerViewModel,
+        TagManagerViewModel tagManagerViewModel,
+        LibraryManagerViewModel libraryManagerViewModel)
     {
         _sideNavBarViewModel = sideNavBarViewModel;
         _mainSearchViewModel = mainSearchViewModel;
-        _libraryManagerViewModel = libraryManagerViewModel;
+        _aliasManagerViewModel = aliasManagerViewModel;
         _tagManagerViewModel = tagManagerViewModel;
+        _libraryManagerViewModel = libraryManagerViewModel;
     }
 
     protected override void OnActivated()
@@ -50,8 +54,9 @@ public partial class MainViewModel : ViewModelBase,
         SelectedTab = message.TabName switch
         {
             SideNavBarViewModel.SearchTabName => _mainSearchViewModel,
-            SideNavBarViewModel.LibraryTabName => _libraryManagerViewModel,
+            SideNavBarViewModel.AliasTabName => _aliasManagerViewModel,
             SideNavBarViewModel.TagsTabName => _tagManagerViewModel,
+            SideNavBarViewModel.LibraryTabName => _libraryManagerViewModel,
             _ => throw new NotImplementedException(),
         };
     }
