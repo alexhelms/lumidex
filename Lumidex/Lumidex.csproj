@@ -53,6 +53,9 @@
     <Compile Update="Features\Aliases\AliasManagerView.axaml.cs">
       <DependentUpon>AliasManagerView.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Features\Aliases\ObjectNameView.axaml.cs">
+      <DependentUpon>ObjectNameView.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Features\Tags\TagManagerView.axaml.cs">
       <DependentUpon>TagManagerView.axaml</DependentUpon>
     </Compile>

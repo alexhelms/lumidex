@@ -15,6 +15,7 @@ public partial class AliasManagerViewModel : ValidatableViewModelBase,
     private StringComparer _comparer = StringComparer.InvariantCultureIgnoreCase;
     private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
 
+    [ObservableProperty] ObjectNameViewModel? _selectedItem;
     [ObservableProperty] ObservableCollectionEx<ObjectNameViewModel> _objectNames = new();
     [ObservableProperty] ObservableCollectionEx<AliasViewModel> _aliases = new();
 
@@ -26,6 +27,7 @@ public partial class AliasManagerViewModel : ValidatableViewModelBase,
         _dbContextFactory = dbContextFactory;
 
         RefreshObjectNamesAndAliases();
+        SelectedItem = ObjectNames.FirstOrDefault();
     }
 
     private void RefreshObjectNamesAndAliases()
@@ -171,33 +173,6 @@ public partial class AliasManagerViewModel : ValidatableViewModelBase,
                     objectName.Aliases.Remove(alias);
                 }
             }
-        }
-    }
-
-    [RelayCommand]
-    private void CreateAlias(ObjectNameViewModel objectName)
-    {
-        if (objectName.NewAliasName is { Length: > 0})
-        {
-            Messenger.Send(new CreateAlias
-            {
-                ObjectName = objectName.ObjectName,
-                Alias = objectName.NewAliasName,
-            });
-
-            objectName.NewAliasName = null;
-        }
-    }
-
-    [RelayCommand]
-    public void DeleteAlias(AliasViewModel alias)
-    {
-        if (alias.Id > 0)
-        {
-            Messenger.Send(new DeleteAlias
-            {
-                Id = alias.Id,
-            });
         }
     }
 }

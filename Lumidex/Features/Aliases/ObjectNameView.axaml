@@ -1,0 +1,78 @@
+<UserControl
+    x:Class="Lumidex.Features.Aliases.ObjectNameView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:alias="using:Lumidex.Features.Aliases"
+    xmlns:common="using:Lumidex.Common"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="https://github.com/projektanker/icons.avalonia"
+    xmlns:ie="using:Avalonia.Xaml.Interactions.Custom"
+    xmlns:interactivity="using:Avalonia.Xaml.Interactivity"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="alias:ObjectNameViewModel"
+    mc:Ignorable="d">
+    <DockPanel Margin="16,0,8,0">
+
+        <StackPanel DockPanel.Dock="Top">
+            <DockPanel>
+                <TextBlock
+                    Width="80"
+                    VerticalAlignment="Center"
+                    DockPanel.Dock="Left"
+                    Text="Name" />
+                <TextBox
+                    Margin="12,0,0,0"
+                    Text="{Binding NewAliasName}"
+                    Watermark="Add an alias">
+                    <interactivity:Interaction.Behaviors>
+                        <ie:ExecuteCommandOnKeyDownBehavior Key="Enter" Command="{Binding CreateAliasCommand}" />
+                    </interactivity:Interaction.Behaviors>
+                </TextBox>
+            </DockPanel>
+            <Button
+                Width="100"
+                Margin="0,8,0,0"
+                HorizontalAlignment="Right"
+                HorizontalContentAlignment="Center"
+                Classes="accent"
+                Command="{Binding CreateAliasCommand}"
+                CommandParameter="{Binding}"
+                Content="Add Alias"
+                IsDefault="True"
+                KeyboardNavigation.TabNavigation="Continue" />
+        </StackPanel>
+
+        <Grid Margin="0,8,0,0" VerticalAlignment="Top">
+            <ListBox
+                x:Name="AliasListBox"
+                MinHeight="150"
+                VerticalAlignment="Top"
+                BorderBrush="#656565"
+                BorderThickness="1"
+                ItemsSource="{Binding Aliases}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="common:AliasViewModel">
+                        <DockPanel>
+                            <Button
+                                i:Attached.Icon="mdi-close"
+                                Background="Red"
+                                Command="{Binding #AliasListBox.((alias:ObjectNameViewModel)DataContext).DeleteAliasCommand}"
+                                CommandParameter="{Binding}"
+                                DockPanel.Dock="Right"
+                                ToolTip.Tip="Remove Alias" />
+                            <TextBlock VerticalAlignment="Center" Text="{Binding Alias}" />
+                        </DockPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <TextBlock
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                IsVisible="{Binding !Aliases.Count}"
+                Text="No Aliases" />
+        </Grid>
+
+    </DockPanel>
+</UserControl>

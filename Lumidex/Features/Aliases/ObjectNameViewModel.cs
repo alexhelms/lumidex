@@ -1,6 +1,8 @@
-﻿namespace Lumidex.Common;
+﻿using Lumidex.Features.Aliases.Messages;
 
-public partial class ObjectNameViewModel : ObservableObject, IEquatable<ObjectNameViewModel?>
+namespace Lumidex.Features.Aliases;
+
+public partial class ObjectNameViewModel : ViewModelBase
 {
     [ObservableProperty] string _objectName = string.Empty;
     [ObservableProperty] ObservableCollectionEx<AliasViewModel> _aliases = new();
@@ -35,4 +37,31 @@ public partial class ObjectNameViewModel : ObservableObject, IEquatable<ObjectNa
     }
 
     #endregion
+
+    [RelayCommand]
+    private void CreateAlias()
+    {
+        if (NewAliasName is { Length: > 0 })
+        {
+            Messenger.Send(new CreateAlias
+            {
+                ObjectName = ObjectName,
+                Alias = NewAliasName.Trim(),
+            });
+
+            NewAliasName = null;
+        }
+    }
+
+    [RelayCommand]
+    private void DeleteAlias(AliasViewModel alias)
+    {
+        if (alias.Id > 0)
+        {
+            Messenger.Send(new DeleteAlias
+            {
+                Id = alias.Id,
+            });
+        }
+    }
 }

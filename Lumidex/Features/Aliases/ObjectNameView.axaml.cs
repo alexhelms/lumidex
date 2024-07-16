@@ -1,9 +1,9 @@
 using Avalonia.Controls;
 
 namespace Lumidex.Features.Aliases;
-public partial class AliasManagerView : UserControl
+public partial class ObjectNameView : UserControl
 {
-    public AliasManagerView()
+    public ObjectNameView()
     {
         InitializeComponent();
     }
