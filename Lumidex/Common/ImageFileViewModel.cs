@@ -15,6 +15,7 @@ public partial class ImageFileViewModel : ObservableObject, IEquatable<ImageFile
     [ObservableProperty] string? _filterName;
     [ObservableProperty] int? _binning;
     [ObservableProperty] DateTime? _observationTimestampUtc;
+    [ObservableProperty] DateTime? _observationTimestampLocal;
 
     #region Equality
 

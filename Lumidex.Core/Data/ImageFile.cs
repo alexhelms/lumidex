@@ -114,6 +114,9 @@ public class ImageFile
     [Column(TypeName = "DATETIME")]
     public DateTime? ObservationTimestampUtc { get; set; }
 
+    [Column(TypeName = "DATETIME")]
+    public DateTime? ObservationTimestampLocal { get; set; }
+
     [Column(TypeName = "TEXT COLLATE NOCASE")]
     public string? ObjectName { get; set; }
 

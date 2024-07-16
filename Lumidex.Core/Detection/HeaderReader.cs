@@ -317,6 +317,16 @@ public class HeaderReader
                 return timestamp;
             },
             "DATE-OBS");
+        ExtractKeyword<string, DateTime?>(header, imageFile, x => x.ObservationTimestampLocal,
+            static rawValue =>
+            {
+                if (DateTime.TryParse(rawValue, out var timestamp))
+                {
+                    return timestamp;
+                }
+                return DateTime.MinValue;
+            },
+            "DATE-LOC");
         ExtractKeyword<string, string?>(header, imageFile, x => x.ObjectName!,
             "OBJECT");
     }

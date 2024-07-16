@@ -105,6 +105,7 @@ public partial class MainSearchViewModel : ViewModelBase,
                 FilterName = f.FilterName,
                 Binning = f.Binning,
                 ObservationTimestampUtc = f.ObservationTimestampUtc,
+                ObservationTimestampLocal = f.ObservationTimestampLocal,
             })
             .ToList();
 

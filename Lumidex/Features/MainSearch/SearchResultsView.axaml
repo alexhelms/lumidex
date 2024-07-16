@@ -17,7 +17,6 @@
     mc:Ignorable="d">
     <UserControl.Resources>
         <converter:TimeSpanToTotalSecondsConverter x:Key="TimeSpanToTotalSeconds" />
-        <converter:LocalDateTimeConverter x:Key="LocalDateTime" />
         <converter:FilenameConverter x:Key="Filename" />
         <converter:ColorToBrushConverter x:Key="ColorToBrush" />
     </UserControl.Resources>
@@ -189,7 +188,7 @@
                         Header="Binning" />
                     <DataGridTextColumn
                         x:DataType="common:ImageFileViewModel"
-                        Binding="{Binding ObservationTimestampUtc, Mode=OneWay, Converter={StaticResource LocalDateTime}, StringFormat={}yyyy-MM-dd HH:mm:ss, TargetNullValue={}}"
+                        Binding="{Binding ObservationTimestampLocal, Mode=OneWay, StringFormat={}yyyy-MM-dd HH:mm:ss, TargetNullValue={}}"
                         Header="Observation (Local)" />
                     <DataGridTextColumn
                         x:DataType="common:ImageFileViewModel"
