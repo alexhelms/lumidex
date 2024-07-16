@@ -115,4 +115,32 @@ public partial class SearchQueryViewModel : ViewModelBase,
             }
         });
     }
+
+    [RelayCommand]
+    private void SearchPrev1Day()
+    {
+        SelectedDateBegin = DateTime.UtcNow.AddDays(-1);
+        Search();
+    }
+
+    [RelayCommand]
+    private void SearchPrev3Day()
+    {
+        SelectedDateBegin = DateTime.UtcNow.AddDays(-3);
+        Search();
+    }
+
+    [RelayCommand]
+    private void SearchPrev7Day()
+    {
+        SelectedDateBegin = DateTime.UtcNow.AddDays(-7);
+        Search();
+    }
+
+    [RelayCommand]
+    private void SearchPrev30Day()
+    {
+        SelectedDateBegin = DateTime.UtcNow.AddDays(-30);
+        Search();
+    }
 }
