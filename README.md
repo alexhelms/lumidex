@@ -23,7 +23,7 @@ Data is never altered in any way.
 
 ![Search](/assets/lumidex_search.png?raw=true "Search")
 
-![Alias](/assets/lumidex_alias.png?raw=true "Aliases")
+![Alias](/assets/lumidex_aliases.png?raw=true "Aliases")
 
 ![Tags](/assets/lumidex_tags.png?raw=true "Tags")
 
