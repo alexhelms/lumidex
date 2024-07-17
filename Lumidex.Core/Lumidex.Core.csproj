@@ -5,7 +5,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationIcon>..\Lumidex\Assets\lumidex-icon.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="..\Lumidex\Assets\lumidex-icon.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentResults" />

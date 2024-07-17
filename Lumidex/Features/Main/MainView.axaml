@@ -14,10 +14,11 @@
 
         <DockPanel Height="32" DockPanel.Dock="Top">
             <Panel Width="48" DockPanel.Dock="Left">
-                <i:Icon
+                <Image
+                    Width="24"
+                    Height="24"
                     HorizontalAlignment="Center"
-                    FontSize="16"
-                    Value="fa-solid fa-rocket" />
+                    Source="/Assets/lumidex-icon-small.png" />
             </Panel>
             <Menu Background="{x:Null}">
                 <MenuItem Header="_File">

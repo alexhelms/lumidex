@@ -4,6 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <ApplicationIcon>Assets\lumidex-icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -47,6 +48,10 @@
 
   <ItemGroup>
     <UpToDateCheckInput Remove="Features\MainSearch\MainSearchView.axaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\lumidex-icon.ico" />
   </ItemGroup>
 
   <ItemGroup>

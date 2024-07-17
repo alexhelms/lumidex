@@ -12,7 +12,7 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     ExtendClientAreaToDecorationsHint="True"
-    Icon="/Assets/avalonia-logo.ico"
+    Icon="/Assets/lumidex-icon.ico"
     mc:Ignorable="d">
     <main:MainView />
 </Window>
