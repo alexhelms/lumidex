@@ -2,6 +2,9 @@
 
 Organize your astrophotography library.
 
+Lumidex scans folders with your image files, reads the headers, and builds a database.
+Data is never altered in any way.
+
 > [!WARNING]
 > Lumidex is very early in development and unstable.
 > For the time being you must build Lumidex to use it.
@@ -11,7 +14,7 @@ Organize your astrophotography library.
 - .FITS and .XISF files
 - Multiple libraries
 - Search -> Search your library to find the images you're looking for
-- Alternate Names -> Assign multiple names to the same image
+- Aliases -> Assign multiple names to object names from the headers
 - Tags -> Group your images with tags
 - Quick Scan -> only scan files added since the last scan
 - Statistics -> See your total integration time and breakdown by filter
@@ -20,6 +23,8 @@ Organize your astrophotography library.
 
 ![Search](/assets/lumidex_search.png?raw=true "Search")
 
-![Library](/assets/lumidex_library.png?raw=true "Library")
+![Alias](/assets/lumidex_alias.png?raw=true "Aliases")
 
 ![Tags](/assets/lumidex_tags.png?raw=true "Tags")
+
+![Library](/assets/lumidex_library.png?raw=true "Library")
