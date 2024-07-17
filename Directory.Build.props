@@ -4,10 +4,16 @@
     <Nullable>enable</Nullable>
     <AvaloniaVersion>11.0.10</AvaloniaVersion>
   </PropertyGroup>
-
+  
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <DebugSymbols>False</DebugSymbols>
     <DebugType>None</DebugType>
   </PropertyGroup>
-
+  
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning" Condition="!Exists('packages.config')">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  
 </Project>

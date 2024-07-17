@@ -4,7 +4,10 @@
 #define MyAppSourceFolder "publish"
 #define MyAppExeName MyAppName + ".Desktop.exe"
 #define MyAppFileVersion GetStringFileInfo(MyAppSourceFolder + '\' + MyAppExeName, FILE_VERSION)
-#define MyAppProductVersion GetStringFileInfo(MyAppSourceFolder + '\' + MyAppExeName, PRODUCT_VERSION)
+
+#ifndef MyAppProductVersion
+	#define MyAppProductVersion GetStringFileInfo(MyAppSourceFolder + '\' + MyAppExeName, PRODUCT_VERSION)
+#endif
 
 [Setup]
 AppId={{2B380828-6D33-457B-B562-1A84B8043FD0}
