@@ -21,10 +21,14 @@ Data is never altered in any way.
 
 ## Screenshots
 
+### Search
 ![Search](/assets/lumidex_search.png?raw=true "Search")
 
+### Aliases
 ![Alias](/assets/lumidex_aliases.png?raw=true "Aliases")
 
+### Tags
 ![Tags](/assets/lumidex_tags.png?raw=true "Tags")
 
+### Library
 ![Library](/assets/lumidex_library.png?raw=true "Library")
