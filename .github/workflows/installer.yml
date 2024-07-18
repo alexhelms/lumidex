@@ -13,12 +13,6 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: 'Cleanup build folder'
-        run: |
-          ls -la ./
-          rm -rf ./* || true
-          rm -rf ./.??* || true
-          ls -la ./
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
