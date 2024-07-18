@@ -187,7 +187,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
         {
             try
             {
-                Process.Start(process, argument);
+                Process.Start(process, $"\"{argument}\"");
             }
             catch (Exception e)
             {
