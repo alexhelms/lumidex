@@ -31,7 +31,7 @@ jobs:
       - name: Installer
         run: |
           $VERSION = (dotnet tool run nbgv get-version)[3].Split(":")[1].Trim()
-          & '${{ env.ISCC }}' lumidex-installer-win.iss /DMyAppProductVersion=$env:VERSION
+          & '${{ env.ISCC }}' lumidex-installer-win.iss /DMyAppProductVersion=${VERSION}
       - uses: LanceMcCarthy/Action-AzureBlobUpload@v3.1.3
         with:
           connection_string: ${{ secrets.INSTALLERBLOBCONNECTIONSTRING }}
