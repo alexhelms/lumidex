@@ -35,5 +35,8 @@ jobs:
       - uses: LanceMcCarthy/Action-AzureBlobUpload@v3.1.3
         with:
           connection_string: ${{ secrets.INSTALLERBLOBCONNECTIONSTRING }}
+          fail_if_source_empty: true
+          is_recursive: true
           container_name: installers
-          source_folder: dist
+          source_folder: dist\
+          destination_folder: \
