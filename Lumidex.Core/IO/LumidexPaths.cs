@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-
-namespace Lumidex.Core.IO;
+﻿namespace Lumidex.Core.IO;
 
 public static class LumidexPaths
 {
@@ -19,9 +17,9 @@ public static class LumidexPaths
     {
         get
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (OperatingSystem.IsWindows())
                 return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Lumidex Library");
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            else if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
                 return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "lumidex");
             throw new PlatformNotSupportedException();
         }
