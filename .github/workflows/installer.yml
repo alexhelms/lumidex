@@ -9,7 +9,7 @@ env:
 
 jobs:
   installer:
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [self-hosted, windows, x64]
     permissions:
       contents: read
     steps:
