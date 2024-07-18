@@ -22,6 +22,10 @@ public static class NativeLoader
         {
             platform = "linux";
         }
+        else if (OperatingSystem.IsMacOS())
+        {
+            platform = "macos";
+        }
         else
             throw new PlatformNotSupportedException();
 
@@ -37,6 +41,10 @@ public static class NativeLoader
             prefix = string.Empty;
         }
         else if (OperatingSystem.IsLinux())
+        {
+            prefix = "lib";
+        }
+        else if (OperatingSystem.IsMacOS())
         {
             prefix = "lib";
         }
