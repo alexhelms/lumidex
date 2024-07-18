@@ -1,0 +1,41 @@
+name: Build
+
+on: workflow_dispatch
+
+
+env:
+  PROJECT: Lumidex.Desktop/Lumidex.Desktop.csproj
+  ISCC: C:\Program Files (x86)\Inno Setup 6\ISCC.exe
+
+jobs:
+  installer:
+    runs-on: [self-hosted, linux, x64]
+    permissions:
+      contents: read
+    steps:
+      - name: 'Cleanup build folder'
+        run: |
+          ls -la ./
+          rm -rf ./* || true
+          rm -rf ./.??* || true
+          ls -la ./
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.x
+      - name: Restore
+        run: dotnet restore ${{ env.PROJECT }}
+      - name: Tools
+        run: dotnet tool restore
+      - name: Publish
+        run: dotnet publish ${{ env.PROJECT }} -r win-x64 --self-contained -c Release -o publish-win
+      - name: Version
+        run: $VERSION = (dotnet tool run nbgv get-version)[3].Split(":")[1].Trim()
+      - name: Installer
+        run: "& '${{ env.ISCC }}' lumidex-installer-win.iss /DMyAppProductVersion=${VERSION}"
+      - uses: bacongobbler/azure-blob-storage-upload@v3.0.0
+        with:
+          source_dir: dist/win
+          container_name: installers
+          connection_string: ${{ secrets.INSTALLERBLOBCONNECTIONSTRING }}
+          extra_args: '--pattern *.exe --destination-path win'

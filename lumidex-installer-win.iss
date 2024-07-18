@@ -1,7 +1,7 @@
 #define MyAppName "Lumidex"
 #define MyAppPublisher "Alex Helms"
 #define MyAppURL "https://github.com/alexhelms/lumidex"
-#define MyAppSourceFolder "publish"
+#define MyAppSourceFolder "publish-win"
 #define MyAppExeName MyAppName + ".Desktop.exe"
 #define MyAppFileVersion GetStringFileInfo(MyAppSourceFolder + '\' + MyAppExeName, FILE_VERSION)
 
@@ -26,7 +26,7 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
-OutputDir=dist
+OutputDir=dist/win
 OutputBaseFilename={#MyAppName}-{#MyAppProductVersion}
 SetupIconFile=Lumidex\Assets\lumidex-icon.ico
 Compression=lzma2
