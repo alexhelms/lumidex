@@ -5,10 +5,6 @@ Organize your astrophotography library.
 Lumidex scans folders with your image files, reads the headers, and builds a database.
 Data is never altered in any way.
 
-> [!WARNING]
-> Lumidex is very early in development and unstable.
-> For the time being you must build Lumidex to use it.
-
 ## Features
 - Windows only for now, Linux and MacOS support soon
 - .FITS and .XISF files
@@ -18,6 +14,10 @@ Data is never altered in any way.
 - Tags -> Group your images with tags
 - Quick Scan -> only scan files added since the last scan
 - Statistics -> See your total integration time and breakdown by filter
+
+## Get Lumidex
+
+Check out the repo [releases](https://github.com/alexhelms/lumidex/releases) to download an installer.
 
 ## Screenshots
 
