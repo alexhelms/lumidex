@@ -23,9 +23,13 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.x
+      - name: Restore Tools
+        run: dotnet tool restore
       - name: Restore
         run: dotnet restore ${{ env.SOLUTION }}
       - name: Build
         run: dotnet build ${{ env.SOLUTION }} -c Release --no-restore
+      - name: Show Version
+        run: dotnet tool run dotnet-gitversion
       - name: Test
         run: dotnet test ${{ env.SOLUTION }} -c Release --no-build
