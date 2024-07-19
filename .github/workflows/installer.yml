@@ -26,11 +26,11 @@ jobs:
         run: dotnet tool restore
       - name: Publish
         run: dotnet publish ${{ env.PROJECT }} -r win-x64 --self-contained -c Release -o publish-win
-      - name: Version
-        run: dotnet tool run nbgv get-version
+      - name: Show Version
+        run: dotnet tool run dotnet-gitversion
       - name: Installer
         run: |
-          $VERSION = (dotnet tool run nbgv get-version)[3].Split(":")[1].Trim()
+          $VERSION=(dotnet tool run dotnet-gitversion /showvariable SemVer)
           & '${{ env.ISCC }}' lumidex-installer-win.iss /DMyAppProductVersion=${VERSION}
       - uses: LanceMcCarthy/Action-AzureBlobUpload@v3.1.3
         with:

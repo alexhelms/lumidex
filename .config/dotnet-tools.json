@@ -2,10 +2,10 @@
   "version": 1,
   "isRoot": true,
   "tools": {
-    "nbgv": {
-      "version": "3.6.139",
+    "gitversion.tool": {
+      "version": "5.12.0",
       "commands": [
-        "nbgv"
+        "dotnet-gitversion"
       ],
       "rollForward": false
     }

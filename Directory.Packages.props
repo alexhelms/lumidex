@@ -37,7 +37,7 @@
     <PackageVersion Include="HotAvalonia" Version="1.1.1" />
     <PackageVersion Include="HotAvalonia.Extensions" Version="1.1.1" />
     <PackageVersion Include="Avalonia.Markup.Xaml.Loader" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Nerdbank.GitVersioning" Version="3.6.139" />
+    <PackageVersion Include="GitVersion.MsBuild" Version="5.12" />
 
 	  <!-- Testing -->
    <PackageVersion Include="coverlet.collector" Version="6.0.2" />
