@@ -4,12 +4,10 @@ on:
   push:
     branches:
       - 'main'
+      - 'feature/**'
+      - 'bug/**'
     tags:
       - 'v*'
-  pull_request:
-    branches:
-      - 'main'
-
  
 jobs:
   build:

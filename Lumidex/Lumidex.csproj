@@ -30,7 +30,9 @@
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="Avalonia.Xaml.Behaviors" />
     <PackageReference Include="Avalonia.Xaml.Interactivity" />
+    <PackageReference Include="AvaloniaDialogs" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="DialogHost.Avalonia" />
     <PackageReference Include="Humanizer" />
     <PackageReference Include="Microsoft.Extensions.Logging" />
     <PackageReference Include="ObservableCollectionEx" />
