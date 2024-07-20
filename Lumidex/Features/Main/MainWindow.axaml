@@ -3,6 +3,7 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dialogs="using:AvaloniaDialogs.Views"
     xmlns:main="clr-namespace:Lumidex.Features.Main"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:Lumidex.ViewModels"
@@ -14,5 +15,10 @@
     ExtendClientAreaToDecorationsHint="True"
     Icon="/Assets/lumidex-icon.ico"
     mc:Ignorable="d">
-    <main:MainView />
+    <dialogs:ReactiveDialogHost
+        CloseOnClickAway="False"
+        DisableOpeningAnimation="True"
+        OverlayBackground="#44dddddd">
+        <main:MainView />
+    </dialogs:ReactiveDialogHost>
 </Window>

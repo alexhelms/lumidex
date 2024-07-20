@@ -1,7 +1,7 @@
-﻿using Avalonia.Controls;
-using Lumidex.Core.Data;
+﻿using Lumidex.Core.Data;
 using Lumidex.Core.Pipelines;
 using Lumidex.Features.Library.Messages;
+using Lumidex.Services;
 using Lumidex.Validation;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
@@ -10,6 +10,7 @@ namespace Lumidex.Features.Library;
 
 public partial class LibraryViewModel : ValidatableViewModelBase
 {
+    private readonly DialogService _dialogService;
     private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
     private readonly Func<LibraryIngestPipeline> _pipelineFactory;
 
@@ -47,9 +48,11 @@ public partial class LibraryViewModel : ValidatableViewModelBase
     public ObservableCollectionEx<FileErrorViewModel> ScanErrors { get; } = new();
 
     public LibraryViewModel(
+        DialogService dialogService,
         IDbContextFactory<LumidexDbContext> dbContextFactory,
         Func<LibraryIngestPipeline> pipelineFactory)
     {
+        _dialogService = dialogService;
         _dbContextFactory = dbContextFactory;
         _pipelineFactory = pipelineFactory;
     }
@@ -183,22 +186,18 @@ public partial class LibraryViewModel : ValidatableViewModelBase
     [RelayCommand]
     private async Task ChangeLibraryPath()
     {
-        // TODO: move file dialog operations into a service.
-        if (TopLevel.GetTopLevel(View) is { } topLevel)
-        {
-            var startLocation = await topLevel.StorageProvider.TryGetFolderFromPathAsync(new Uri(Path));
-            var folder = await topLevel.StorageProvider.OpenFolderPickerAsync(new()
+        var folder = await _dialogService.ShowFolderPicker(
+            new()
             {
                 AllowMultiple = false,
-                SuggestedStartLocation = startLocation,
                 Title = $"{Name} Library",
-            });
+            },
+            startLocation: Path);
 
-            if (folder.Count == 1)
-            {
-                Path = Uri.UnescapeDataString(folder[0].Path.AbsolutePath);
-                SaveChanges();
-            }
+        if (folder.Count == 1)
+        {
+            Path = Uri.UnescapeDataString(folder[0].Path.AbsolutePath);
+            SaveChanges();
         }
     }
 
@@ -219,20 +218,21 @@ public partial class LibraryViewModel : ValidatableViewModelBase
     public bool CanQuickScanLibrary => !HasErrors && !Scanning && LastScan is not null; 
 
     [RelayCommand(CanExecute = nameof(CanDeleteLibrary))]
-    private void DeleteLibrary()
+    private async Task DeleteLibrary()
     {
-        // TODO: Confirmation dialog since this is a destructive action.
-
-        Messenger.Send(new DeleteLibrary
-        { 
-            Library = new Common.LibraryViewModel
+        if (await _dialogService.ShowConfirmationDialog("Are you sure you want to delete this library?"))
+        {
+            Messenger.Send(new DeleteLibrary
             {
-                Id = Id,
-                Name = Name,
-                Path = Path,
-                LastScan = LastScan,
-            },
-        });
+                Library = new Common.LibraryViewModel
+                {
+                    Id = Id,
+                    Name = Name,
+                    Path = Path,
+                    LastScan = LastScan,
+                },
+            });
+        }
     }
 
     public bool CanDeleteLibrary

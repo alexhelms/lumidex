@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Lumidex.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Lumidex;
 
@@ -11,6 +12,8 @@ public static class DependencyInjection
 
         RegisterAllDerivedTypes<Avalonia.Controls.Window>(services);
         RegisterAllDerivedTypes<Avalonia.Controls.UserControl>(services);
+
+        services.AddSingleton<DialogService>();
     }
 
     private static IEnumerable<Type> GetDerivedTypes<T>()

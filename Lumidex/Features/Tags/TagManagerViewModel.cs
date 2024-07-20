@@ -2,6 +2,7 @@
 using Avalonia.Media;
 using Lumidex.Core.Data;
 using Lumidex.Features.Tags.Messages;
+using Lumidex.Services;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
@@ -23,6 +24,7 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
 {
     private static readonly Color DefaultColor = Color.Parse(Tag.DefaultColor);
 
+    private readonly DialogService _dialogService;
     private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
 
     [ObservableProperty]
@@ -37,8 +39,10 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
     [ObservableProperty] TagViewModel? _selectedTag;
 
     public TagManagerViewModel(
+        DialogService dialogService,
         IDbContextFactory<LumidexDbContext> dbContextFactory)
     {
+        _dialogService = dialogService;
         _dbContextFactory = dbContextFactory;
 
         using var dbContext = _dbContextFactory.CreateDbContext();
@@ -398,15 +402,17 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
     }
 
     [RelayCommand]
-    private void DeleteTag(int id)
+    private async Task DeleteTag(int id)
     {
-        var tag = Tags.FirstOrDefault(tag => tag.Id == id);
-        if (tag is not null)
+        if (await _dialogService.ShowConfirmationDialog("Are you sure you want to delete this tag?"))
         {
-            Messenger.Send(new DeleteTag
+            if (Tags.FirstOrDefault(tag => tag.Id == id) is { } tag)
             {
-                Tag = tag,
-            });
+                Messenger.Send(new DeleteTag
+                {
+                    Tag = tag,
+                });
+            }
         }
     }
 
