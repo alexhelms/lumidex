@@ -101,7 +101,17 @@ public partial class LibraryViewModel : ValidatableViewModelBase
         {
             library.Name = Name;
             library.Path = Path;
-            dbContext.SaveChanges();
+            if (dbContext.SaveChanges() > 0)
+            {
+                var vm = new Common.LibraryViewModel
+                {
+                    Id = library.Id,
+                    Name = library.Name,
+                    Path = library.Path,
+                    LastScan = library.LastScan,
+                };
+                Messenger.Send(new LibraryEdited { Library = vm });
+            }
         }
     }
 
