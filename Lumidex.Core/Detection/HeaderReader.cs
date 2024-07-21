@@ -242,6 +242,9 @@ public class HeaderReader
             "OFFSET");
         ExtractKeyword<int, int?>(header, imageFile, x => x.Binning,
             "XBINNING", "CCDXBIN");
+        ExtractKeyword<double, int?>(header, imageFile, x => x.Binning,
+            x => (int)x, // Some software writes these as doubles instead of integers
+            "XBINNING", "CCDXBIN");
         ExtractKeyword<double, double?>(header, imageFile, x => x.PixelSize,
             "XPIXSZ");
         ExtractKeyword<string, string?>(header, imageFile, x => x.ReadoutMode!,
