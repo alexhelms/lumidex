@@ -1,6 +1,7 @@
 ﻿using Lumidex.Core.Data;
 using Lumidex.Features.Aliases.Messages;
 using Lumidex.Features.Library.Messages;
+using Lumidex.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Lumidex.Features.Aliases;
@@ -12,7 +13,9 @@ public partial class AliasManagerViewModel : ValidatableViewModelBase,
     IRecipient<AliasCreated>,
     IRecipient<AliasDeleted>
 {
-    private StringComparer _comparer = StringComparer.InvariantCultureIgnoreCase;
+    private readonly StringComparer _comparer = StringComparer.InvariantCultureIgnoreCase;
+
+    private readonly DialogService _dialogService;
     private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
 
     [ObservableProperty] ObjectNameViewModel? _selectedItem;
@@ -22,8 +25,11 @@ public partial class AliasManagerViewModel : ValidatableViewModelBase,
     public DataGridCollectionView ObjectNameView { get; private set; } = new(Array.Empty<ObjectNameViewModel>());
     public DataGridCollectionView AliasView { get; private set; } = new(Array.Empty<AliasViewModel>());
 
-    public AliasManagerViewModel(IDbContextFactory<LumidexDbContext> dbContextFactory)
+    public AliasManagerViewModel(
+        DialogService dialogService,
+        IDbContextFactory<LumidexDbContext> dbContextFactory)
     {
+        _dialogService = dialogService;
         _dbContextFactory = dbContextFactory;
 
         RefreshObjectNamesAndAliases();
@@ -173,6 +179,40 @@ public partial class AliasManagerViewModel : ValidatableViewModelBase,
                     objectName.Aliases.Remove(alias);
                 }
             }
+        }
+    }
+
+    [RelayCommand]
+    private async Task DeleteAliasGroup(string? aliasName)
+    {
+        if (aliasName is null) return;
+
+        if (await _dialogService.ShowConfirmationDialog("Are you sure you want to delete these aliases?"))
+        {
+            var aliasIds = Aliases
+            .Where(alias => alias.Alias.Equals(aliasName, StringComparison.InvariantCultureIgnoreCase))
+            .Select(alias => alias.Id)
+            .ToArray();
+
+            foreach (var id in aliasIds)
+            {
+                Messenger.Send(new DeleteAlias
+                {
+                    Id = id,
+                });
+            }
+        }
+    }
+
+    [RelayCommand]
+    private async Task DeleteAlias(AliasViewModel alias)
+    {
+        if (await _dialogService.ShowConfirmationDialog("Are you sure you want to delete this alias?"))
+        {
+            Messenger.Send(new DeleteAlias
+            {
+                Id = alias.Id,
+            });
         }
     }
 }

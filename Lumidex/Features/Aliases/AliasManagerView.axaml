@@ -72,11 +72,35 @@
             SelectionMode="Single"
             VerticalScrollBarVisibility="Visible">
             <DataGrid.Styles>
+                <Style Selector="ScrollBar">
+                    <Setter Property="AllowAutoHide" Value="False" />
+                </Style>
                 <Style Selector="DataGridColumnHeader">
                     <Setter Property="Foreground" Value="White" />
                 </Style>
-                <Style Selector="ScrollBar">
-                    <Setter Property="AllowAutoHide" Value="False" />
+                <Style Selector="DataGridRowGroupHeader">
+                    <Setter Property="ContextMenu">
+                        <Setter.Value>
+                            <ContextMenu>
+                                <MenuItem
+                                    Command="{Binding #AliasDataGrid.((alias:AliasManagerViewModel)DataContext).DeleteAliasGroupCommand}"
+                                    CommandParameter="{ReflectionBinding Key}"
+                                    Header="Delete" />
+                            </ContextMenu>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+                <Style Selector="DataGridRow">
+                    <Setter Property="ContextMenu">
+                        <Setter.Value>
+                            <ContextMenu>
+                                <MenuItem
+                                    Command="{Binding #AliasDataGrid.((alias:AliasManagerViewModel)DataContext).DeleteAliasCommand}"
+                                    CommandParameter="{Binding}"
+                                    Header="Delete" />
+                            </ContextMenu>
+                        </Setter.Value>
+                    </Setter>
                 </Style>
             </DataGrid.Styles>
             <DataGrid.Columns>
