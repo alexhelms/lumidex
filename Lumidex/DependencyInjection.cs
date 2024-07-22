@@ -1,4 +1,5 @@
-﻿using Lumidex.Services;
+﻿using Lumidex.Features.MainSearch.Editing;
+using Lumidex.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Lumidex;
@@ -12,6 +13,8 @@ public static class DependencyInjection
 
         RegisterAllDerivedTypes<Avalonia.Controls.Window>(services);
         RegisterAllDerivedTypes<Avalonia.Controls.UserControl>(services);
+
+        services.AddTransient<Func<EditItemsViewModel>>(provider => () => provider.GetRequiredService<EditItemsViewModel>());
 
         services.AddSingleton<DialogService>();
     }

@@ -7,7 +7,6 @@ using Serilog;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO.Abstractions;
-using System.Linq;
 using System.Threading.Tasks.Dataflow;
 
 namespace Lumidex.Core.Pipelines;

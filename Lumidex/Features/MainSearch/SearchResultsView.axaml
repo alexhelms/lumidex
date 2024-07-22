@@ -118,6 +118,8 @@
                         <Setter Property="ContextMenu">
                             <Setter.Value>
                                 <ContextMenu>
+                                    <MenuItem Command="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ShowEditDialogCommand}" Header="Edit" />
+                                    <Separator />
                                     <MenuItem
                                         Header="Add Tag"
                                         IsEnabled="{Binding !!#SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).AllTags.Count}"
