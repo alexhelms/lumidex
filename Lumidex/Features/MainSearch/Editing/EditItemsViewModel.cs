@@ -1,5 +1,6 @@
 ﻿using Humanizer;
 using Lumidex.Core.Data;
+using Lumidex.Features.MainSearch.Editing.Messages;
 using Lumidex.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
@@ -85,6 +86,14 @@ public partial class EditItemsViewModel : ViewModelBase
 
                 int count = dbContext.SaveChanges();
                 Log.Information("{Count} items edited", count);
+
+                if (count > 0)
+                {
+                    Messenger.Send(new ImageFilesEditedMessage
+                    {
+                        ImageFiles = SelectedItems,
+                    });
+                }
             }
             catch (Exception e)
             {

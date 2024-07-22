@@ -1,6 +1,7 @@
 ﻿using Lumidex.Core.Data;
 using Lumidex.Features.Aliases.Messages;
 using Lumidex.Features.Library.Messages;
+using Lumidex.Features.MainSearch.Editing.Messages;
 using Lumidex.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +12,8 @@ public partial class AliasManagerViewModel : ValidatableViewModelBase,
     IRecipient<CreateAlias>,
     IRecipient<DeleteAlias>,
     IRecipient<AliasCreated>,
-    IRecipient<AliasDeleted>
+    IRecipient<AliasDeleted>,
+    IRecipient<ImageFilesEditedMessage>
 {
     private readonly StringComparer _comparer = StringComparer.InvariantCultureIgnoreCase;
 
@@ -182,6 +184,11 @@ public partial class AliasManagerViewModel : ValidatableViewModelBase,
         }
     }
 
+    public void Receive(ImageFilesEditedMessage message)
+    {
+        RefreshObjectNamesAndAliases();
+    }
+
     [RelayCommand]
     private async Task DeleteAliasGroup(string? aliasName)
     {
@@ -190,9 +197,9 @@ public partial class AliasManagerViewModel : ValidatableViewModelBase,
         if (await _dialogService.ShowConfirmationDialog("Are you sure you want to delete these aliases?"))
         {
             var aliasIds = Aliases
-            .Where(alias => alias.Alias.Equals(aliasName, StringComparison.InvariantCultureIgnoreCase))
-            .Select(alias => alias.Id)
-            .ToArray();
+                .Where(alias => alias.Alias.Equals(aliasName, StringComparison.InvariantCultureIgnoreCase))
+                .Select(alias => alias.Id)
+                .ToArray();
 
             foreach (var id in aliasIds)
             {
