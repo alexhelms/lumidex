@@ -1,6 +1,7 @@
 ﻿using Avalonia.Threading;
 using Lumidex.Core.Data;
 using Lumidex.Features.MainSearch.Actions;
+using Lumidex.Features.MainSearch.Editing;
 using Lumidex.Features.MainSearch.Messages;
 using Lumidex.Features.Tags.Messages;
 using Lumidex.Services;
@@ -17,8 +18,9 @@ public partial class SearchResultsViewModel : ViewModelBase,
     IRecipient<TagCreated>,
     IRecipient<TagDeleted>
 {
-    private readonly DialogService _dialogService;
     private readonly IFileSystem _fileSystem;
+    private readonly DialogService _dialogService;
+    private readonly Func<EditItemsViewModel> _editItemsViewModelFactory;
 
     [ObservableProperty] bool _isSearching;
     [ObservableProperty] string? _totalIntegration;
@@ -37,13 +39,16 @@ public partial class SearchResultsViewModel : ViewModelBase,
     public ActionsContainerViewModel ActionsViewModel { get; }
     
     public SearchResultsViewModel(
+        IFileSystem fileSystem,
         DialogService dialogService,
         ActionsContainerViewModel actionsViewModel,
-        IFileSystem fileSystem)
+        Func<EditItemsViewModel> editItemsViewModelFactory)
     {
-        _dialogService = dialogService;
-        ActionsViewModel = actionsViewModel;
         _fileSystem = fileSystem;
+        _dialogService = dialogService;
+
+        ActionsViewModel = actionsViewModel;
+        _editItemsViewModelFactory = editItemsViewModelFactory;
     }
 
     protected override void OnInitialActivated()
@@ -132,6 +137,17 @@ public partial class SearchResultsViewModel : ViewModelBase,
     public void Receive(TagDeleted message)
     {
         AllTags.Remove(message.Tag);
+    }
+
+    [RelayCommand]
+    private async Task ShowEditDialog()
+    {
+        var vm = _editItemsViewModelFactory();
+        vm.SelectedItems = SelectedSearchResults;
+        _ = await _dialogService.ShowDialog(vm, onOpen: (o, e) =>
+        {
+            vm.CloseDialog = () => e.Session.Close();
+        });
     }
 
     [RelayCommand]

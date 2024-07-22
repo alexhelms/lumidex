@@ -3,6 +3,7 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dialogHost="using:DialogHostAvalonia"
     xmlns:dialogs="using:AvaloniaDialogs.Views"
     xmlns:main="clr-namespace:Lumidex.Features.Main"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -16,7 +17,9 @@
     Icon="/Assets/lumidex-icon.ico"
     mc:Ignorable="d">
     <dialogs:ReactiveDialogHost
+        dialogHost:DialogHostStyle.CornerRadius="8"
         CloseOnClickAway="False"
+        DialogMargin="16"
         DisableOpeningAnimation="True"
         OverlayBackground="#44dddddd">
         <main:MainView />

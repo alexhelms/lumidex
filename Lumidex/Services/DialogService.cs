@@ -2,6 +2,7 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
 using AvaloniaDialogs.Views;
+using DialogHostAvalonia;
 
 namespace Lumidex.Services;
 
@@ -43,5 +44,33 @@ public class DialogService
             ButtonText = "OK",
         };
         await dialog.ShowAsync();
+    }
+
+    public async Task<object?> ShowDialog<T>(T viewModel)
+        where T : IViewModelBase
+    {
+        return await DialogHost.Show(viewModel);
+    }
+
+    public async Task<object?> ShowDialog<T>(T viewModel, DialogOpenedEventHandler onOpen)
+        where T : IViewModelBase
+    {
+        return await DialogHost.Show(viewModel,
+            openedEventHandler: onOpen);
+    }
+
+    public async Task<object?> ShowDialog<T>(T viewModel, DialogClosingEventHandler onClosing)
+        where T : IViewModelBase
+    {
+        return await DialogHost.Show(viewModel,
+            closingEventHandler: onClosing);
+    }
+
+    public async Task<object?> ShowDialog<T>(T viewModel, DialogOpenedEventHandler onOpen, DialogClosingEventHandler onClosing)
+        where T : IViewModelBase
+    {
+        return await DialogHost.Show(viewModel,
+            openedEventHandler: onOpen,
+            closingEventHandler: onClosing);
     }
 }

@@ -3,7 +3,6 @@ using Lumidex.Features.MainSearch.Messages;
 using Lumidex.Features.Tags.Messages;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
-using System.Security.AccessControl;
 
 namespace Lumidex.Features.MainSearch;
 
@@ -100,12 +99,48 @@ public partial class MainSearchViewModel : ViewModelBase,
                 Path = f.Path,
                 Type = f.Type,
                 Kind = f.Kind,
-                ObjectName = f.ObjectName,
+                // Camera
+                CameraName = f.CameraName,
                 Exposure = f.Exposure,
-                FilterName = f.FilterName,
+                CameraTemperatureSetPoint = f.CameraTemperatureSetPoint,
+                CameraTemperature = f.CameraTemperature,
+                CameraGain = f.CameraGain,
+                CameraOffset = f.CameraOffset,
                 Binning = f.Binning,
+                PixelSize = f.PixelSize,
+                ReadoutMode = f.ReadoutMode,
+                //Focuser
+                FocuserName = f.FocuserName,
+                FocuserPosition = f.FocuserPosition,
+                FocuserTemperature = f.FocuserTemperature,
+                // Rotator
+                RotatorName = f.RotatorName,
+                RotatorPosition = f.RotatorPosition,
+                // FilterWheel
+                FilterWheelName = f.FilterWheelName,
+                FilterName = f.FilterName,
+                //Mount
+                MountName = f.MountName,
+                RightAscension = f.RightAscension,
+                Declination = f.Declination,
+                Altitude = f.Altitude,
+                Azimuth = f.Azimuth,
+                // Telescope
+                FocalLength = f.FocalLength,
+                Airmass = f.Airmass,
+                // Target
                 ObservationTimestampUtc = f.ObservationTimestampUtc,
                 ObservationTimestampLocal = f.ObservationTimestampLocal,
+                ObjectName = f.ObjectName,
+                // Site
+                Latitude = f.Latitude,
+                Longitude = f.Longitude,
+                Elevation = f.Elevation,
+                // Weather
+                DewPoint = f.DewPoint,
+                Humidity = f.Humidity,
+                Pressure = f.Pressure,
+                Temperature = f.Temperature,
             })
             .ToList();
 
