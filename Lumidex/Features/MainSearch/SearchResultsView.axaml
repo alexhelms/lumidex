@@ -20,226 +20,245 @@
         <converter:FilenameConverter x:Key="Filename" />
         <converter:ColorToBrushConverter x:Key="ColorToBrush" />
     </UserControl.Resources>
-    <Grid ColumnDefinitions="3*,Auto,0.75*">
-        <DockPanel>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*" MinWidth="100" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="0.75*" MinWidth="100" />
+        </Grid.ColumnDefinitions>
 
-            <!--  Actions  -->
-            <Border
-                Height="300"
-                BorderBrush="#33656565"
-                BorderThickness="1,0,1,1"
-                DockPanel.Dock="Bottom">
-                <ContentControl Height="300" Content="{Binding ActionsViewModel}" />
-            </Border>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="3*" MinHeight="200" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="1*" MinHeight="200" />
+            </Grid.RowDefinitions>
 
-            <!--  Result Stats  -->
-            <Border
-                Padding="6"
-                BorderBrush="#55656565"
-                BorderThickness="1,0,1,1"
-                DockPanel.Dock="Bottom">
-                <StackPanel Orientation="Horizontal">
+            <DockPanel Grid.Row="0">
+                <!--  Result Stats  -->
+                <Border
+                    Padding="6"
+                    BorderBrush="#55656565"
+                    BorderThickness="1,0,1,1"
+                    DockPanel.Dock="Bottom">
+                    <StackPanel Orientation="Horizontal">
 
-                    <TextBlock Text="Rows" />
-                    <TextBlock Margin="8,0,0,0" Text="{Binding SearchResults.Count, FallbackValue=0}" />
-                    <TextBlock
-                        Margin="8,0"
-                        Opacity="0.3"
-                        Text="|" />
+                        <TextBlock Text="Rows" />
+                        <TextBlock Margin="8,0,0,0" Text="{Binding SearchResults.Count, FallbackValue=0}" />
+                        <TextBlock
+                            Margin="8,0"
+                            Opacity="0.3"
+                            Text="|" />
 
-                    <TextBlock Text="Lights" />
-                    <TextBlock Margin="8,0,0,0" Text="{Binding LightCount, FallbackValue=0}" />
-                    <TextBlock
-                        Margin="8,0"
-                        Opacity="0.3"
-                        Text="|" />
+                        <TextBlock Text="Lights" />
+                        <TextBlock Margin="8,0,0,0" Text="{Binding LightCount, FallbackValue=0}" />
+                        <TextBlock
+                            Margin="8,0"
+                            Opacity="0.3"
+                            Text="|" />
 
-                    <TextBlock Text="Flats" />
-                    <TextBlock Margin="8,0,0,0" Text="{Binding FlatCount, FallbackValue=0}" />
-                    <TextBlock
-                        Margin="8,0"
-                        Opacity="0.3"
-                        Text="|" />
+                        <TextBlock Text="Flats" />
+                        <TextBlock Margin="8,0,0,0" Text="{Binding FlatCount, FallbackValue=0}" />
+                        <TextBlock
+                            Margin="8,0"
+                            Opacity="0.3"
+                            Text="|" />
 
-                    <TextBlock Text="Darks" />
-                    <TextBlock Margin="8,0,0,0" Text="{Binding DarkCount, FallbackValue=0}" />
-                    <TextBlock
-                        Margin="8,0"
-                        Opacity="0.3"
-                        Text="|" />
+                        <TextBlock Text="Darks" />
+                        <TextBlock Margin="8,0,0,0" Text="{Binding DarkCount, FallbackValue=0}" />
+                        <TextBlock
+                            Margin="8,0"
+                            Opacity="0.3"
+                            Text="|" />
 
-                    <TextBlock Text="Bias" />
-                    <TextBlock Margin="8,0,0,0" Text="{Binding BiasCount, FallbackValue=0}" />
-                    <TextBlock
-                        Margin="8,0"
-                        Opacity="0.3"
-                        Text="|" />
+                        <TextBlock Text="Bias" />
+                        <TextBlock Margin="8,0,0,0" Text="{Binding BiasCount, FallbackValue=0}" />
+                        <TextBlock
+                            Margin="8,0"
+                            Opacity="0.3"
+                            Text="|" />
 
-                    <TextBlock Text="Unknown" />
-                    <TextBlock Margin="8,0,0,0" Text="{Binding UnknownCount, FallbackValue=0}" />
-                    <TextBlock
-                        Margin="8,0"
-                        Opacity="0.3"
-                        Text="|" />
+                        <TextBlock Text="Unknown" />
+                        <TextBlock Margin="8,0,0,0" Text="{Binding UnknownCount, FallbackValue=0}" />
+                        <TextBlock
+                            Margin="8,0"
+                            Opacity="0.3"
+                            Text="|" />
 
-                    <TextBlock Text="Selected" />
-                    <TextBlock Margin="8,0,0,0" Text="{Binding SelectedSearchResults.Count, FallbackValue=0}" />
-                    <TextBlock
-                        Margin="8,0"
-                        Opacity="0.3"
-                        Text="|" />
+                        <TextBlock Text="Selected" />
+                        <TextBlock Margin="8,0,0,0" Text="{Binding SelectedSearchResults.Count, FallbackValue=0}" />
+                        <TextBlock
+                            Margin="8,0"
+                            Opacity="0.3"
+                            Text="|" />
 
-                </StackPanel>
-            </Border>
+                    </StackPanel>
+                </Border>
 
-            <!--  Search Results  -->
-            <DataGrid
-                x:Name="SearchResultsDataGrid"
-                Grid.Column="0"
-                Background="#333538"
-                BorderBrush="#33656565"
-                BorderThickness="1"
-                CanUserReorderColumns="True"
-                CanUserResizeColumns="True"
-                GridLinesVisibility="Horizontal"
-                IsReadOnly="True"
-                ItemsSource="{Binding SearchResults}"
-                SelectionChanged="DataGrid_SelectionChanged"
-                SelectionMode="Extended"
-                VerticalScrollBarVisibility="Visible">
-                <DataGrid.Styles>
-                    <Style Selector="ScrollBar">
-                        <Setter Property="AllowAutoHide" Value="False" />
-                    </Style>
-                    <Style Selector="DataGridColumnHeader">
-                        <Setter Property="Foreground" Value="White" />
-                    </Style>
-                    <Style Selector="DataGridRow">
-                        <Setter Property="ContextMenu">
-                            <Setter.Value>
-                                <ContextMenu>
-                                    <MenuItem Command="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ShowEditDialogCommand}" Header="Edit" />
-                                    <Separator />
-                                    <MenuItem
-                                        Header="Add Tag"
-                                        IsEnabled="{Binding !!#SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).AllTags.Count}"
-                                        ItemsSource="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).AllTags}">
-                                        <MenuItem.Styles>
-                                            <Style Selector="MenuItem > MenuItem">
-                                                <Setter Property="Command" Value="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).AddTagCommand}" />
-                                                <Setter Property="CommandParameter" Value="{ReflectionBinding}" />
-                                            </Style>
-                                        </MenuItem.Styles>
-                                        <MenuItem.ItemTemplate>
+                <!--  Search Results  -->
+                <DataGrid
+                    x:Name="SearchResultsDataGrid"
+                    Grid.Column="0"
+                    Background="#333538"
+                    BorderBrush="#33656565"
+                    BorderThickness="1"
+                    CanUserReorderColumns="True"
+                    CanUserResizeColumns="True"
+                    GridLinesVisibility="Horizontal"
+                    IsReadOnly="True"
+                    ItemsSource="{Binding SearchResults}"
+                    SelectionChanged="DataGrid_SelectionChanged"
+                    SelectionMode="Extended"
+                    VerticalScrollBarVisibility="Visible">
+                    <DataGrid.Styles>
+                        <Style Selector="ScrollBar">
+                            <Setter Property="AllowAutoHide" Value="False" />
+                        </Style>
+                        <Style Selector="DataGridColumnHeader">
+                            <Setter Property="Foreground" Value="White" />
+                        </Style>
+                        <Style Selector="DataGridRow">
+                            <Setter Property="ContextMenu">
+                                <Setter.Value>
+                                    <ContextMenu>
+                                        <MenuItem Command="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ShowEditDialogCommand}" Header="Edit" />
+                                        <Separator />
+                                        <MenuItem
+                                            Header="Add Tag"
+                                            IsEnabled="{Binding !!#SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).AllTags.Count}"
+                                            ItemsSource="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).AllTags}">
+                                            <MenuItem.Styles>
+                                                <Style Selector="MenuItem > MenuItem">
+                                                    <Setter Property="Command" Value="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).AddTagCommand}" />
+                                                    <Setter Property="CommandParameter" Value="{ReflectionBinding}" />
+                                                </Style>
+                                            </MenuItem.Styles>
+                                            <MenuItem.ItemTemplate>
+                                                <DataTemplate DataType="common:TagViewModel">
+                                                    <TextBlock
+                                                        Padding="8,4"
+                                                        HorizontalAlignment="Left"
+                                                        VerticalAlignment="Center"
+                                                        Background="{Binding Brush}"
+                                                        Text="{Binding Name}" />
+                                                </DataTemplate>
+                                            </MenuItem.ItemTemplate>
+                                        </MenuItem>
+                                        <MenuItem
+                                            Command="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).RemoveAllTagsFromSelectionCommand}"
+                                            Header="Remove Tags"
+                                            IsEnabled="{ReflectionBinding !!Tags.Count}" />
+                                        <Separator />
+                                        <MenuItem
+                                            Command="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).OpenInPixInsightCommand}"
+                                            CommandParameter="{Binding}"
+                                            Header="Open in PixInsight" />
+                                        <MenuItem
+                                            Command="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).OpenInExplorerCommand}"
+                                            CommandParameter="{Binding}"
+                                            Header="Open in Explorer" />
+                                    </ContextMenu>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGrid.Styles>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding LibraryName}"
+                            Header="Library" />
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding ObjectName}"
+                            Header="Name" />
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding Type}"
+                            Header="Type" />
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding Kind}"
+                            Header="Kind" />
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding Exposure, Mode=OneWay, StringFormat={}###0.###}"
+                            Header="Exposure (s)" />
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding FilterName}"
+                            Header="Filter" />
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding Binning}"
+                            Header="Binning" />
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding ObservationTimestampLocal, Mode=OneWay, StringFormat={}yyyy-MM-dd HH:mm:ss, TargetNullValue={}}"
+                            Header="Observation (Local)" />
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding ObservationTimestampUtc, Mode=OneWay, StringFormat={}yyyy-MM-dd HH:mm:ss, TargetNullValue={}}"
+                            Header="Observation (UTC)" />
+                        <DataGridTemplateColumn x:DataType="common:ImageFileViewModel" Header="Filename">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate DataType="common:ImageFileViewModel">
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        Text="{Binding Path, Converter={StaticResource Filename}}"
+                                        ToolTip.Tip="{Binding Path}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn x:DataType="common:ImageFileViewModel" Header="Tags">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate DataType="common:ImageFileViewModel">
+                                    <ItemsControl ItemsSource="{Binding Tags}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel VerticalAlignment="Center" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
                                             <DataTemplate DataType="common:TagViewModel">
                                                 <TextBlock
-                                                    Padding="8,4"
+                                                    Margin="4,0,0,0"
+                                                    Padding="4,2"
                                                     HorizontalAlignment="Left"
                                                     VerticalAlignment="Center"
                                                     Background="{Binding Brush}"
-                                                    Text="{Binding Name}" />
+                                                    Text="{Binding Name}">
+                                                    <TextBlock.ContextMenu>
+                                                        <ContextMenu Tag="{Binding $parent[DataGridRow].DataContext}">
+                                                            <MenuItem Click="RemoveTagMenuItem_Click" Header="Remove Tag" />
+                                                        </ContextMenu>
+                                                    </TextBlock.ContextMenu>
+                                                </TextBlock>
                                             </DataTemplate>
-                                        </MenuItem.ItemTemplate>
-                                    </MenuItem>
-                                    <MenuItem
-                                        Command="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).RemoveAllTagsFromSelectionCommand}"
-                                        Header="Remove Tags"
-                                        IsEnabled="{ReflectionBinding !!Tags.Count}" />
-                                    <Separator />
-                                    <MenuItem
-                                        Command="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).OpenInPixInsightCommand}"
-                                        CommandParameter="{Binding}"
-                                        Header="Open in PixInsight" />
-                                    <MenuItem
-                                        Command="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).OpenInExplorerCommand}"
-                                        CommandParameter="{Binding}"
-                                        Header="Open in Explorer" />
-                                </ContextMenu>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </DataGrid.Styles>
-                <DataGrid.Columns>
-                    <DataGridTextColumn
-                        x:DataType="common:ImageFileViewModel"
-                        Binding="{Binding LibraryName}"
-                        Header="Library" />
-                    <DataGridTextColumn
-                        x:DataType="common:ImageFileViewModel"
-                        Binding="{Binding ObjectName}"
-                        Header="Name" />
-                    <DataGridTextColumn
-                        x:DataType="common:ImageFileViewModel"
-                        Binding="{Binding Type}"
-                        Header="Type" />
-                    <DataGridTextColumn
-                        x:DataType="common:ImageFileViewModel"
-                        Binding="{Binding Kind}"
-                        Header="Kind" />
-                    <DataGridTextColumn
-                        x:DataType="common:ImageFileViewModel"
-                        Binding="{Binding Exposure, Mode=OneWay, StringFormat={}###0.###}"
-                        Header="Exposure (s)" />
-                    <DataGridTextColumn
-                        x:DataType="common:ImageFileViewModel"
-                        Binding="{Binding FilterName}"
-                        Header="Filter" />
-                    <DataGridTextColumn
-                        x:DataType="common:ImageFileViewModel"
-                        Binding="{Binding Binning}"
-                        Header="Binning" />
-                    <DataGridTextColumn
-                        x:DataType="common:ImageFileViewModel"
-                        Binding="{Binding ObservationTimestampLocal, Mode=OneWay, StringFormat={}yyyy-MM-dd HH:mm:ss, TargetNullValue={}}"
-                        Header="Observation (Local)" />
-                    <DataGridTextColumn
-                        x:DataType="common:ImageFileViewModel"
-                        Binding="{Binding ObservationTimestampUtc, Mode=OneWay, StringFormat={}yyyy-MM-dd HH:mm:ss, TargetNullValue={}}"
-                        Header="Observation (UTC)" />
-                    <DataGridTemplateColumn x:DataType="common:ImageFileViewModel" Header="Filename">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate DataType="common:ImageFileViewModel">
-                                <TextBlock
-                                    VerticalAlignment="Center"
-                                    Text="{Binding Path, Converter={StaticResource Filename}}"
-                                    ToolTip.Tip="{Binding Path}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTemplateColumn x:DataType="common:ImageFileViewModel" Header="Tags">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate DataType="common:ImageFileViewModel">
-                                <ItemsControl ItemsSource="{Binding Tags}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <WrapPanel VerticalAlignment="Center" />
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate DataType="common:TagViewModel">
-                                            <TextBlock
-                                                Margin="4,0,0,0"
-                                                Padding="4,2"
-                                                HorizontalAlignment="Left"
-                                                VerticalAlignment="Center"
-                                                Background="{Binding Brush}"
-                                                Text="{Binding Name}">
-                                                <TextBlock.ContextMenu>
-                                                    <ContextMenu Tag="{Binding $parent[DataGridRow].DataContext}">
-                                                        <MenuItem Click="RemoveTagMenuItem_Click" Header="Remove Tag" />
-                                                    </ContextMenu>
-                                                </TextBlock.ContextMenu>
-                                            </TextBlock>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </DataGrid>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
 
-        </DockPanel>
+            <GridSplitter
+                Grid.Row="1"
+                MinHeight="4"
+                Margin="0,4"
+                Background="#55656565"
+                ResizeDirection="Rows" />
+
+            <!--  Actions  -->
+            <Border
+                Grid.Row="2"
+                BorderBrush="#33656565"
+                BorderThickness="1,0,1,1">
+                <ContentControl Content="{Binding ActionsViewModel}" />
+            </Border>
+
+        </Grid>
 
         <Border
             Grid.Column="0"
@@ -253,8 +272,8 @@
 
         <GridSplitter
             Grid.Column="1"
-            MinWidth="3"
-            Margin="6,0"
+            MinWidth="4"
+            Margin="4,0"
             Background="#55656565"
             ResizeDirection="Columns" />
 
