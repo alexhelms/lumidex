@@ -30,11 +30,11 @@ public partial class SearchResultsViewModel : ViewModelBase,
     [ObservableProperty] int _darkCount;
     [ObservableProperty] int _biasCount;
     [ObservableProperty] int _unknownCount;
-    [ObservableProperty] int _distinctObjectNameCount;
     [ObservableProperty] ObservableCollectionEx<TagViewModel> _allTags = new();
     [ObservableProperty] ObservableCollectionEx<ImageFileViewModel> _searchResults = new();
     [ObservableProperty] ObservableCollectionEx<ImageFileViewModel> _selectedSearchResults = new();
     [ObservableProperty] ObservableCollectionEx<IntegrationStatistic> _integrationStats = new();
+    [ObservableProperty] ObservableCollectionEx<string> _distinctObjectNames = new();
 
     public ActionsContainerViewModel ActionsViewModel { get; }
     
@@ -65,6 +65,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
             IsSearching = true;
             SearchResults.Clear();
             IntegrationStats.Clear();
+            DistinctObjectNames.Clear();
             TotalIntegration = null;
             TypeAggregate = null;
             LightCount = 0;
@@ -101,11 +102,11 @@ public partial class SearchResultsViewModel : ViewModelBase,
                 else UnknownCount++;
             }
             TypeAggregate = string.Join('/', LightCount, FlatCount, DarkCount, BiasCount, UnknownCount);
-            DistinctObjectNameCount = message.SearchResults
+            DistinctObjectNames = new(message.SearchResults
+                .Where(x => x.ObjectName != null)
                 .Select(x => x.ObjectName)
-                .Where(x => x is not null)
                 .Distinct()
-                .Count();
+                .Order()!);
 
             SearchResults = message.SearchResults;
         });
@@ -113,16 +114,16 @@ public partial class SearchResultsViewModel : ViewModelBase,
         static IEnumerable<IntegrationStatistic> ComputeIntegrationStatistics(IEnumerable<ImageFileViewModel> images)
         {
             var results = images
-            .Where(img => img.Type == ImageType.Light)
-            .GroupBy(img => img.FilterName)
-            .Select(grp => new IntegrationStatistic
-            {
-                Filter = grp.Key ?? "None",
-                Count = grp.Count(),
-                TotalIntegration = TimeSpan.FromSeconds(grp
-                    .Sum(img => img.Exposure.GetValueOrDefault()))
+                .Where(img => img.Type == ImageType.Light)
+                .GroupBy(img => img.FilterName)
+                .Select(grp => new IntegrationStatistic
+                {
+                    Filter = grp.Key ?? "None",
+                    Count = grp.Count(),
+                    TotalIntegration = TimeSpan.FromSeconds(grp
+                        .Sum(img => img.Exposure.GetValueOrDefault()))
 
-            });
+                });
 
             return new ObservableCollectionEx<IntegrationStatistic>(results);
         }

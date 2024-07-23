@@ -260,18 +260,14 @@
 
         <StackPanel Grid.Column="2">
 
-            <Grid Margin="0,8,0,0" RowDefinitions="*,*">
+            <Grid Margin="0,8,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
+                <TextBlock Grid.Column="0" Text="Total Integration (hr)" />
                 <TextBlock
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    Text="Total Integration (hr)" />
-                <TextBlock
-                    Grid.Row="0"
                     Grid.Column="1"
                     Text="{Binding TotalIntegration, TargetNullValue={}--}"
                     TextAlignment="Right" />
@@ -314,6 +310,33 @@
                         Header="Count" />
                 </DataGrid.Columns>
             </DataGrid>
+
+            <Rectangle
+                Height="1"
+                Margin="8,12"
+                Fill="#55656565" />
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="Objects" />
+                <TextBlock
+                    Grid.Column="1"
+                    Text="{Binding DistinctObjectNames.Count}"
+                    TextAlignment="Right" />
+
+            </Grid>
+
+            <ListBox
+                Height="300"
+                Margin="0,12,0,0"
+                Background="#333538"
+                BorderBrush="#55656565"
+                BorderThickness="1"
+                ItemsSource="{Binding DistinctObjectNames}" />
 
         </StackPanel>
     </Grid>
