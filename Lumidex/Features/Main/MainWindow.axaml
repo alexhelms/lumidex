@@ -18,6 +18,7 @@
     mc:Ignorable="d">
     <dialogs:ReactiveDialogHost
         dialogHost:DialogHostStyle.CornerRadius="8"
+        Background="{DynamicResource SystemRegionColor}"
         CloseOnClickAway="False"
         DialogMargin="16"
         DisableOpeningAnimation="True"
