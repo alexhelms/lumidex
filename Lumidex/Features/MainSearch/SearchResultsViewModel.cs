@@ -2,12 +2,14 @@
 using Lumidex.Core.Data;
 using Lumidex.Features.MainSearch.Actions;
 using Lumidex.Features.MainSearch.Editing;
+using Lumidex.Features.MainSearch.Editing.Messages;
 using Lumidex.Features.MainSearch.Messages;
 using Lumidex.Features.Tags.Messages;
 using Lumidex.Services;
 using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Runtime.InteropServices;
+using Tmds.DBus.Protocol;
 
 namespace Lumidex.Features.MainSearch;
 
@@ -16,7 +18,8 @@ public partial class SearchResultsViewModel : ViewModelBase,
     IRecipient<SearchResultsReady>,
     IRecipient<SearchComplete>,
     IRecipient<TagCreated>,
-    IRecipient<TagDeleted>
+    IRecipient<TagDeleted>,
+    IRecipient<ImageFilesEdited>
 {
     private readonly IFileSystem _fileSystem;
     private readonly DialogService _dialogService;
@@ -49,6 +52,15 @@ public partial class SearchResultsViewModel : ViewModelBase,
 
         ActionsViewModel = actionsViewModel;
         _editItemsViewModelFactory = editItemsViewModelFactory;
+    }
+
+    private IEnumerable<string> GetDistinctObjectNames(IEnumerable<ImageFileViewModel> items)
+    {
+        return items
+            .Where(x => x.ObjectName != null)
+            .Select(x => x.ObjectName)
+            .Distinct()
+            .Order()!;
     }
 
     protected override void OnInitialActivated()
@@ -102,11 +114,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
                 else UnknownCount++;
             }
             TypeAggregate = string.Join('/', LightCount, FlatCount, DarkCount, BiasCount, UnknownCount);
-            DistinctObjectNames = new(message.SearchResults
-                .Where(x => x.ObjectName != null)
-                .Select(x => x.ObjectName)
-                .Distinct()
-                .Order()!);
+            DistinctObjectNames = new(GetDistinctObjectNames(message.SearchResults));
 
             SearchResults = message.SearchResults;
         });
@@ -138,6 +146,11 @@ public partial class SearchResultsViewModel : ViewModelBase,
     public void Receive(TagDeleted message)
     {
         AllTags.Remove(message.Tag);
+    }
+
+    public void Receive(ImageFilesEdited message)
+    {
+        DistinctObjectNames = new(GetDistinctObjectNames(SearchResults));
     }
 
     [RelayCommand]

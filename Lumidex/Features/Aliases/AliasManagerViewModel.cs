@@ -13,7 +13,7 @@ public partial class AliasManagerViewModel : ValidatableViewModelBase,
     IRecipient<DeleteAlias>,
     IRecipient<AliasCreated>,
     IRecipient<AliasDeleted>,
-    IRecipient<ImageFilesEditedMessage>
+    IRecipient<ImageFilesEdited>
 {
     private readonly StringComparer _comparer = StringComparer.InvariantCultureIgnoreCase;
 
@@ -184,7 +184,7 @@ public partial class AliasManagerViewModel : ValidatableViewModelBase,
         }
     }
 
-    public void Receive(ImageFilesEditedMessage message)
+    public void Receive(ImageFilesEdited message)
     {
         RefreshObjectNamesAndAliases();
     }
