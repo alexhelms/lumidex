@@ -89,7 +89,7 @@ public partial class EditItemsViewModel : ViewModelBase
 
                 if (count > 0)
                 {
-                    Messenger.Send(new ImageFilesEditedMessage
+                    Messenger.Send(new ImageFilesEdited
                     {
                         ImageFiles = SelectedItems,
                     });
