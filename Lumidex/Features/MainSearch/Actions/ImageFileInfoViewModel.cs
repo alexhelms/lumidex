@@ -38,6 +38,12 @@ public partial class ImageFileInfoViewModel : ActionViewModelBase,
 
     private void UpdateInfoItems()
     {
+        if (SelectedItems.Count == 0)
+        {
+            Items.Clear();
+            return;
+        }
+
         // Create a lookup keyed by property info and the value is a hash set of all values across all image files.
         var lookup = new Dictionary<PropertyInfo, HashSet<object?>>();
         foreach (var item in SelectedItems)
