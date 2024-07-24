@@ -39,6 +39,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
     [ObservableProperty] ObservableCollectionEx<ImageFileViewModel> _selectedSearchResults = new();
     [ObservableProperty] ObservableCollectionEx<IntegrationStatistic> _integrationStats = new();
     [ObservableProperty] ObservableCollectionEx<string> _distinctObjectNames = new();
+    [ObservableProperty] int _selectedSearchResultsCount;
 
     public ActionsContainerViewModel ActionsViewModel { get; }
     

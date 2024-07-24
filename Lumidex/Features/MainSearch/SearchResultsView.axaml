@@ -152,11 +152,13 @@
                                         <MenuItem
                                             Command="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).OpenInPixInsightCommand}"
                                             CommandParameter="{Binding}"
-                                            Header="Open in PixInsight" />
+                                            Header="Open in PixInsight"
+                                            IsEnabled="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).SelectedSearchResultsCount, Converter={x:Static converter:FuncConverters.EqualToOne}}" />
                                         <MenuItem
                                             Command="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).OpenInExplorerCommand}"
                                             CommandParameter="{Binding}"
-                                            Header="Open in Explorer" />
+                                            Header="Open in Explorer"
+                                            IsEnabled="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).SelectedSearchResultsCount, Converter={x:Static converter:FuncConverters.EqualToOne}}" />
                                     </ContextMenu>
                                 </Setter.Value>
                             </Setter>

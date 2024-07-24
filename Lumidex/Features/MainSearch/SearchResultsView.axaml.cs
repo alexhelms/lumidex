@@ -52,10 +52,16 @@ public partial class SearchResultsView : UserControl
                 // because the behavior happens *after* the SelectionChanged event so in the scope of this
                 // event handler SelectedSearchResults contains old data.
                 foreach (var item in e.RemovedItems.OfType<ImageFileViewModel>())
+                {
                     vm.SelectedSearchResults.Remove(item);
+                    vm.SelectedSearchResultsCount--;
+                }
 
                 foreach (var item in e.AddedItems.OfType<ImageFileViewModel>())
+                {
                     vm.SelectedSearchResults.Add(item);
+                    vm.SelectedSearchResultsCount++;
+                }
 
                 // This message is sent here instead of listening to collection changed events
                 // because this message is only sent after all items have been added. Using the
