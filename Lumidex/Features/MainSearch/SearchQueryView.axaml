@@ -299,7 +299,8 @@
                         <Button
                             Classes="accent"
                             Command="{Binding SearchCommand}"
-                            Content="Search" />
+                            Content="Search"
+                            IsDefault="True" />
                     </StackPanel>
 
                 </StackPanel>
