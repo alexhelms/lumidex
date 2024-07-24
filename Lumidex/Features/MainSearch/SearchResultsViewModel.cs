@@ -1,4 +1,5 @@
 ﻿using Avalonia.Threading;
+using Humanizer;
 using Lumidex.Core.Data;
 using Lumidex.Features.MainSearch.Actions;
 using Lumidex.Features.MainSearch.Editing;
@@ -9,7 +10,6 @@ using Lumidex.Services;
 using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Runtime.InteropServices;
-using Tmds.DBus.Protocol;
 
 namespace Lumidex.Features.MainSearch;
 
@@ -33,6 +33,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
     [ObservableProperty] int _darkCount;
     [ObservableProperty] int _biasCount;
     [ObservableProperty] int _unknownCount;
+    [ObservableProperty] string? _totalFileSize;
     [ObservableProperty] ObservableCollectionEx<TagViewModel> _allTags = new();
     [ObservableProperty] ObservableCollectionEx<ImageFileViewModel> _searchResults = new();
     [ObservableProperty] ObservableCollectionEx<ImageFileViewModel> _selectedSearchResults = new();
@@ -85,6 +86,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
             DarkCount = 0;
             BiasCount = 0;
             UnknownCount = 0;
+            TotalFileSize = null;
         });
     }
 
@@ -115,6 +117,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
             }
             TypeAggregate = string.Join('/', LightCount, FlatCount, DarkCount, BiasCount, UnknownCount);
             DistinctObjectNames = new(GetDistinctObjectNames(message.SearchResults));
+            TotalFileSize = message.SearchResults.Sum(f => f.FileSize).Bytes().ToString("0.00 GB");
 
             SearchResults = message.SearchResults;
         });
