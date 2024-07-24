@@ -5,6 +5,7 @@
     xmlns:common="using:Lumidex.Common"
     xmlns:converter="using:Lumidex.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:filter="using:Lumidex.Features.MainSearch.Filters"
     xmlns:i="https://github.com/projektanker/icons.avalonia"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:search="using:Lumidex.Features.MainSearch"
@@ -19,236 +20,260 @@
 
         <StackPanel>
 
-            <!--  Name  -->
-            <Grid ColumnDefinitions="1*,2*">
-                <TextBlock
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Text="Name" />
-                <DockPanel Grid.Column="1">
-                    <Button
-                        Margin="5,0,0,0"
-                        VerticalAlignment="Stretch"
-                        i:Attached.Icon="mdi-close"
-                        Command="{Binding ClearObjectNameCommand}"
-                        DockPanel.Dock="Right"
-                        ToolTip.Tip="Clear Object Name" />
-                    <TextBox Text="{Binding ObjectName}" />
-                </DockPanel>
-            </Grid>
+            <ItemsControl ItemsSource="{Binding ActiveFilters}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.Styles>
+                    <Style Selector="ItemsControl > ContentPresenter:nth-child(n+2)">
+                        <Setter Property="Padding" Value="0,8,0,0" />
+                    </Style>
+                </ItemsControl.Styles>
+                <ItemsControl.DataTemplates>
 
-            <!--  Library  -->
-            <Grid Margin="0,8,0,0" ColumnDefinitions="1*,2*">
-                <TextBlock
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Text="Library" />
-                <DockPanel Grid.Column="1">
-                    <Button
-                        Margin="5,0,0,0"
-                        VerticalAlignment="Stretch"
-                        i:Attached.Icon="mdi-close"
-                        Command="{Binding ClearLibraryCommand}"
-                        DockPanel.Dock="Right"
-                        ToolTip.Tip="Clear Library" />
-                    <ComboBox
-                        HorizontalAlignment="Stretch"
-                        DisplayMemberBinding="{Binding Name}"
-                        ItemsSource="{Binding Libraries}"
-                        SelectedItem="{Binding Library, Mode=TwoWay}" />
-                </DockPanel>
-            </Grid>
+                    <!--  Avalonia does not support data templates in an external file :(  -->
 
-            <!--  Image Type  -->
-            <Grid Margin="0,8,0,0" ColumnDefinitions="1*,2*">
-                <TextBlock
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Text="Image Type" />
-                <DockPanel Grid.Column="1">
-                    <Button
-                        Margin="5,0,0,0"
-                        VerticalAlignment="Stretch"
-                        i:Attached.Icon="mdi-close"
-                        Command="{Binding ClearSelectedImageTypeCommand}"
-                        DockPanel.Dock="Right"
-                        ToolTip.Tip="Clear Image Type" />
-                    <ComboBox
-                        HorizontalAlignment="Stretch"
-                        ItemsSource="{Binding ImageTypes, Mode=OneTime}"
-                        SelectedItem="{Binding SelectedImageType}" />
-                </DockPanel>
-            </Grid>
+                    <DataTemplate DataType="filter:NameFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="{Binding DisplayName}" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear Name" />
+                                <TextBox Text="{Binding Name}" />
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
 
-            <!--  Image Kind  -->
-            <Grid Margin="0,8,0,0" ColumnDefinitions="1*,2*">
-                <TextBlock
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Text="Image Kind" />
-                <DockPanel Grid.Column="1">
-                    <Button
-                        Margin="5,0,0,0"
-                        VerticalAlignment="Stretch"
-                        i:Attached.Icon="mdi-close"
-                        Command="{Binding ClearSelectedImageKindCommand}"
-                        DockPanel.Dock="Right"
-                        ToolTip.Tip="Clear Image Kind" />
-                    <ComboBox
-                        HorizontalAlignment="Stretch"
-                        ItemsSource="{Binding ImageKinds, Mode=OneTime}"
-                        SelectedItem="{Binding SelectedImageKind}" />
-                </DockPanel>
-            </Grid>
+                    <DataTemplate DataType="filter:LibraryFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="{Binding DisplayName}" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear Library" />
+                                <ComboBox
+                                    HorizontalAlignment="Stretch"
+                                    DisplayMemberBinding="{Binding Name}"
+                                    ItemsSource="{Binding Libraries}"
+                                    SelectedItem="{Binding Library, Mode=TwoWay}" />
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
 
-            <!--  Exposure  -->
-            <Grid Margin="0,8,0,0" ColumnDefinitions="1*,2*">
-                <TextBlock
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Text="Exposure (s)" />
-                <DockPanel Grid.Column="1">
-                    <Button
-                        Margin="5,0,0,0"
-                        VerticalAlignment="Stretch"
-                        i:Attached.Icon="mdi-close"
-                        Command="{Binding ClearExposureCommand}"
-                        DockPanel.Dock="Right"
-                        ToolTip.Tip="Clear Exposure" />
-                    <Grid ColumnDefinitions="1*,Auto,1*">
-                        <NumericUpDown
-                            Grid.Column="0"
-                            Maximum="3600"
-                            Minimum="0"
-                            ShowButtonSpinner="False"
-                            Value="{Binding ExposureMin}" />
-                        <TextBlock
-                            Grid.Column="1"
-                            Margin="8,0"
-                            VerticalAlignment="Center"
-                            Text="to" />
-                        <NumericUpDown
-                            Grid.Column="2"
-                            Maximum="3600"
-                            Minimum="0"
-                            ShowButtonSpinner="False"
-                            Value="{Binding ExposureMax}" />
-                    </Grid>
-                </DockPanel>
-            </Grid>
+                    <DataTemplate DataType="filter:ImageTypeFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="{Binding DisplayName}" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear Image Type" />
+                                <ComboBox
+                                    HorizontalAlignment="Stretch"
+                                    ItemsSource="{Binding ImageTypes, Mode=OneTime}"
+                                    SelectedItem="{Binding ImageType}" />
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
 
-            <!--  Filter  -->
-            <Grid Margin="0,8,0,0" ColumnDefinitions="1*,2*">
-                <TextBlock
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Text="Filter" />
-                <DockPanel Grid.Column="1">
-                    <Button
-                        Margin="5,0,0,0"
-                        VerticalAlignment="Stretch"
-                        i:Attached.Icon="mdi-close"
-                        Command="{Binding ClearSelectedFilterCommand}"
-                        DockPanel.Dock="Right"
-                        ToolTip.Tip="Clear Filter" />
-                    <TextBox Text="{Binding SelectedFilter}" />
-                </DockPanel>
-            </Grid>
+                    <DataTemplate DataType="filter:ImageKindFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="{Binding DisplayName}" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear Image Kind" />
+                                <ComboBox
+                                    HorizontalAlignment="Stretch"
+                                    ItemsSource="{Binding ImageKinds, Mode=OneTime}"
+                                    SelectedItem="{Binding ImageKind}" />
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
 
-            <!--  Observation Date Begin  -->
-            <Grid Margin="0,8,0,0" ColumnDefinitions="1*,2*">
-                <TextBlock
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Text="Date Begin" />
-                <DockPanel Grid.Column="1">
-                    <Button
-                        Margin="5,0,0,0"
-                        VerticalAlignment="Stretch"
-                        i:Attached.Icon="mdi-close"
-                        Command="{Binding ClearDateBeginCommand}"
-                        DockPanel.Dock="Right"
-                        ToolTip.Tip="Clear Begin Date" />
-                    <CalendarDatePicker
-                        HorizontalAlignment="Stretch"
-                        CustomDateFormatString="yyyy/MM/dd"
-                        IsTodayHighlighted="True"
-                        SelectedDate="{Binding SelectedDateBegin}"
-                        SelectedDateFormat="Custom"
-                        ToolTip.Tip="Begin date, UTC"
-                        Watermark=" " />
-                </DockPanel>
-            </Grid>
+                    <DataTemplate DataType="filter:ExposureFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Exposure (s)" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear Exposure" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        Maximum="3600"
+                                        Minimum="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding ExposureMin}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        Maximum="3600"
+                                        Minimum="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding ExposureMax}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
 
-            <!--  Observation Date End  -->
-            <Grid Margin="0,8,0,0" ColumnDefinitions="1*,2*">
-                <TextBlock
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Text="Date End" />
-                <DockPanel Grid.Column="1">
-                    <Button
-                        Margin="5,0,0,0"
-                        VerticalAlignment="Stretch"
-                        i:Attached.Icon="mdi-close"
-                        Command="{Binding ClearDateEndCommand}"
-                        DockPanel.Dock="Right"
-                        ToolTip.Tip="Clear End Date" />
-                    <CalendarDatePicker
-                        HorizontalAlignment="Stretch"
-                        CustomDateFormatString="yyyy/MM/dd"
-                        IsTodayHighlighted="True"
-                        SelectedDate="{Binding SelectedDateEnd}"
-                        SelectedDateFormat="Custom"
-                        ToolTip.Tip="End date, UTC"
-                        Watermark=" " />
-                </DockPanel>
-            </Grid>
+                    <DataTemplate DataType="filter:FilterFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="{Binding DisplayName}" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear Filter" />
+                                <TextBox Text="{Binding Filter}" />
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
 
-            <!--  Tags  -->
-            <Grid
-                Margin="0,8,0,0"
-                ColumnDefinitions="1*,2*"
-                IsVisible="{Binding !!Tags.Count}">
-                <TextBlock
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Text="Tags" />
-                <DockPanel Grid.Column="1">
-                    <Button
-                        Height="32"
-                        Margin="5,0,0,0"
-                        VerticalAlignment="Top"
-                        i:Attached.Icon="mdi-close"
-                        Command="{Binding ClearTagsCommand}"
-                        DockPanel.Dock="Right"
-                        ToolTip.Tip="Clear Tags" />
-                    <ListBox
-                        Height="120"
-                        ItemsSource="{Binding Tags}"
-                        SelectedItems="{Binding QueryTags}"
-                        SelectionMode="Multiple,Toggle">
-                        <ListBox.Styles>
-                            <Style Selector="ScrollBar">
-                                <Setter Property="AllowAutoHide" Value="False" />
-                            </Style>
-                            <Style Selector="ListBoxItem">
-                                <Setter Property="Padding" Value="8,4" />
-                            </Style>
-                        </ListBox.Styles>
-                        <ListBox.ItemTemplate>
-                            <DataTemplate DataType="common:TagViewModel">
-                                <TextBlock
-                                    Padding="8,4"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Center"
-                                    Background="{Binding Brush}"
-                                    Text="{Binding Name}" />
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </DockPanel>
-            </Grid>
+                    <DataTemplate DataType="filter:ObservationBeginFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="{Binding DisplayName}" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear Begin Date" />
+                                <CalendarDatePicker
+                                    HorizontalAlignment="Stretch"
+                                    CustomDateFormatString="yyyy/MM/dd"
+                                    IsTodayHighlighted="True"
+                                    SelectedDate="{Binding DateBegin}"
+                                    SelectedDateFormat="Custom"
+                                    ToolTip.Tip="Begin date, UTC"
+                                    Watermark=" " />
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:ObservationEndFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="{Binding DisplayName}" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear End Date" />
+                                <CalendarDatePicker
+                                    HorizontalAlignment="Stretch"
+                                    CustomDateFormatString="yyyy/MM/dd"
+                                    IsTodayHighlighted="True"
+                                    SelectedDate="{Binding DateEnd}"
+                                    SelectedDateFormat="Custom"
+                                    ToolTip.Tip="End date, UTC"
+                                    Watermark=" " />
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:TagFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="{Binding DisplayName}" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Height="32"
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Top"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear Tags" />
+                                <ListBox
+                                    Height="120"
+                                    ItemsSource="{Binding AllTags}"
+                                    SelectedItems="{Binding SelectedTags}"
+                                    SelectionMode="Multiple,Toggle">
+                                    <ListBox.Styles>
+                                        <Style Selector="ScrollBar">
+                                            <Setter Property="AllowAutoHide" Value="False" />
+                                        </Style>
+                                        <Style Selector="ListBoxItem">
+                                            <Setter Property="Padding" Value="8,4" />
+                                        </Style>
+                                    </ListBox.Styles>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate DataType="common:TagViewModel">
+                                            <TextBlock
+                                                Padding="8,4"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Center"
+                                                Background="{Binding Brush}"
+                                                Text="{Binding Name}" />
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                </ItemsControl.DataTemplates>
+            </ItemsControl>
 
             <Grid Margin="0,8,36,0" ColumnDefinitions="1*,2*">
                 <StackPanel Grid.Column="1">
