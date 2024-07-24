@@ -97,6 +97,7 @@ public partial class MainSearchViewModel : ViewModelBase,
                         Color = tag.Color,
                     })),
                 Path = f.Path,
+                FileSize = f.FileSize,
                 Type = f.Type,
                 Kind = f.Kind,
                 // Camera

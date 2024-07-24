@@ -21,6 +21,8 @@ public class ImageFile
     [Column(TypeName = "TEXT COLLATE NOCASE")]
     public string Path { get; set; } = null!;
 
+    public long FileSize { get; set; }
+
     [Column(TypeName = "DATETIME")]
     public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 

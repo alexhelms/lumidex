@@ -150,10 +150,11 @@ public partial class LibraryViewModel : ValidatableViewModelBase
                 token: token);
 
             var added = pipeline.Added.Count;
+            var updated = pipeline.Updated.Count;
             var skipped = pipeline.Skipped.Count;
             var errors = pipeline.Errors.Count;
             var elapsed = pipeline.Elapsed;
-            ScanSummary = $"{added} added, {skipped} skipped, {errors} errors in {elapsed.TotalSeconds:F3} seconds";
+            ScanSummary = $"{added} added, {updated} updated, {skipped} skipped, {errors} errors in {elapsed.TotalSeconds:F3} seconds";
             ScanErrors.AddRange(pipeline.Errors
                 .Select(error => new FileErrorViewModel
                 {

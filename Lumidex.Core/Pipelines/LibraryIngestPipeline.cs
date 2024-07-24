@@ -16,9 +16,10 @@ public record IngestStatus(IFileInfo FileInfo, string Message);
 public class IngestProgress
 {
     public List<IngestStatus> Added { get; init; } = new();
+    public List<IngestStatus> Updated { get; init; } = new();
     public List<IngestStatus> Skipped { get; init; } = new();
     public List<IngestStatus> Errors { get; init; } = new();
-    public int TotalCount => Added.Count + Skipped.Count + Errors.Count;
+    public int TotalCount => Added.Count + Updated.Count + Skipped.Count + Errors.Count;
 }
 
 public class LibraryIngestPipeline
@@ -26,14 +27,11 @@ public class LibraryIngestPipeline
     private readonly IFileSystem _fileSystem;
     private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
 
-    private record FileMessage(IFileInfo FileInfo, int LibraryId);
-    private record HashedImage(IFileInfo FileInfo, int LibraryId, string Hash);
-
     public ConcurrentBag<IngestStatus> Added { get; private set; } = new();
+    public ConcurrentBag<IngestStatus> Updated { get; private set; } = new();
     public ConcurrentBag<IngestStatus> Skipped { get; private set; } = new();
     public ConcurrentBag<IngestStatus> Errors { get; private set; } = new();
-    public int TotalCount => Added.Count + Skipped.Count + Errors.Count;
-
+    public int TotalCount => Added.Count + Updated.Count + Skipped.Count + Errors.Count;
     public TimeSpan Elapsed { get; private set; }
 
     public LibraryIngestPipeline(
@@ -79,6 +77,7 @@ public class LibraryIngestPipeline
         CancellationToken token = default)
     {
         Added = new();
+        Updated = new();
         Skipped = new();
         Errors = new();
 
@@ -86,6 +85,9 @@ public class LibraryIngestPipeline
         {
             foreach (var item in p.Added)
                 Added.Add(item);
+
+            foreach (var item in p.Updated)
+                Updated.Add(item);
 
             foreach (var item in p.Skipped)
                 Skipped.Add(item);
@@ -96,18 +98,18 @@ public class LibraryIngestPipeline
             progress?.Report(p);
         });
 
-        var (pipeline, completion) = CreatePipeline(internalProgress);
+        var (pipeline, completion) = CreatePipeline(internalProgress, token);
 
         Log.Information("Starting library ingest pipeline...");
         var start = Stopwatch.GetTimestamp();
-        
+
         // Walk the directories on a background thread
-        await Task.Run(async () =>
+        await Task.Run(() =>
         {
             DateTime? startDate = forceFullScan ? null : library.LastScan;
             foreach (var fileInfo in DirectoryWalker.Walk(_fileSystem, library.Path, startDate))
             {
-                await pipeline.SendAsync(new FileMessage(fileInfo, library.Id));
+                pipeline.Post(new FileMessage(fileInfo, library.Id));
             }
         });
 
@@ -134,7 +136,8 @@ public class LibraryIngestPipeline
 
         Elapsed = Stopwatch.GetElapsedTime(start);
         Log.Information("Library ingest completed in {Elapsed:F3} seconds", Elapsed.TotalSeconds);
-        Log.Information("{AddedCount} added, {SkippedCount} skipped, {ErrorCount} errors", Added.Count, Skipped.Count, Errors.Count);
+        Log.Information("{AddedCount} added, {UpdatedCount} updated, {SkippedCount} skipped, {ErrorCount} errors",
+            Added.Count, Updated.Count, Skipped.Count, Errors.Count);
 
         if (Errors.Count > 0)
         {
@@ -145,59 +148,135 @@ public class LibraryIngestPipeline
         }
     }
 
-    private (ITargetBlock<FileMessage>, Task) CreatePipeline(IProgress<IngestProgress>? progress = null, CancellationToken token = default)
+    private (ITargetBlock<FileMessage>, Task) CreatePipeline(
+        IProgress<IngestProgress>? progress = null,
+        CancellationToken token = default)
     {
         // HELPER BLOCKS: Progress etc.
         var addedProgressBlock = new ActionBlock<List<IngestStatus>>(
             status => progress?.Report(new() { Added = status })
         );
-        var skippedProgressBlock = new ActionBlock<IngestStatus>(
-            status => progress?.Report(new() { Skipped = [status] })
+        var updatedProgressBlock = new ActionBlock<List<IngestStatus>>(
+            status => progress?.Report(new() { Updated = status })
         );
-        var errorProgressBlock = new ActionBlock<IngestStatus>(
-            status => progress?.Report(new() { Errors = [status] })
+        var skippedProgressBlock = new ActionBlock<List<IngestStatus>>(
+            status => progress?.Report(new() { Skipped = status })
+        );
+        var errorProgressBlock = new ActionBlock<List<IngestStatus>>(
+            status => progress?.Report(new() { Errors = status })
         );
 
-        // STEP 1: Hash the header and only process the file if the hash is not in the database.
-        var hashBlock = new TransformBlock<FileMessage, Result<HashedImage>>(async message =>
+        // *******************************
+        // STEP 1: Compute the header hash
+        // *******************************
+        var block1ComputeHash = new TransformBlock<FileMessage, Result<HashMessage>>(async message =>
         {
             try
             {
-                var extension = message.FileInfo.Extension.ToLowerInvariant();
-                HeaderHasher hasher = extension == ".xisf" ? new XisfHeaderHasher() : new FitsHeaderHasher();
-                var hash = await hasher.ComputeHashAsync(message.FileInfo.FullName);
-                var hashString = string.Concat(hash.Select(h => h.ToString("x2")));
-                return Result.Ok(new HashedImage(message.FileInfo, message.LibraryId, hashString));
+                string extension = message.FileInfo.Extension.ToLowerInvariant();
+                HeaderHasher hasher = extension switch
+                {
+                    ".xisf" => new XisfHeaderHasher(),
+                    ".fits" => new FitsHeaderHasher(),
+                    ".fit" => new FitsHeaderHasher(),
+                    _ => throw new Exception($"Unsupported file extension: {extension}"),
+                };
+                byte[] hash = await hasher.ComputeHashAsync(message.FileInfo.FullName);
+                string headerHash = string.Concat(hash.Select(h => h.ToString("x2")));
+                return Result.Ok(new HashMessage(message.FileInfo, message.LibraryId, headerHash));
             }
             catch (Exception ex)
             {
-                await errorProgressBlock.SendAsync(new(message.FileInfo, "Hash Error"));
                 Log.Error(ex, "Error hashing {Filename}", message.FileInfo.FullName);
+                errorProgressBlock.Post([new(message.FileInfo, "Hash Error")]);
                 return Result.Fail(new PipelineError(message.FileInfo, "Error hashing file"));
             }
         },
         new ExecutionDataflowBlockOptions
         {
             MaxDegreeOfParallelism = Environment.ProcessorCount,
-            SingleProducerConstrained = true,
             CancellationToken = token,
         });
 
-        // STEP 2: Extract data from the image header and create the database object.
-        var createImageFileBlock = new TransformBlock<Result<HashedImage>, Result<(IFileInfo, ImageFile)>>(async result =>
+        // ***************************
+        // STEP 2: Batch header hashes
+        // ***************************
+        var block2BatchHashes = new BatchBlock<Result<HashMessage>>(100,
+            new GroupingDataflowBlockOptions
+            {
+                CancellationToken = token,
+            });
+
+        // ***********************************
+        // STEP 3: Filter existing image files
+        // ***********************************
+        var block3GetOrCreateEntity = new TransformManyBlock<Result<HashMessage>[], Result<HashMessage>>(messages =>
         {
+            HashSet<string> existingHashes = [];
+
+            // Map hash -> file info
+            var fileInfoLookup = messages
+                .Select(m => m.Value)
+                .DistinctBy(m => m.HeaderHash)
+                .ToDictionary(m => m.HeaderHash, m => m.FileInfo);
+
+            // Get existing image files and update non-header database columns
+            using (var dbContext = _dbContextFactory.CreateDbContext())
+            {
+                var updateStatuses = new List<IngestStatus>(messages.Length);
+                var skipStatuses = new List<IngestStatus>(messages.Length);
+                var hashes = fileInfoLookup.Keys.ToHashSet();
+                var imageFiles = dbContext.ImageFiles
+                    .Where(f => hashes.Contains(f.HeaderHash))
+                    .ToList();
+
+                foreach (var imageFile in imageFiles)
+                {
+                    var fileInfo = fileInfoLookup[imageFile.HeaderHash];
+                    if (UpdateNonHeaderFields(fileInfo, imageFile))
+                    {
+                        updateStatuses.Add(new IngestStatus(fileInfo, "Updated"));
+                    }
+                    else
+                    {
+                        skipStatuses.Add(new IngestStatus(fileInfo, "Skipped"));
+                    }
+                }
+
+                int count = dbContext.SaveChanges();
+                updatedProgressBlock.Post(updateStatuses);
+                skippedProgressBlock.Post(skipStatuses);
+                existingHashes = imageFiles.Select(f => f.HeaderHash).ToHashSet();
+            }
+
+            return messages.Where(m => !existingHashes.Contains(m.Value.HeaderHash));
+
+        },
+        new ExecutionDataflowBlockOptions
+        {
+            MaxDegreeOfParallelism = Environment.ProcessorCount,
+            CancellationToken = token,
+        });
+
+        // **************************
+        // STEP 4: Parse image header
+        // **************************
+        var block4ParseHeader = new TransformBlock<Result<HashMessage>, Result<EntityMessage>>(result =>
+        {
+            var (fileInfo, libraryId, headerHash) = result.Value;
             try
             {
                 var reader = new HeaderReader();
-                var imageFile = reader.Process(result.Value.FileInfo, result.Value.Hash);
-                imageFile.LibraryId = result.Value.LibraryId;
-                return Result.Ok((result.Value.FileInfo, imageFile));
+                var imageFile = reader.Process(fileInfo, headerHash);
+                imageFile.LibraryId = libraryId;
+                UpdateNonHeaderFields(fileInfo, imageFile);
+                return Result.Ok(new EntityMessage(fileInfo, imageFile));
             }
             catch (Exception ex)
             {
-                await errorProgressBlock.SendAsync(new(result.Value.FileInfo, "Header Error"));
-                Log.Error(ex, "Error processing image header in {Filename}", result.Value.FileInfo.FullName);
-                return Result.Fail(new PipelineError(result.Value.FileInfo, "Error processing image header"));
+                errorProgressBlock.Post([new(fileInfo, "Header Error")]);
+                Log.Error(ex, "Error processing image header in {Filename}", fileInfo.FullName);
+                return Result.Fail(new PipelineError(fileInfo, "Error processing image header"));
             }
         },
         new ExecutionDataflowBlockOptions
@@ -206,101 +285,91 @@ public class LibraryIngestPipeline
             CancellationToken = token,
         });
 
-        // STEP 3: Batch objects to be added to the database.
-        var addToDatabaseBatchBlock = new BatchBlock<Result<(IFileInfo, ImageFile)>>(
-            100,
-            new GroupingDataflowBlockOptions()
+        // ************************************************
+        // STEP 5: Batch image files to add to the database
+        // ************************************************
+        var block5BatchImageFiles = new BatchBlock<Result<EntityMessage>>(100,
+            new GroupingDataflowBlockOptions
             {
                 CancellationToken = token,
             });
 
-        // STEP 4: Save new objects in database.
-        var addToDatabaseBlock = new ActionBlock<Result<(IFileInfo, ImageFile)>[]>(async results =>
+        // ***************************************
+        // STEP 6: Add new image files to database
+        // ***************************************
+        var block6AddToDatabase = new ActionBlock<Result<EntityMessage>[]>(results =>
         {
-            var successes = results
-                .Where(result => result.IsSuccess)
-                .Select( result => result.Value)
-                .ToList();
+            var fileInfos = results.Select(r => r.Value.FileInfo);
+            var imageFiles = results.Select(r => r.Value.ImageFile);
 
-            var failures = results
-                .Where(result => result.IsFailed)
-                .Select( result => result.Value);
-
-            if (failures.Any())
+            try
             {
-                // This should never happen because the pipeline is setup to filter these before this block.
-                Log.Error("Failed images made it to the database block");
+                using var dbContext = _dbContextFactory.CreateDbContext();
+                dbContext.ImageFiles.AddRange(imageFiles);
+                dbContext.SaveChanges();
+                addedProgressBlock.Post(fileInfos
+                    .Select(fileInfo => new IngestStatus(fileInfo, "Added"))
+                    .ToList());
             }
-
-            if (successes.Count > 0)
+            catch (Exception ex)
             {
-                var fileInfos = successes.Select(x => x.Item1);
-                var imageFiles = successes.Select(x => x.Item2);
-
-                try
-                {
-                    using var dbContext = _dbContextFactory.CreateDbContext();
-                    dbContext.ImageFiles.AddRange(imageFiles);
-                    dbContext.SaveChanges();
-                    await addedProgressBlock.SendAsync(
-                        fileInfos
-                            .Select(fileInfo => new IngestStatus(fileInfo, "Added"))
-                            .ToList()
-                    );
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, "Error adding images to database");
-                }
+                Log.Error(ex, "Error adding images to the database");
+                errorProgressBlock.Post(fileInfos
+                    .Select(fileInfo => new IngestStatus(fileInfo, "Error adding to database"))
+                    .ToList());
             }
-        }, new ExecutionDataflowBlockOptions
+        },
+        new ExecutionDataflowBlockOptions
         {
             BoundedCapacity = 1,
             CancellationToken = token,
         });
 
-        // Build the pipline
+        // ********************
+        // Wire up the pipeline
+        // ********************
         var options = new DataflowLinkOptions { PropagateCompletion = true };
 
-        hashBlock.LinkTo(createImageFileBlock, options,
-            result =>
-            {
-                if (result.IsFailed)
-                    return false;
+        block1ComputeHash.LinkTo(block2BatchHashes, options, result => result.IsSuccess);
+        block1ComputeHash.LinkTo(DataflowBlock.NullTarget<Result<HashMessage>>());
 
-                using var dbContext = _dbContextFactory.CreateDbContext();
-                bool isInDatabase = dbContext.ImageFiles.Any(imageFile => imageFile.HeaderHash == result.Value.Hash);
-                return isInDatabase == false;
-            });
-        hashBlock.LinkTo(new ActionBlock<Result<HashedImage>>(async result =>
-        {
-            IFileInfo? fileInfo = result.ValueOrDefault?.FileInfo;
+        block2BatchHashes.LinkTo(block3GetOrCreateEntity, options);
 
-            if (result.IsFailed)
-            {
-                if (result.Errors.OfType<PipelineError>().FirstOrDefault() is { } error)
-                {
-                    fileInfo = error.FileInfo;
-                }
-            }
+        block3GetOrCreateEntity.LinkTo(block4ParseHeader, options);
 
-            if (fileInfo is not null)
-                await skippedProgressBlock.SendAsync(new(fileInfo, "Skipped"));
+        block4ParseHeader.LinkTo(block5BatchImageFiles, options, result => result.IsSuccess);
+        block4ParseHeader.LinkTo(DataflowBlock.NullTarget<Result<EntityMessage>>());
 
-        }), options);
+        block5BatchImageFiles.LinkTo(block6AddToDatabase, options);
 
-        createImageFileBlock.LinkTo(addToDatabaseBatchBlock, options, result => result.IsSuccess);
-
-        addToDatabaseBatchBlock.LinkTo(addToDatabaseBlock, options);
-
-        var completion = addToDatabaseBlock.Completion
-            .ContinueWith(t =>
+        Task completion = block6AddToDatabase.Completion
+            .ContinueWith(_ =>
             {
                 addedProgressBlock.Complete();
+                updatedProgressBlock.Complete();
+                skippedProgressBlock.Complete();
+                errorProgressBlock.Complete();
             });
 
-        return (hashBlock, completion);
+        return (block1ComputeHash, completion);
     }
+
+    private static bool UpdateNonHeaderFields(IFileInfo fileInfo, ImageFile imageFile)
+    {
+        bool updated = false;
+
+        if (imageFile.FileSize != fileInfo.Length)
+        {
+            imageFile.FileSize = fileInfo.Length;
+            updated = true;
+        }
+
+        return updated;
+    }
+
+    private record FileMessage(IFileInfo FileInfo, int LibraryId);
+    private record HashMessage(IFileInfo FileInfo, int LibraryId, string HeaderHash);
+    private record EntityMessage(IFileInfo FileInfo, ImageFile ImageFile);
 
     private class PipelineError : FluentResults.Error
     {

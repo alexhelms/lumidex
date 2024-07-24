@@ -285,12 +285,24 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" Text="Total Integration (hr)" />
+                <TextBlock Grid.Column="0" Text="Total Disk" />
                 <TextBlock
                     Grid.Column="1"
-                    Text="{Binding TotalIntegration, TargetNullValue={}--}"
+                    Text="{Binding TotalFileSize, TargetNullValue={}--}"
                     TextAlignment="Right" />
+            </Grid>
 
+            <Grid Margin="0,8,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="Total Integration" />
+                <TextBlock
+                    Grid.Column="1"
+                    Text="{Binding TotalIntegration, TargetNullValue={}--, StringFormat={}{0} hr}"
+                    TextAlignment="Right" />
             </Grid>
 
             <DataGrid

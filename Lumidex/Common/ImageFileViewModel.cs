@@ -8,6 +8,7 @@ public partial class ImageFileViewModel : ObservableObject, IEquatable<ImageFile
     [ObservableProperty] string _libraryName = string.Empty;
     [ObservableProperty] ObservableCollectionEx<TagViewModel> _tags = new();
     [ObservableProperty] string _path = null!;
+    [ObservableProperty] long _fileSize;
 
     [ObservableProperty]
     [property: UserEditable]
