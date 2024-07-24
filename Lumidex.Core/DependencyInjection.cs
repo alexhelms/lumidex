@@ -13,7 +13,8 @@ public static class DependencyInjection
     {
         services.AddTransient<IFileSystem, FileSystem>();
         services.AddTransient<LibraryIngestPipeline>();
-        services.AddTransient<Func<LibraryIngestPipeline>>(provider => () => provider.GetRequiredService<LibraryIngestPipeline>());
+        services.AddTransient<Func<LibraryIngestPipeline>>(provider
+            => () => provider.GetRequiredService<LibraryIngestPipeline>());
         
         services.AddDbContextFactory<LumidexDbContext>();
     }
