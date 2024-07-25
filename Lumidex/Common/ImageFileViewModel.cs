@@ -102,10 +102,6 @@ public partial class ImageFileViewModel : ObservableObject, IEquatable<ImageFile
 
     [ObservableProperty]
     [property: UserEditable]
-    string? _mountName;
-
-    [ObservableProperty]
-    [property: UserEditable]
     double? _rightAscension;
 
     [ObservableProperty]
@@ -123,6 +119,10 @@ public partial class ImageFileViewModel : ObservableObject, IEquatable<ImageFile
     #endregion
 
     #region Telescope
+
+    [ObservableProperty]
+    [property: UserEditable]
+    string? _telescopeName;
 
     [ObservableProperty]
     [property: UserEditable]

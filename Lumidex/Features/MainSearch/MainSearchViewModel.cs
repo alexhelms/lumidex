@@ -79,12 +79,12 @@ public partial class MainSearchViewModel : ViewModelBase,
                 FilterWheelName = f.FilterWheelName,
                 FilterName = f.FilterName,
                 //Mount
-                MountName = f.MountName,
                 RightAscension = f.RightAscension,
                 Declination = f.Declination,
                 Altitude = f.Altitude,
                 Azimuth = f.Azimuth,
                 // Telescope
+                TelescopeName = f.TelescopeName,
                 FocalLength = f.FocalLength,
                 Airmass = f.Airmass,
                 // Target

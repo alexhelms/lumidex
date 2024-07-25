@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Lumidex.Features.MainSearch.Filters;
 
-public partial class MountNameFilter : FilterViewModelBase
+public partial class PathFilter : FilterViewModelBase
 {
     [ObservableProperty] string? _name;
 
-    public override string DisplayName => "Mount Name";
+    public override string DisplayName => "Path";
 
     protected override void OnClear() => Name = null;
 
@@ -15,7 +15,7 @@ public partial class MountNameFilter : FilterViewModelBase
     {
         if (Name is { Length: > 0 })
         {
-            query = query.Where(f => EF.Functions.Like(f.MountName, $"%{Name}%"));
+            query = query.Where(f => EF.Functions.Like(f.Path, $"%{Name}%"));
         }
 
         return query;

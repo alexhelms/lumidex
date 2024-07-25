@@ -366,6 +366,34 @@
 
                     <!--  ADVANCED FILTERS  -->
 
+                    <DataTemplate DataType="filter:PathFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Path" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <TextBox Text="{Binding Name}" />
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
                     <DataTemplate DataType="filter:CameraNameFilter">
                         <Grid ColumnDefinitions="1*,2*">
                             <TextBlock
@@ -892,7 +920,7 @@
                         </Grid>
                     </DataTemplate>
 
-                    <DataTemplate DataType="filter:MountNameFilter">
+                    <DataTemplate DataType="filter:TelescopeNameFilter">
                         <Grid ColumnDefinitions="1*,2*">
                             <TextBlock
                                 Grid.Column="0"

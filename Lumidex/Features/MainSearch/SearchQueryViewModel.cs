@@ -20,6 +20,7 @@ public partial class SearchQueryViewModel : ViewModelBase
         ObservationEndFilter observationEndFilter,
         TagFilter tagFilter,
         // Advanced filters
+        PathFilter pathFilter,
         CameraNameFilter cameraNameFilter,
         CameraTemperatureSetPointFilter cameraTemperatureSetPointFilter,
         CameraTemperatureFilter cameraTemperatureFilter,
@@ -34,7 +35,7 @@ public partial class SearchQueryViewModel : ViewModelBase
         RotatorNameFilter rotatorNameFilter,
         RotatorPositionFilter rotatorPositionFilter,
         FilterWheelNameFilter filterWheelNameFilter,
-        MountNameFilter mountNameFilter,
+        TelescopeNameFilter mountNameFilter,
         RightAscensionFilter rightAscensionFilter,
         DeclinationFilter declinationFilter,
         AltitudeFilter altitudeFilter,
@@ -62,6 +63,7 @@ public partial class SearchQueryViewModel : ViewModelBase
         ]);
 
         List<FilterViewModelBase> allFilters = [
+            pathFilter,
             cameraNameFilter,
             cameraTemperatureSetPointFilter,
             cameraTemperatureFilter,

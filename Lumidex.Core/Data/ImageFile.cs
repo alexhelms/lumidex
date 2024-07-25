@@ -90,9 +90,6 @@ public class ImageFile
 
     #region Mount
 
-    [Column(TypeName = "TEXT COLLATE NOCASE")]
-    public string? MountName { get; set; }
-
     public double? RightAscension { get; set; }
 
     public double? Declination { get; set; }
@@ -104,6 +101,9 @@ public class ImageFile
     #endregion
 
     #region Telescope
+
+    [Column(TypeName = "TEXT COLLATE NOCASE")]
+    public string? TelescopeName { get; set; }
 
     public double? FocalLength { get; set; }
 

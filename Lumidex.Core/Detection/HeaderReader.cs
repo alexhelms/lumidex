@@ -287,8 +287,6 @@ public class HeaderReader
 
     private void ExtractMountKeywords(ImageHeader header, ImageFile imageFile)
     {
-        ExtractKeyword<string, string?>(header, imageFile, x => x.MountName!,
-            "TELESCOP");
         ExtractKeyword<double, double?>(header, imageFile, x => x.RightAscension,
             "RA");
         ExtractKeyword<double, double?>(header, imageFile, x => x.Declination,
@@ -301,6 +299,8 @@ public class HeaderReader
 
     private void ExtractTelescopeKeywords(ImageHeader header, ImageFile imageFile)
     {
+        ExtractKeyword<string, string?>(header, imageFile, x => x.TelescopeName!,
+            "TELESCOP");
         ExtractKeyword<double, double?>(header, imageFile, x => x.FocalLength,
             "FOCALLEN");
         ExtractKeyword<double, double?>(header, imageFile, x => x.Airmass,
