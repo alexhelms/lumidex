@@ -394,14 +394,14 @@
                         </Grid>
                     </DataTemplate>
 
-					<DataTemplate DataType="filter:ObservationBeginLocalFilter">
-						<Grid ColumnDefinitions="1*,2*">
-							<TextBlock
+                    <DataTemplate DataType="filter:ObservationBeginLocalFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
                                 Grid.Column="0"
                                 VerticalAlignment="Center"
                                 Text="{Binding DisplayName}" />
-							<DockPanel Grid.Column="1">
-								<Button
+                            <DockPanel Grid.Column="1">
+                                <Button
                                     Margin="5,0,0,0"
                                     VerticalAlignment="Stretch"
                                     i:Attached.Icon="mdi-filter-remove"
@@ -410,14 +410,14 @@
                                     CommandParameter="{Binding}"
                                     DockPanel.Dock="Right"
                                     ToolTip.Tip="Remove filter" />
-								<Button
+                                <Button
                                     Margin="5,0,0,0"
                                     VerticalAlignment="Stretch"
                                     i:Attached.Icon="mdi-close"
                                     Command="{Binding ClearCommand}"
                                     DockPanel.Dock="Right"
                                     ToolTip.Tip="Clear" />
-								<CalendarDatePicker
+                                <CalendarDatePicker
                                     HorizontalAlignment="Stretch"
                                     CustomDateFormatString="yyyy/MM/dd"
                                     IsTodayHighlighted="True"
@@ -425,18 +425,18 @@
                                     SelectedDateFormat="Custom"
                                     ToolTip.Tip="Begin date, UTC"
                                     Watermark=" " />
-							</DockPanel>
-						</Grid>
-					</DataTemplate>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
 
-					<DataTemplate DataType="filter:ObservationEndLocalFilter">
-						<Grid ColumnDefinitions="1*,2*">
-							<TextBlock
+                    <DataTemplate DataType="filter:ObservationEndLocalFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
                                 Grid.Column="0"
                                 VerticalAlignment="Center"
                                 Text="{Binding DisplayName}" />
-							<DockPanel Grid.Column="1">
-								<Button
+                            <DockPanel Grid.Column="1">
+                                <Button
                                     Margin="5,0,0,0"
                                     VerticalAlignment="Stretch"
                                     i:Attached.Icon="mdi-filter-remove"
@@ -445,14 +445,14 @@
                                     CommandParameter="{Binding}"
                                     DockPanel.Dock="Right"
                                     ToolTip.Tip="Remove filter" />
-								<Button
+                                <Button
                                     Margin="5,0,0,0"
                                     VerticalAlignment="Stretch"
                                     i:Attached.Icon="mdi-close"
                                     Command="{Binding ClearCommand}"
                                     DockPanel.Dock="Right"
                                     ToolTip.Tip="Clear" />
-								<CalendarDatePicker
+                                <CalendarDatePicker
                                     HorizontalAlignment="Stretch"
                                     CustomDateFormatString="yyyy/MM/dd"
                                     IsTodayHighlighted="True"
@@ -460,9 +460,9 @@
                                     SelectedDateFormat="Custom"
                                     ToolTip.Tip="End date, UTC"
                                     Watermark=" " />
-							</DockPanel>
-						</Grid>
-					</DataTemplate>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
 
                     <DataTemplate DataType="filter:CameraNameFilter">
                         <Grid ColumnDefinitions="1*,2*">
@@ -1090,8 +1090,8 @@
                                 <Grid ColumnDefinitions="1*,Auto,1*">
                                     <NumericUpDown
                                         Grid.Column="0"
-                                        Maximum="-90"
-                                        Minimum="90"
+                                        Maximum="90"
+                                        Minimum="-90"
                                         ShowButtonSpinner="False"
                                         Value="{Binding MinValue}" />
                                     <TextBlock
@@ -1101,8 +1101,8 @@
                                         Text="to" />
                                     <NumericUpDown
                                         Grid.Column="2"
-                                        Maximum="-90"
-                                        Minimum="90"
+                                        Maximum="90"
+                                        Minimum="-90"
                                         ShowButtonSpinner="False"
                                         Value="{Binding MaxValue}" />
                                 </Grid>
@@ -1136,8 +1136,8 @@
                                 <Grid ColumnDefinitions="1*,Auto,1*">
                                     <NumericUpDown
                                         Grid.Column="0"
-                                        Maximum="-90"
-                                        Minimum="90"
+                                        Maximum="90"
+                                        Minimum="-90"
                                         ShowButtonSpinner="False"
                                         Value="{Binding MinValue}" />
                                     <TextBlock
@@ -1147,8 +1147,8 @@
                                         Text="to" />
                                     <NumericUpDown
                                         Grid.Column="2"
-                                        Maximum="-90"
-                                        Minimum="90"
+                                        Maximum="90"
+                                        Minimum="-90"
                                         ShowButtonSpinner="False"
                                         Value="{Binding MaxValue}" />
                                 </Grid>
@@ -1182,8 +1182,8 @@
                                 <Grid ColumnDefinitions="1*,Auto,1*">
                                     <NumericUpDown
                                         Grid.Column="0"
-                                        Maximum="0"
-                                        Minimum="360"
+                                        Maximum="360"
+                                        Minimum="0"
                                         ShowButtonSpinner="False"
                                         Value="{Binding MinValue}" />
                                     <TextBlock
@@ -1193,8 +1193,8 @@
                                         Text="to" />
                                     <NumericUpDown
                                         Grid.Column="2"
-                                        Maximum="0"
-                                        Minimum="360"
+                                        Maximum="360"
+                                        Minimum="0"
                                         ShowButtonSpinner="False"
                                         Value="{Binding MaxValue}" />
                                 </Grid>
@@ -1314,8 +1314,8 @@
                                 <Grid ColumnDefinitions="1*,Auto,1*">
                                     <NumericUpDown
                                         Grid.Column="0"
-                                        Maximum="-90"
-                                        Minimum="90"
+                                        Maximum="90"
+                                        Minimum="-90"
                                         ShowButtonSpinner="False"
                                         Value="{Binding MinValue}" />
                                     <TextBlock
@@ -1325,8 +1325,8 @@
                                         Text="to" />
                                     <NumericUpDown
                                         Grid.Column="2"
-                                        Maximum="-90"
-                                        Minimum="90"
+                                        Maximum="90"
+                                        Minimum="-90"
                                         ShowButtonSpinner="False"
                                         Value="{Binding MaxValue}" />
                                 </Grid>
@@ -1360,8 +1360,8 @@
                                 <Grid ColumnDefinitions="1*,Auto,1*">
                                     <NumericUpDown
                                         Grid.Column="0"
-                                        Maximum="-180"
-                                        Minimum="180"
+                                        Maximum="180"
+                                        Minimum="-180"
                                         ShowButtonSpinner="False"
                                         Value="{Binding MinValue}" />
                                     <TextBlock
@@ -1371,8 +1371,8 @@
                                         Text="to" />
                                     <NumericUpDown
                                         Grid.Column="2"
-                                        Maximum="-180"
-                                        Minimum="180"
+                                        Maximum="180"
+                                        Minimum="-180"
                                         ShowButtonSpinner="False"
                                         Value="{Binding MaxValue}" />
                                 </Grid>
@@ -1406,8 +1406,8 @@
                                 <Grid ColumnDefinitions="1*,Auto,1*">
                                     <NumericUpDown
                                         Grid.Column="0"
-                                        Maximum="-90"
-                                        Minimum="90"
+                                        Maximum="90"
+                                        Minimum="-90"
                                         ShowButtonSpinner="False"
                                         Value="{Binding MinValue}" />
                                     <TextBlock
@@ -1417,8 +1417,8 @@
                                         Text="to" />
                                     <NumericUpDown
                                         Grid.Column="2"
-                                        Maximum="-90"
-                                        Minimum="90"
+                                        Maximum="90"
+                                        Minimum="-90"
                                         ShowButtonSpinner="False"
                                         Value="{Binding MaxValue}" />
                                 </Grid>
