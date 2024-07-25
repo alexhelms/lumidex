@@ -55,10 +55,11 @@ jobs:
       - name: Publish
         run: dotnet publish ${{ env.PROJECT }} -r win-x64 --self-contained -c Release -o publish-win
       - name: Show Version
-        run: dotnet tool run dotnet-gitversion /output buildserver
+        run: dotnet tool run dotnet-gitversion
       - name: Installer
         run: |
-          & 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' lumidex-installer-win.iss /DMyAppProductVersion=${GitVersion_SemVer}
+          $VERSION=(dotnet tool run dotnet-gitversion /showvariable SemVer)
+          & 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' lumidex-installer-win.iss /DMyAppProductVersion=${VERSION}
       - uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
@@ -82,6 +83,7 @@ jobs:
           tag: ${{ github.ref_name }}
         run: |
           gh release create "$GITHUB_REF_NAME" \
+            --repo="$GITHUB_REPOSITORY" \
             --title="${GITHUB_REPOSITORY#*/} ${tag#v}" \
             --generate-notes \
             --draft \
