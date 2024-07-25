@@ -32,7 +32,7 @@ jobs:
       - name: Build
         run: dotnet build ${{ env.SOLUTION }} -c Release --no-restore
       - name: Show Version
-        run: dotnet tool run dotnet-gitversion
+        run: dotnet tool run dotnet-gitversion /output
       - name: Test
         run: dotnet test ${{ env.SOLUTION }} -c Release --no-build
 
@@ -55,11 +55,10 @@ jobs:
       - name: Publish
         run: dotnet publish ${{ env.PROJECT }} -r win-x64 --self-contained -c Release -o publish-win
       - name: Show Version
-        run: dotnet tool run dotnet-gitversion
+        run: dotnet tool run dotnet-gitversion /output
       - name: Installer
         run: |
-          $VERSION=(dotnet tool run dotnet-gitversion /showvariable SemVer)
-          & 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' lumidex-installer-win.iss /DMyAppProductVersion=${VERSION}
+          & 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' lumidex-installer-win.iss /DMyAppProductVersion=${GitVersion_SemVer}
       - uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
@@ -75,6 +74,8 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: windows-installer
+      - name: Display structure of downloaded files
+        run: ls -R
       - name: Create Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
