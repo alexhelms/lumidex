@@ -14,6 +14,9 @@ public partial class ObservationEndFilter : FilterViewModelBase
     {
         if (DateEnd is { } dateEnd)
         {
+            // Set the time to the last possible moment before the next day
+            // so the search is inclusive of the same day.
+            dateEnd = new DateTime(dateEnd.Year, dateEnd.Month, dateEnd.Day, 23, 59, 59, 999);
             query = query.Where(f => f.ObservationTimestampUtc <= dateEnd);
         }
 
