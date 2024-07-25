@@ -1,8 +1,10 @@
 ﻿using Lumidex.Core.Data;
+using Lumidex.Features.MainSearch.Filters;
 using Lumidex.Features.MainSearch.Messages;
 using Lumidex.Features.Tags.Messages;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Text;
 
 namespace Lumidex.Features.MainSearch;
 
@@ -27,7 +29,7 @@ public partial class MainSearchViewModel : ViewModelBase,
         SearchResultsViewModel = searchResultsViewModel;
     }
 
-    private IList<ImageFileViewModel> Search(ImageFileFilters filters)
+    private IList<ImageFileViewModel> Search(IReadOnlyList<FilterViewModelBase> filters)
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 
@@ -35,53 +37,9 @@ public partial class MainSearchViewModel : ViewModelBase,
             .AsNoTracking()
             .AsQueryable();
 
-        if (filters.Name is { Length: > 0 })
+        foreach (var filter in filters)
         {
-            // Create a set that contains the user's filter, any matching alias, and any matching object name
-            var aliases = new HashSet<string>([filters.Name], StringComparer.InvariantCultureIgnoreCase);
-
-            aliases.UnionWith(dbContext.ObjectAliases
-                .Where(a => EF.Functions.Like(a.Alias, $"%{filters.Name}%"))
-                .Select(a => a.ObjectName));
-
-            aliases.UnionWith(dbContext.ImageFiles
-                .Where(f => f.ObjectName != null)
-                .Select(f => f.ObjectName)
-                .Where(objectName => EF.Functions.Like(objectName, $"%{filters.Name}%"))!);
-
-            query = query
-                .Where(f => f.ObjectName != null)
-                .Where(f => aliases.Contains(f.ObjectName!));
-        }
-
-        if (filters.LibraryId.HasValue)
-            query = query.Where(f => f.LibraryId == filters.LibraryId);
-
-        if (filters.ImageType is { } imageType)
-            query = query.Where(f => f.Type == imageType);
-
-        if (filters.ImageKind is { } imageKind)
-            query = query.Where(f => f.Kind == imageKind);
-
-        if (filters.ExposureMin is { } min)
-            query = query.Where(f => f.Exposure!.Value >= min.TotalSeconds);
-
-        if (filters.ExposureMax is { } max)
-            query = query.Where(f => f.Exposure!.Value <= max.TotalSeconds);
-
-        if (filters.Filter is { Length: > 0 } filter)
-            query = query.Where(f => f.FilterName == filter);
-
-        if (filters.DateBegin is { } dateBegin)
-            query = query.Where(f => f.ObservationTimestampUtc >= dateBegin);
-
-        if (filters.DateEnd is { } dateEnd)
-            query = query.Where(f => f.ObservationTimestampUtc <= dateEnd);
-
-        if (filters.TagIds is not null && filters.TagIds.Any())
-        {
-            var tagIds = filters.TagIds.ToHashSet();
-            query = query.Where(f => f.Tags.Any(tag => tagIds.Contains(tag.Id)));
+            query = filter.ApplyFilter(dbContext, query);
         }
 
         var imageFiles = query
@@ -121,12 +79,12 @@ public partial class MainSearchViewModel : ViewModelBase,
                 FilterWheelName = f.FilterWheelName,
                 FilterName = f.FilterName,
                 //Mount
-                MountName = f.MountName,
                 RightAscension = f.RightAscension,
                 Declination = f.Declination,
                 Altitude = f.Altitude,
                 Azimuth = f.Azimuth,
                 // Telescope
+                TelescopeName = f.TelescopeName,
                 FocalLength = f.FocalLength,
                 Airmass = f.Airmass,
                 // Target
@@ -152,29 +110,15 @@ public partial class MainSearchViewModel : ViewModelBase,
     {
         bool success = true;
 
-        Log.Information("New search: " +
-            "Name = {ObjectName}, " +
-            "Library ID = {LibraryId}, " +
-            "Image Type = {ImageType}, " +
-            "Image Kind = {ImageKind}, " +
-            "Exposure Min = {ExposureMin}, " +
-            "Exposure Max = {ExposureMax}, " +
-            "Filter = {Filter}, " +
-            "Date Begin = {DateBegin}, " +
-            "Date End = {DateEnd}, " +
-            "Tag IDs = {TagIds} ",
-        message.Filters.LibraryId,
-        message.Filters.Name,
-        message.Filters.ImageType,
-        message.Filters.ImageKind,
-        message.Filters.ExposureMin,
-        message.Filters.ExposureMax,
-        message.Filters.Filter,
-        message.Filters.DateBegin,
-        message.Filters.DateEnd,
-        message.Filters.TagIds);
+        StringBuilder filterLogMessage = new();
+        filterLogMessage.Append("Search: ");
+        filterLogMessage.AppendJoin(", ", message.Filters.Select(f => f.ToString()));
+        Log.Information(filterLogMessage.ToString());
 
-        Messenger.Send(new SearchStarting());
+        Messenger.Send(new SearchStarting
+        {
+            Filters = message.Filters,
+        });
 
         try
         {

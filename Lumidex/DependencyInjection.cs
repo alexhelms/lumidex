@@ -14,7 +14,7 @@ public static class DependencyInjection
         RegisterAllDerivedTypes<Avalonia.Controls.Window>(services);
         RegisterAllDerivedTypes<Avalonia.Controls.UserControl>(services);
 
-        services.AddTransient<Func<EditItemsViewModel>>(provider => () => provider.GetRequiredService<EditItemsViewModel>());
+        services.AddTransient<Func<EditItemsViewModel>>(p => () => p.GetRequiredService<EditItemsViewModel>());
 
         services.AddSingleton<DialogService>();
     }

@@ -1,116 +1,144 @@
-﻿using Lumidex.Core.Data;
-using Lumidex.Features.Library.Messages;
+﻿using Lumidex.Features.MainSearch.Filters;
 using Lumidex.Features.MainSearch.Messages;
-using Lumidex.Features.Tags.Messages;
 
 namespace Lumidex.Features.MainSearch;
 
-public partial class SearchQueryViewModel : ViewModelBase,
-    IRecipient<LibraryCreated>,
-    IRecipient<LibraryDeleted>,
-    IRecipient<LibraryEdited>,
-    IRecipient<TagCreated>,
-    IRecipient<TagDeleted>
+public partial class SearchQueryViewModel : ViewModelBase
 {
-    [ObservableProperty] LibraryViewModel? _library;
-    [ObservableProperty] string? _objectName;
-    [ObservableProperty] ImageKind? _selectedImageKind;
-    [ObservableProperty] ImageType? _selectedImageType;
-    [ObservableProperty] decimal? _exposureMin;
-    [ObservableProperty] decimal? _exposureMax;
-    [ObservableProperty] string? _selectedFilter;
-    [ObservableProperty] DateTime? _selectedDateBegin;
-    [ObservableProperty] DateTime? _selectedDateEnd;
-    [ObservableProperty] ObservableCollectionEx<LibraryViewModel> _libraries = new ();
-    [ObservableProperty] ObservableCollectionEx<TagViewModel> _tags = new ();
-    [ObservableProperty] ObservableCollectionEx<TagViewModel> _selectedTags = new ();
-    [ObservableProperty] ObservableCollectionEx<TagViewModel> _queryTags = new ();
+    [ObservableProperty] ObservableCollectionEx<FilterViewModelBase> _allFilters = new();
+    [ObservableProperty] ObservableCollectionEx<FilterViewModelBase> _activeFilters = new();
 
-    public List<ImageKind> ImageKinds { get; } = Enum.GetValues<ImageKind>().OrderBy(x => x.ToString()).ToList();
-    public List<ImageType> ImageTypes { get; } = Enum.GetValues<ImageType>().OrderBy(x => x.ToString()).ToList();
-
-    public void Receive(LibraryCreated message)
+    public SearchQueryViewModel(
+        // Default filters
+        ObjectNameFilter nameFilter,
+        LibraryFilter libraryFilter,
+        ImageTypeFilter imageTypeFilter,
+        ImageKindFilter imageKindFilter,
+        ExposureFilter exposureFilter,
+        FilterFilter filterFilter,
+        ObservationBeginUtcFilter observationBeginFilter,
+        ObservationEndUtcFilter observationEndFilter,
+        TagFilter tagFilter,
+        // Advanced filters
+        PathFilter pathFilter,
+        ObservationBeginLocalFilter observationBeginLocalFilter,
+        ObservationEndLocalFilter observationEndLocalFilter,
+        CameraNameFilter cameraNameFilter,
+        CameraTemperatureSetPointFilter cameraTemperatureSetPointFilter,
+        CameraTemperatureFilter cameraTemperatureFilter,
+        CameraGainFilter cameraGainFilter,
+        CameraOffsetFilter cameraOffsetFilter,
+        CameraBinningFilter cameraBinningFilter,
+        PixelSizeFilter pixelSizeFilter,
+        ReadoutModeFilter readoutModeFilter,
+        FocuserNameFilter focuserNameFilter,
+        FocuserPositionFilter focuserPositionFilter,
+        FocuserTemperatureFilter focuserTemperatureFilter,
+        RotatorNameFilter rotatorNameFilter,
+        RotatorPositionFilter rotatorPositionFilter,
+        FilterWheelNameFilter filterWheelNameFilter,
+        TelescopeNameFilter mountNameFilter,
+        RightAscensionFilter rightAscensionFilter,
+        DeclinationFilter declinationFilter,
+        AltitudeFilter altitudeFilter,
+        AzimuthFilter azimuthFilter,
+        FocalLengthFilter focalLengthFilter,
+        AirmassFilter airmassFilter,
+        LatitudeFilter latitudeFilter,
+        LongitudeFilter longitudeFilter,
+        ElevationFilter elevationFilter,
+        DewPointFilter dewPointFilter,
+        HumidityFilter humidityFilter,
+        PressureFilter pressureFilter,
+        TemperatureFilter temperatureFilter)
     {
-        if (!Libraries.Contains(message.Library))
-            Libraries.Add(message.Library);
+        ActiveFilters.AddRange([
+            nameFilter,
+            libraryFilter,
+            imageTypeFilter,
+            imageKindFilter,
+            exposureFilter,
+            filterFilter,
+            observationBeginFilter,
+            observationEndFilter,
+            tagFilter,
+        ]);
+
+        List<FilterViewModelBase> allFilters = [
+            pathFilter,
+            observationBeginLocalFilter,
+            observationEndLocalFilter,
+            cameraNameFilter,
+            cameraTemperatureSetPointFilter,
+            cameraTemperatureFilter,
+            cameraGainFilter,
+            cameraOffsetFilter,
+            cameraBinningFilter,
+            pixelSizeFilter,
+            readoutModeFilter,
+            focuserNameFilter,
+            focuserPositionFilter,
+            focuserTemperatureFilter,
+            rotatorNameFilter,
+            rotatorPositionFilter,
+            filterWheelNameFilter,
+            mountNameFilter,
+            rightAscensionFilter,
+            declinationFilter,
+            altitudeFilter,
+            azimuthFilter,
+            focalLengthFilter,
+            airmassFilter,
+            latitudeFilter,
+            longitudeFilter,
+            elevationFilter,
+            dewPointFilter,
+            humidityFilter,
+            pressureFilter,
+            temperatureFilter,
+        ];
+        AllFilters.AddRange(allFilters.OrderBy(f => f.DisplayName));
     }
 
-    public void Receive(LibraryDeleted message)
+    [RelayCommand]
+    private void AddAdvancedFilter(FilterViewModelBase filter)
     {
-        Libraries.Remove(message.Library);
-    }
-
-    public void Receive(LibraryEdited message)
-    {
-        if (Libraries.FirstOrDefault(library => library == message.Library) is { } existingLibrary)
+        if (AllFilters.Remove(filter))
         {
-            // Retain a reference to the selected library, if one exists. Removing it from the list deselects!
-            LibraryViewModel? selectedLibrary = Library;
-
-            var index = Libraries.IndexOf(existingLibrary);
-            Libraries.RemoveAt(index);
-            Libraries.Insert(index, message.Library);
-
-            // Retain user selection
-            if (selectedLibrary is not null && selectedLibrary == message.Library)
-                Library = message.Library;
+            ActiveFilters.Add(filter);
         }
     }
 
-    public void Receive(TagCreated message)
+    [RelayCommand]
+    private void RemoveAdvancedFilter(FilterViewModelBase filter)
     {
-        if (!Tags.Contains(message.Tag))
-            Tags.Add(message.Tag);
+        if (ActiveFilters.Remove(filter))
+        {
+            filter.ClearCommand.Execute(null);
+
+            // Insert in the list while maintaining alphabetical order
+            var index = AllFilters
+                .Select(f => f.DisplayName)
+                .ToList()
+                .BinarySearch(filter.DisplayName);
+            if (index < 0)
+            {
+                AllFilters.Insert(~index, filter);
+            }
+            else
+            {
+                AllFilters.Insert(index, filter);
+            }
+        }
     }
-
-    public void Receive(TagDeleted message)
-    {
-        Tags.Remove(message.Tag);
-    }
-
-    [RelayCommand]
-    private void ClearLibrary() => Library = null;
-
-    [RelayCommand]
-    private void ClearObjectName() => ObjectName = null;
-
-    [RelayCommand]
-    private void ClearSelectedImageType() => SelectedImageType = null;
-
-    [RelayCommand]
-    private void ClearSelectedImageKind() => SelectedImageKind = null;
-
-    [RelayCommand]
-    private void ClearExposure()
-    {
-        ExposureMin = null;
-        ExposureMax = null;
-    }
-
-    [RelayCommand]
-    private void ClearSelectedFilter() => SelectedFilter = null;
-
-    [RelayCommand]
-    private void ClearDateBegin() => SelectedDateBegin = null;
-
-    [RelayCommand]
-    private void ClearDateEnd() => SelectedDateEnd = null;
-
-    [RelayCommand]
-    private void ClearTags() => QueryTags.Clear();
 
     [RelayCommand]
     private void Clear()
     {
-        ClearLibrary();
-        ClearObjectName();
-        ClearSelectedImageType();
-        ClearSelectedImageKind();
-        ClearExposure();
-        ClearSelectedFilter();
-        ClearDateBegin();
-        ClearDateEnd();
-        ClearTags();
+        foreach (var filter in ActiveFilters)
+        {
+            filter.ClearCommand.Execute(null);
+        }
     }
 
     [RelayCommand]
@@ -118,47 +146,47 @@ public partial class SearchQueryViewModel : ViewModelBase,
     {
         Messenger.Send(new SearchMessage
         {
-            Filters = new ImageFileFilters
-            {
-                LibraryId = Library?.Id,
-                Name = ObjectName,
-                ImageType = SelectedImageType,
-                ImageKind = SelectedImageKind,
-                ExposureMin = ExposureMin.HasValue ? TimeSpan.FromSeconds((double)ExposureMin.Value) : null,
-                ExposureMax = ExposureMax.HasValue ? TimeSpan.FromSeconds((double)ExposureMax.Value) : null,
-                Filter = SelectedFilter,
-                DateBegin = SelectedDateBegin,
-                DateEnd = SelectedDateEnd,
-                TagIds = QueryTags.Select(t => t.Id).ToArray(),
-            }
+            Filters = ActiveFilters,
         });
     }
 
     [RelayCommand]
     private void SearchPrev1Day()
     {
-        SelectedDateBegin = DateTime.UtcNow.AddDays(-1);
-        Search();
+        if (ActiveFilters.OfType<ObservationBeginUtcFilter>().FirstOrDefault() is { } filter)
+        {
+            filter.DateBegin = DateTime.UtcNow.AddDays(-1);
+            Search();
+        }
     }
 
     [RelayCommand]
     private void SearchPrev3Day()
     {
-        SelectedDateBegin = DateTime.UtcNow.AddDays(-3);
-        Search();
+        if (ActiveFilters.OfType<ObservationBeginUtcFilter>().FirstOrDefault() is { } filter)
+        {
+            filter.DateBegin = DateTime.UtcNow.AddDays(-3);
+            Search();
+        }
     }
 
     [RelayCommand]
     private void SearchPrev7Day()
     {
-        SelectedDateBegin = DateTime.UtcNow.AddDays(-7);
-        Search();
+        if (ActiveFilters.OfType<ObservationBeginUtcFilter>().FirstOrDefault() is { } filter)
+        {
+            filter.DateBegin = DateTime.UtcNow.AddDays(-7);
+            Search();
+        }
     }
 
     [RelayCommand]
     private void SearchPrev30Day()
     {
-        SelectedDateBegin = DateTime.UtcNow.AddDays(-30);
-        Search();
+        if (ActiveFilters.OfType<ObservationBeginUtcFilter>().FirstOrDefault() is { } filter)
+        {
+            filter.DateBegin = DateTime.UtcNow.AddDays(-30);
+            Search();
+        }
     }
 }

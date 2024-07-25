@@ -1,8 +1,8 @@
-﻿using Lumidex.Core.Data;
+﻿using Lumidex.Features.MainSearch.Filters;
 
 namespace Lumidex.Features.MainSearch.Messages;
 
 public class SearchMessage
 {
-    public ImageFileFilters Filters { get; init; } = new();
+    public IReadOnlyList<FilterViewModelBase> Filters { get; init; } = [];
 }

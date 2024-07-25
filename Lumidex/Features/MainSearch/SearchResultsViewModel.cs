@@ -4,6 +4,7 @@ using Lumidex.Core.Data;
 using Lumidex.Features.MainSearch.Actions;
 using Lumidex.Features.MainSearch.Editing;
 using Lumidex.Features.MainSearch.Editing.Messages;
+using Lumidex.Features.MainSearch.Filters;
 using Lumidex.Features.MainSearch.Messages;
 using Lumidex.Features.Tags.Messages;
 using Lumidex.Services;
@@ -36,6 +37,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
     [ObservableProperty] string? _totalFileSize;
     [ObservableProperty] ObservableCollectionEx<TagViewModel> _allTags = new();
     [ObservableProperty] ObservableCollectionEx<ImageFileViewModel> _searchResults = new();
+    [ObservableProperty] ObservableCollectionEx<FilterViewModelBase> _activeFilters = new();
     [ObservableProperty] ObservableCollectionEx<ImageFileViewModel> _selectedSearchResults = new();
     [ObservableProperty] ObservableCollectionEx<IntegrationStatistic> _integrationStats = new();
     [ObservableProperty] ObservableCollectionEx<string> _distinctObjectNames = new();
@@ -77,6 +79,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
         Dispatcher.UIThread.Invoke(() =>
         {
             IsSearching = true;
+            ActiveFilters = new(message.Filters);
             SearchResults.Clear();
             IntegrationStats.Clear();
             DistinctObjectNames.Clear();

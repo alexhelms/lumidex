@@ -6,6 +6,7 @@
     xmlns:common="using:Lumidex.Common"
     xmlns:converter="using:Lumidex.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:filter="using:Lumidex.Features.MainSearch.Filters"
     xmlns:i="https://github.com/projektanker/icons.avalonia"
     xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
     xmlns:interactivity="using:Avalonia.Xaml.Interactivity"
@@ -191,10 +192,6 @@
                             Header="Filter" />
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding Binning}"
-                            Header="Binning" />
-                        <DataGridTextColumn
-                            x:DataType="common:ImageFileViewModel"
                             Binding="{Binding ObservationTimestampLocal, Mode=OneWay, StringFormat={}yyyy-MM-dd HH:mm:ss, TargetNullValue={}}"
                             Header="Observation (Local)" />
                         <DataGridTextColumn
@@ -241,6 +238,178 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
+
+                        <!--  ADVANCED FILTERS  -->
+                        <!--  Please try to keep alphabetical by filter type.  -->
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding Airmass}"
+                            Header="Airmass"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:AirmassFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding Altitude}"
+                            Header="Altitude (&#186;)"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:AltitudeFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding Azimuth}"
+                            Header="Azimuth (&#186;)"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:AzimuthFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding Binning}"
+                            Header="Binning"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:CameraBinningFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding CameraGain}"
+                            Header="Gain"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:CameraGainFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding CameraName}"
+                            Header="Camera Name"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:CameraNameFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding CameraOffset}"
+                            Header="Offset"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:CameraOffsetFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding CameraTemperature}"
+                            Header="Camera Temperature (&#186;C)"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:CameraTemperatureFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding CameraTemperatureSetPoint}"
+                            Header="Camera Temperature Set Point (&#186;C)"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:CameraTemperatureSetPointFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding Declination}"
+                            Header="Declination (&#186;)"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:DeclinationFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding DewPoint}"
+                            Header="Dew Point (&#186;C)"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:DewPointFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding Elevation}"
+                            Header="Elevation (m)"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:ElevationFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding FilterWheelName}"
+                            Header="Filter Wheel Name"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:FilterWheelNameFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding FocalLength}"
+                            Header="Focal Length (mm)"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:FocalLengthFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding FocuserName}"
+                            Header="Focuser Name"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:FocuserNameFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding FocuserPosition}"
+                            Header="Focuser Position"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:FocuserPositionFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding FocuserTemperature}"
+                            Header="Focuser Temperature (&#186;C)"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:FocuserTemperatureFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding Humidity}"
+                            Header="Humidity (%)"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:HumidityFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding Latitude}"
+                            Header="Latitude (&#186;)"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:LatitudeFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding Longitude}"
+                            Header="Longitude (&#186;)"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:LongitudeFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding PixelSize}"
+                            Header="Pixel Size (µm)"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:PixelSizeFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding Pressure}"
+                            Header="Pressure (mbar)"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:PressureFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding ReadoutMode}"
+                            Header="Readout Mode"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:ReadoutModeFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding RightAscension, Converter={x:Static converter:FuncConverters.DegreesToHours}}"
+                            Header="Right Ascension (hr)"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:ReadoutModeFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding RotatorName}"
+                            Header="Rotator Name"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:RotatorNameFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding RotatorPosition}"
+                            Header="Rotator Position"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:RotatorPositionFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding TelescopeName}"
+                            Header="Telescope Name"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:TelescopeNameFilter}}" />
+
+                        <DataGridTextColumn
+                            x:DataType="common:ImageFileViewModel"
+                            Binding="{Binding Temperature}"
+                            Header="Temperature (&#186;C)"
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:TemperatureFilter}}" />
+
                     </DataGrid.Columns>
                 </DataGrid>
             </DockPanel>
