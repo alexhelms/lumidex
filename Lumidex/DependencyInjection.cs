@@ -1,5 +1,4 @@
 ﻿using Lumidex.Features.MainSearch.Editing;
-using Lumidex.Features.MainSearch.Filters;
 using Lumidex.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,17 +15,6 @@ public static class DependencyInjection
         RegisterAllDerivedTypes<Avalonia.Controls.UserControl>(services);
 
         services.AddTransient<Func<EditItemsViewModel>>(p => () => p.GetRequiredService<EditItemsViewModel>());
-
-        // Filters
-        services.AddTransient<Func<ObjectNameFilter>>(p => () => p.GetRequiredService<ObjectNameFilter>());
-        services.AddTransient<Func<LibraryFilter>>(p => () => p.GetRequiredService<LibraryFilter>());
-        services.AddTransient<Func<ImageTypeFilter>>(p => () => p.GetRequiredService<ImageTypeFilter>());
-        services.AddTransient<Func<ImageKindFilter>>(p => () => p.GetRequiredService<ImageKindFilter>());
-        services.AddTransient<Func<ExposureFilter>>(p => () => p.GetRequiredService<ExposureFilter>());
-        services.AddTransient<Func<FilterFilter>>(p => () => p.GetRequiredService<FilterFilter>());
-        services.AddTransient<Func<ObservationBeginFilter>>(p => () => p.GetRequiredService<ObservationBeginFilter>());
-        services.AddTransient<Func<ObservationEndFilter>>(p => () => p.GetRequiredService<ObservationEndFilter>());
-        services.AddTransient<Func<TagFilter>>(p => () => p.GetRequiredService<TagFilter>());
 
         services.AddSingleton<DialogService>();
     }
