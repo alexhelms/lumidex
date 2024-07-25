@@ -115,7 +115,10 @@ public partial class MainSearchViewModel : ViewModelBase,
         filterLogMessage.AppendJoin(", ", message.Filters.Select(f => f.ToString()));
         Log.Information(filterLogMessage.ToString());
 
-        Messenger.Send(new SearchStarting());
+        Messenger.Send(new SearchStarting
+        {
+            Filters = message.Filters,
+        });
 
         try
         {
