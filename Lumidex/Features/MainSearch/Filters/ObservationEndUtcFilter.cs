@@ -2,11 +2,11 @@
 
 namespace Lumidex.Features.MainSearch.Filters;
 
-public partial class ObservationEndFilter : FilterViewModelBase
+public partial class ObservationEndUtcFilter : FilterViewModelBase
 {
     [ObservableProperty] DateTime? _dateEnd;
 
-    public override string DisplayName => "Date End";
+    public override string DisplayName => "Date End UTC";
 
     protected override void OnClear() => DateEnd = null;
 

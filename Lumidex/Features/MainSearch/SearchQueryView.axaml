@@ -265,7 +265,7 @@
                         </Grid>
                     </DataTemplate>
 
-                    <DataTemplate DataType="filter:ObservationBeginFilter">
+                    <DataTemplate DataType="filter:ObservationBeginUtcFilter">
                         <Grid ColumnDefinitions="1*,2*">
                             <TextBlock
                                 Grid.Column="0"
@@ -291,7 +291,7 @@
                         </Grid>
                     </DataTemplate>
 
-                    <DataTemplate DataType="filter:ObservationEndFilter">
+                    <DataTemplate DataType="filter:ObservationEndUtcFilter">
                         <Grid ColumnDefinitions="1*,2*">
                             <TextBlock
                                 Grid.Column="0"
@@ -393,6 +393,76 @@
                             </DockPanel>
                         </Grid>
                     </DataTemplate>
+
+					<DataTemplate DataType="filter:ObservationBeginLocalFilter">
+						<Grid ColumnDefinitions="1*,2*">
+							<TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="{Binding DisplayName}" />
+							<DockPanel Grid.Column="1">
+								<Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+								<Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+								<CalendarDatePicker
+                                    HorizontalAlignment="Stretch"
+                                    CustomDateFormatString="yyyy/MM/dd"
+                                    IsTodayHighlighted="True"
+                                    SelectedDate="{Binding DateBegin}"
+                                    SelectedDateFormat="Custom"
+                                    ToolTip.Tip="Begin date, UTC"
+                                    Watermark=" " />
+							</DockPanel>
+						</Grid>
+					</DataTemplate>
+
+					<DataTemplate DataType="filter:ObservationEndLocalFilter">
+						<Grid ColumnDefinitions="1*,2*">
+							<TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="{Binding DisplayName}" />
+							<DockPanel Grid.Column="1">
+								<Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+								<Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+								<CalendarDatePicker
+                                    HorizontalAlignment="Stretch"
+                                    CustomDateFormatString="yyyy/MM/dd"
+                                    IsTodayHighlighted="True"
+                                    SelectedDate="{Binding DateEnd}"
+                                    SelectedDateFormat="Custom"
+                                    ToolTip.Tip="End date, UTC"
+                                    Watermark=" " />
+							</DockPanel>
+						</Grid>
+					</DataTemplate>
 
                     <DataTemplate DataType="filter:CameraNameFilter">
                         <Grid ColumnDefinitions="1*,2*">

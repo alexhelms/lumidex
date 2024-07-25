@@ -2,11 +2,11 @@
 
 namespace Lumidex.Features.MainSearch.Filters;
 
-public partial class ObservationBeginFilter : FilterViewModelBase
+public partial class ObservationBeginUtcFilter : FilterViewModelBase
 {
     [ObservableProperty] DateTime? _dateBegin;
 
-    public override string DisplayName => "Date Begin";
+    public override string DisplayName => "Date Begin UTC";
 
     protected override void OnClear() => DateBegin = null;
 

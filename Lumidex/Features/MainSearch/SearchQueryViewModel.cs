@@ -16,11 +16,13 @@ public partial class SearchQueryViewModel : ViewModelBase
         ImageKindFilter imageKindFilter,
         ExposureFilter exposureFilter,
         FilterFilter filterFilter,
-        ObservationBeginFilter observationBeginFilter,
-        ObservationEndFilter observationEndFilter,
+        ObservationBeginUtcFilter observationBeginFilter,
+        ObservationEndUtcFilter observationEndFilter,
         TagFilter tagFilter,
         // Advanced filters
         PathFilter pathFilter,
+        ObservationBeginLocalFilter observationBeginLocalFilter,
+        ObservationEndLocalFilter observationEndLocalFilter,
         CameraNameFilter cameraNameFilter,
         CameraTemperatureSetPointFilter cameraTemperatureSetPointFilter,
         CameraTemperatureFilter cameraTemperatureFilter,
@@ -64,6 +66,8 @@ public partial class SearchQueryViewModel : ViewModelBase
 
         List<FilterViewModelBase> allFilters = [
             pathFilter,
+            observationBeginLocalFilter,
+            observationEndLocalFilter,
             cameraNameFilter,
             cameraTemperatureSetPointFilter,
             cameraTemperatureFilter,
@@ -149,7 +153,7 @@ public partial class SearchQueryViewModel : ViewModelBase
     [RelayCommand]
     private void SearchPrev1Day()
     {
-        if (ActiveFilters.OfType<ObservationBeginFilter>().FirstOrDefault() is { } filter)
+        if (ActiveFilters.OfType<ObservationBeginUtcFilter>().FirstOrDefault() is { } filter)
         {
             filter.DateBegin = DateTime.UtcNow.AddDays(-1);
             Search();
@@ -159,7 +163,7 @@ public partial class SearchQueryViewModel : ViewModelBase
     [RelayCommand]
     private void SearchPrev3Day()
     {
-        if (ActiveFilters.OfType<ObservationBeginFilter>().FirstOrDefault() is { } filter)
+        if (ActiveFilters.OfType<ObservationBeginUtcFilter>().FirstOrDefault() is { } filter)
         {
             filter.DateBegin = DateTime.UtcNow.AddDays(-3);
             Search();
@@ -169,7 +173,7 @@ public partial class SearchQueryViewModel : ViewModelBase
     [RelayCommand]
     private void SearchPrev7Day()
     {
-        if (ActiveFilters.OfType<ObservationBeginFilter>().FirstOrDefault() is { } filter)
+        if (ActiveFilters.OfType<ObservationBeginUtcFilter>().FirstOrDefault() is { } filter)
         {
             filter.DateBegin = DateTime.UtcNow.AddDays(-7);
             Search();
@@ -179,7 +183,7 @@ public partial class SearchQueryViewModel : ViewModelBase
     [RelayCommand]
     private void SearchPrev30Day()
     {
-        if (ActiveFilters.OfType<ObservationBeginFilter>().FirstOrDefault() is { } filter)
+        if (ActiveFilters.OfType<ObservationBeginUtcFilter>().FirstOrDefault() is { } filter)
         {
             filter.DateBegin = DateTime.UtcNow.AddDays(-30);
             Search();
