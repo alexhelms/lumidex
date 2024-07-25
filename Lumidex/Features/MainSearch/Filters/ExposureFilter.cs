@@ -20,13 +20,13 @@ public partial class ExposureFilter : FilterViewModelBase
         if (ExposureMin is { } min)
         {
             var minimum = TimeSpan.FromSeconds((double)min);
-            query = query.Where(f => f.Exposure!.Value >= minimum.TotalSeconds);
+            query = query.Where(f => f.Exposure >= minimum.TotalSeconds);
         }
 
         if (ExposureMax is { } max)
         {
             var maximum = TimeSpan.FromSeconds((double)max);
-            query = query.Where(f => f.Exposure!.Value <= maximum.TotalSeconds);
+            query = query.Where(f => f.Exposure <= maximum.TotalSeconds);
         }
 
         return query;

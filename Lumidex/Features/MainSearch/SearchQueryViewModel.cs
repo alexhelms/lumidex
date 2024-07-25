@@ -5,10 +5,12 @@ namespace Lumidex.Features.MainSearch;
 
 public partial class SearchQueryViewModel : ViewModelBase
 {
+    [ObservableProperty] ObservableCollectionEx<FilterViewModelBase> _allFilters = new();
     [ObservableProperty] ObservableCollectionEx<FilterViewModelBase> _activeFilters = new();
 
     public SearchQueryViewModel(
-        NameFilter nameFilter,
+        // Default filters
+        ObjectNameFilter nameFilter,
         LibraryFilter libraryFilter,
         ImageTypeFilter imageTypeFilter,
         ImageKindFilter imageKindFilter,
@@ -16,7 +18,36 @@ public partial class SearchQueryViewModel : ViewModelBase
         FilterFilter filterFilter,
         ObservationBeginFilter observationBeginFilter,
         ObservationEndFilter observationEndFilter,
-        TagFilter tagFilter)
+        TagFilter tagFilter,
+        // Advanced filters
+        CameraNameFilter cameraNameFilter,
+        CameraTemperatureSetPointFilter cameraTemperatureSetPointFilter,
+        CameraTemperatureFilter cameraTemperatureFilter,
+        CameraGainFilter cameraGainFilter,
+        CameraOffsetFilter cameraOffsetFilter,
+        CameraBinningFilter cameraBinningFilter,
+        PixelSizeFilter pixelSizeFilter,
+        ReadoutModeFilter readoutModeFilter,
+        FocuserNameFilter focuserNameFilter,
+        FocuserPositionFilter focuserPositionFilter,
+        FocuserTemperatureFilter focuserTemperatureFilter,
+        RotatorNameFilter rotatorNameFilter,
+        RotatorPositionFilter rotatorPositionFilter,
+        FilterWheelNameFilter filterWheelNameFilter,
+        MountNameFilter mountNameFilter,
+        RightAscensionFilter rightAscensionFilter,
+        DeclinationFilter declinationFilter,
+        AltitudeFilter altitudeFilter,
+        AzimuthFilter azimuthFilter,
+        FocalLengthFilter focalLengthFilter,
+        AirmassFilter airmassFilter,
+        LatitudeFilter latitudeFilter,
+        LongitudeFilter longitudeFilter,
+        ElevationFilter elevationFilter,
+        DewPointFilter dewPointFilter,
+        HumidityFilter humidityFilter,
+        PressureFilter pressureFilter,
+        TemperatureFilter temperatureFilter)
     {
         ActiveFilters.AddRange([
             nameFilter,
@@ -29,6 +60,70 @@ public partial class SearchQueryViewModel : ViewModelBase
             observationEndFilter,
             tagFilter,
         ]);
+
+        List<FilterViewModelBase> allFilters = [
+            cameraNameFilter,
+            cameraTemperatureSetPointFilter,
+            cameraTemperatureFilter,
+            cameraGainFilter,
+            cameraOffsetFilter,
+            cameraBinningFilter,
+            pixelSizeFilter,
+            readoutModeFilter,
+            focuserNameFilter,
+            focuserPositionFilter,
+            focuserTemperatureFilter,
+            rotatorNameFilter,
+            rotatorPositionFilter,
+            filterWheelNameFilter,
+            mountNameFilter,
+            rightAscensionFilter,
+            declinationFilter,
+            altitudeFilter,
+            azimuthFilter,
+            focalLengthFilter,
+            airmassFilter,
+            latitudeFilter,
+            longitudeFilter,
+            elevationFilter,
+            dewPointFilter,
+            humidityFilter,
+            pressureFilter,
+            temperatureFilter,
+        ];
+        AllFilters.AddRange(allFilters.OrderBy(f => f.DisplayName));
+    }
+
+    [RelayCommand]
+    private void AddAdvancedFilter(FilterViewModelBase filter)
+    {
+        if (AllFilters.Remove(filter))
+        {
+            ActiveFilters.Add(filter);
+        }
+    }
+
+    [RelayCommand]
+    private void RemoveAdvancedFilter(FilterViewModelBase filter)
+    {
+        if (ActiveFilters.Remove(filter))
+        {
+            filter.ClearCommand.Execute(null);
+
+            // Insert in the list while maintaining alphabetical order
+            var index = AllFilters
+                .Select(f => f.DisplayName)
+                .ToList()
+                .BinarySearch(filter.DisplayName);
+            if (index < 0)
+            {
+                AllFilters.Insert(~index, filter);
+            }
+            else
+            {
+                AllFilters.Insert(index, filter);
+            }
+        }
     }
 
     [RelayCommand]

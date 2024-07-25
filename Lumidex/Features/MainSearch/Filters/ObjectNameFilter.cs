@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Lumidex.Features.MainSearch.Filters;
 
-public partial class NameFilter : FilterViewModelBase
+public partial class ObjectNameFilter : FilterViewModelBase
 {
     [ObservableProperty] string? _name;
 
-    public override string DisplayName => "Name";
+    public override string DisplayName => "Object Name";
 
     protected override void OnClear() => Name = null;
 

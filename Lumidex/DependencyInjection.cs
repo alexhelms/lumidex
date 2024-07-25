@@ -18,7 +18,7 @@ public static class DependencyInjection
         services.AddTransient<Func<EditItemsViewModel>>(p => () => p.GetRequiredService<EditItemsViewModel>());
 
         // Filters
-        services.AddTransient<Func<NameFilter>>(p => () => p.GetRequiredService<NameFilter>());
+        services.AddTransient<Func<ObjectNameFilter>>(p => () => p.GetRequiredService<ObjectNameFilter>());
         services.AddTransient<Func<LibraryFilter>>(p => () => p.GetRequiredService<LibraryFilter>());
         services.AddTransient<Func<ImageTypeFilter>>(p => () => p.GetRequiredService<ImageTypeFilter>());
         services.AddTransient<Func<ImageKindFilter>>(p => () => p.GetRequiredService<ImageKindFilter>());

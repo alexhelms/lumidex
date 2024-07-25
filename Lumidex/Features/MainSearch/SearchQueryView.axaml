@@ -13,14 +13,102 @@
     d:DesignWidth="800"
     x:DataType="search:SearchQueryViewModel"
     mc:Ignorable="d">
-    <UserControl.Resources>
-        <converter:ColorToBrushConverter x:Key="ColorToBrush" />
-    </UserControl.Resources>
     <DockPanel>
 
-        <StackPanel>
+        <DockPanel Margin="8" DockPanel.Dock="Bottom">
 
-            <ItemsControl ItemsSource="{Binding ActiveFilters}">
+            <!--  N Days Ago  -->
+            <StackPanel
+                HorizontalAlignment="Left"
+                DockPanel.Dock="Left"
+                Orientation="Horizontal">
+                <Button
+                    Width="35"
+                    HorizontalContentAlignment="Center"
+                    Command="{Binding SearchPrev1DayCommand}"
+                    Content="1" />
+                <Button
+                    Width="35"
+                    Margin="5,0,0,0"
+                    HorizontalContentAlignment="Center"
+                    Command="{Binding SearchPrev3DayCommand}"
+                    Content="3" />
+                <Button
+                    Width="35"
+                    Margin="5,0,0,0"
+                    HorizontalContentAlignment="Center"
+                    Command="{Binding SearchPrev7DayCommand}"
+                    Content="7" />
+                <Button
+                    Width="35"
+                    Margin="5,0,0,0"
+                    HorizontalContentAlignment="Center"
+                    Command="{Binding SearchPrev30DayCommand}"
+                    Content="30" />
+                <TextBlock
+                    Margin="5,0,0,0"
+                    VerticalAlignment="Center"
+                    Text="Days Ago" />
+            </StackPanel>
+
+            <!--  Clear / Search  -->
+            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                <Button
+                    Margin="0,0,5,0"
+                    Command="{Binding ClearCommand}"
+                    Content="Clear"
+                    ToolTip.Tip="Clear all filters" />
+                <Button
+                    Classes="accent"
+                    Command="{Binding SearchCommand}"
+                    Content="Search"
+                    IsDefault="True"
+                    ToolTip.Tip="Search all images" />
+            </StackPanel>
+
+        </DockPanel>
+
+        <Rectangle
+            Height="1"
+            Margin="8"
+            DockPanel.Dock="Bottom"
+            Fill="#565656" />
+
+        <!--  Add a Filter  -->
+        <DockPanel Margin="8" DockPanel.Dock="Bottom">
+            <TextBlock
+                VerticalAlignment="Center"
+                DockPanel.Dock="Left"
+                Text="More Filters" />
+            <DockPanel Margin="8,0,0,0">
+                <Button
+                    Margin="5,0,0,0"
+                    Command="{Binding AddAdvancedFilterCommand}"
+                    CommandParameter="{Binding #AdvancedFilterComboBox.SelectedItem}"
+                    Content="Add"
+                    DockPanel.Dock="Right" />
+                <ComboBox
+                    x:Name="AdvancedFilterComboBox"
+                    HorizontalAlignment="Stretch"
+                    DisplayMemberBinding="{Binding DisplayName}"
+                    ItemsSource="{Binding AllFilters}"
+                    PlaceholderForeground="Gray"
+                    PlaceholderText="Select a Filter" />
+            </DockPanel>
+        </DockPanel>
+
+        <Rectangle
+            Height="1"
+            Margin="8,0,8,8"
+            DockPanel.Dock="Bottom"
+            Fill="#565656" />
+
+        <!--  Filters  -->
+        <ScrollViewer>
+            <ItemsControl
+                x:Name="FilterItemsControl"
+                Margin="0,0,8,0"
+                ItemsSource="{Binding ActiveFilters}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel />
@@ -35,7 +123,7 @@
 
                     <!--  Avalonia does not support data templates in an external file :(  -->
 
-                    <DataTemplate DataType="filter:NameFilter">
+                    <DataTemplate DataType="filter:ObjectNameFilter">
                         <Grid ColumnDefinitions="1*,2*">
                             <TextBlock
                                 Grid.Column="0"
@@ -48,7 +136,7 @@
                                     i:Attached.Icon="mdi-close"
                                     Command="{Binding ClearCommand}"
                                     DockPanel.Dock="Right"
-                                    ToolTip.Tip="Clear Name" />
+                                    ToolTip.Tip="Clear" />
                                 <TextBox Text="{Binding Name}" />
                             </DockPanel>
                         </Grid>
@@ -67,7 +155,7 @@
                                     i:Attached.Icon="mdi-close"
                                     Command="{Binding ClearCommand}"
                                     DockPanel.Dock="Right"
-                                    ToolTip.Tip="Clear Library" />
+                                    ToolTip.Tip="Clear" />
                                 <ComboBox
                                     HorizontalAlignment="Stretch"
                                     DisplayMemberBinding="{Binding Name}"
@@ -90,7 +178,7 @@
                                     i:Attached.Icon="mdi-close"
                                     Command="{Binding ClearCommand}"
                                     DockPanel.Dock="Right"
-                                    ToolTip.Tip="Clear Image Type" />
+                                    ToolTip.Tip="Clear" />
                                 <ComboBox
                                     HorizontalAlignment="Stretch"
                                     ItemsSource="{Binding ImageTypes, Mode=OneTime}"
@@ -112,7 +200,7 @@
                                     i:Attached.Icon="mdi-close"
                                     Command="{Binding ClearCommand}"
                                     DockPanel.Dock="Right"
-                                    ToolTip.Tip="Clear Image Kind" />
+                                    ToolTip.Tip="Clear" />
                                 <ComboBox
                                     HorizontalAlignment="Stretch"
                                     ItemsSource="{Binding ImageKinds, Mode=OneTime}"
@@ -134,7 +222,7 @@
                                     i:Attached.Icon="mdi-close"
                                     Command="{Binding ClearCommand}"
                                     DockPanel.Dock="Right"
-                                    ToolTip.Tip="Clear Exposure" />
+                                    ToolTip.Tip="Clear" />
                                 <Grid ColumnDefinitions="1*,Auto,1*">
                                     <NumericUpDown
                                         Grid.Column="0"
@@ -171,7 +259,7 @@
                                     i:Attached.Icon="mdi-close"
                                     Command="{Binding ClearCommand}"
                                     DockPanel.Dock="Right"
-                                    ToolTip.Tip="Clear Filter" />
+                                    ToolTip.Tip="Clear" />
                                 <TextBox Text="{Binding Filter}" />
                             </DockPanel>
                         </Grid>
@@ -190,7 +278,7 @@
                                     i:Attached.Icon="mdi-close"
                                     Command="{Binding ClearCommand}"
                                     DockPanel.Dock="Right"
-                                    ToolTip.Tip="Clear Begin Date" />
+                                    ToolTip.Tip="Clear" />
                                 <CalendarDatePicker
                                     HorizontalAlignment="Stretch"
                                     CustomDateFormatString="yyyy/MM/dd"
@@ -216,7 +304,7 @@
                                     i:Attached.Icon="mdi-close"
                                     Command="{Binding ClearCommand}"
                                     DockPanel.Dock="Right"
-                                    ToolTip.Tip="Clear End Date" />
+                                    ToolTip.Tip="Clear" />
                                 <CalendarDatePicker
                                     HorizontalAlignment="Stretch"
                                     CustomDateFormatString="yyyy/MM/dd"
@@ -243,9 +331,13 @@
                                     i:Attached.Icon="mdi-close"
                                     Command="{Binding ClearCommand}"
                                     DockPanel.Dock="Right"
-                                    ToolTip.Tip="Clear Tags" />
+                                    ToolTip.Tip="Clear" />
                                 <ListBox
                                     Height="120"
+                                    Background="#161616"
+                                    BorderBrush="#656565"
+                                    BorderThickness="1"
+                                    CornerRadius="3"
                                     ItemsSource="{Binding AllTags}"
                                     SelectedItems="{Binding SelectedTags}"
                                     SelectionMode="Multiple,Toggle">
@@ -272,66 +364,1149 @@
                         </Grid>
                     </DataTemplate>
 
+                    <!--  ADVANCED FILTERS  -->
+
+                    <DataTemplate DataType="filter:CameraNameFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Camera Name" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <TextBox Text="{Binding Name}" />
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:CameraTemperatureSetPointFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Cam Set Point (&#186;C)" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MinValue}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MaxValue}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:CameraTemperatureFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Camera Temp (&#186;C)" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MinValue}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MaxValue}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:CameraGainFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Camera Gain" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        Minimum="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MinValue}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        Minimum="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MaxValue}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:CameraOffsetFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Camera Offset" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        Minimum="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MinValue}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        Minimum="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MaxValue}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:CameraBinningFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Camera Binning" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        Minimum="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MinValue}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        Minimum="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MaxValue}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:PixelSizeFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Pixel Size (µm)" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        Minimum="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MinValue}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        Minimum="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MaxValue}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:ReadoutModeFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Readout Mode" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <TextBox Text="{Binding Name}" />
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:FocuserNameFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Focuser Name" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <TextBox Text="{Binding Name}" />
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:FocuserPositionFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Focuser Position" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MinValue}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MaxValue}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:FocuserTemperatureFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Focuser Temp (&#186;C)" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MinValue}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MaxValue}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:RotatorNameFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Rotator Name" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <TextBox Text="{Binding Name}" />
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:RotatorPositionFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Rotator Position" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MinValue}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MaxValue}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:FilterWheelNameFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Filter Wheel Name" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <TextBox Text="{Binding Name}" />
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:MountNameFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Mount Name" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <TextBox Text="{Binding Name}" />
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:RightAscensionFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="RA (hr)" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        Maximum="24"
+                                        Minimum="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MinValue}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        Maximum="24"
+                                        Minimum="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MaxValue}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:DeclinationFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="DEC (&#186;)" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        Maximum="-90"
+                                        Minimum="90"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MinValue}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        Maximum="-90"
+                                        Minimum="90"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MaxValue}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:AltitudeFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Altitude (&#186;)" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        Maximum="-90"
+                                        Minimum="90"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MinValue}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        Maximum="-90"
+                                        Minimum="90"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MaxValue}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:AzimuthFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Azimuth (&#186;)" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        Maximum="0"
+                                        Minimum="360"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MinValue}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        Maximum="0"
+                                        Minimum="360"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MaxValue}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:FocalLengthFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Focal Length (mm)" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MinValue}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MaxValue}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:AirmassFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Airmass" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        Minimum="1"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MinValue}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        Minimum="1"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MaxValue}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:LatitudeFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Latitude (&#186;)" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        Maximum="-90"
+                                        Minimum="90"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MinValue}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        Maximum="-90"
+                                        Minimum="90"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MaxValue}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:LongitudeFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Longitude (&#186;)" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        Maximum="-180"
+                                        Minimum="180"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MinValue}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        Maximum="-180"
+                                        Minimum="180"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MaxValue}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:ElevationFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Elevation (&#186;)" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        Maximum="-90"
+                                        Minimum="90"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MinValue}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        Maximum="-90"
+                                        Minimum="90"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MaxValue}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:DewPointFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Dew Point (&#186;C)" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MinValue}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MaxValue}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:HumidityFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Humidity (%)" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        Maximum="100"
+                                        Minimum="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MinValue}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        Maximum="100"
+                                        Minimum="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MaxValue}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:PressureFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Pressure (mbar)" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        Maximum="2000"
+                                        Minimum="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MinValue}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        Maximum="2000"
+                                        Minimum="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MaxValue}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="filter:TemperatureFilter">
+                        <Grid ColumnDefinitions="1*,2*">
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Temperature (&#186;C)" />
+                            <DockPanel Grid.Column="1">
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-filter-remove"
+                                    Background="#ffcc2222"
+                                    Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                    CommandParameter="{Binding}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Remove filter" />
+                                <Button
+                                    Margin="5,0,0,0"
+                                    VerticalAlignment="Stretch"
+                                    i:Attached.Icon="mdi-close"
+                                    Command="{Binding ClearCommand}"
+                                    DockPanel.Dock="Right"
+                                    ToolTip.Tip="Clear" />
+                                <Grid ColumnDefinitions="1*,Auto,1*">
+                                    <NumericUpDown
+                                        Grid.Column="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MinValue}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Text="to" />
+                                    <NumericUpDown
+                                        Grid.Column="2"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding MaxValue}" />
+                                </Grid>
+                            </DockPanel>
+                        </Grid>
+                    </DataTemplate>
+
                 </ItemsControl.DataTemplates>
             </ItemsControl>
-
-            <Grid Margin="0,8,36,0" ColumnDefinitions="1*,2*">
-                <StackPanel Grid.Column="1">
-
-                    <StackPanel
-                        Margin="12,0,0,0"
-                        HorizontalAlignment="Left"
-                        Orientation="Horizontal">
-                        <Button
-                            Width="35"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding SearchPrev1DayCommand}"
-                            Content="1" />
-                        <Button
-                            Width="35"
-                            Margin="5,0,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding SearchPrev3DayCommand}"
-                            Content="3" />
-                        <Button
-                            Width="35"
-                            Margin="5,0,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding SearchPrev7DayCommand}"
-                            Content="7" />
-                        <Button
-                            Width="35"
-                            Margin="5,0,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding SearchPrev30DayCommand}"
-                            Content="30" />
-                        <TextBlock
-                            Margin="5,0,0,0"
-                            VerticalAlignment="Center"
-                            Text="Days Ago" />
-                    </StackPanel>
-
-                    <Rectangle
-                        Height="1"
-                        Margin="12,8,0,8"
-                        Fill="#565656" />
-
-                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                        <Button
-                            Margin="0,0,5,0"
-                            Command="{Binding ClearCommand}"
-                            Content="Clear" />
-                        <Button
-                            Classes="accent"
-                            Command="{Binding SearchCommand}"
-                            Content="Search"
-                            IsDefault="True" />
-                    </StackPanel>
-
-                </StackPanel>
-            </Grid>
-
-        </StackPanel>
+        </ScrollViewer>
 
     </DockPanel>
 </UserControl>
