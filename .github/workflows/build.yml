@@ -55,7 +55,7 @@ jobs:
       - name: Publish
         run: dotnet publish ${{ env.PROJECT }} -r win-x64 --self-contained -c Release -o publish-win
       - name: Show Version
-        run: dotnet tool run dotnet-gitversion /output
+        run: dotnet tool run dotnet-gitversion /output buildserver
       - name: Installer
         run: |
           & 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' lumidex-installer-win.iss /DMyAppProductVersion=${GitVersion_SemVer}
@@ -85,4 +85,4 @@ jobs:
             --title="${GITHUB_REPOSITORY#*/} ${tag#v}" \
             --generate-notes \
             --draft \
-            ./dist/win/*.exe
+            Lumidex-*.exe
