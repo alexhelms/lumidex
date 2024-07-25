@@ -8,9 +8,13 @@ on:
       - 'bug/**'
     tags:
       - 'v*'
+
+env:
+  SOLUTION: Lumidex.sln
+  PROJECT: Lumidex.Desktop/Lumidex.Desktop.csproj
  
 jobs:
-  build:
+  build-win:
     runs-on: [self-hosted, windows, x64]
     permissions:
       contents: read
@@ -31,3 +35,52 @@ jobs:
         run: dotnet tool run dotnet-gitversion
       - name: Test
         run: dotnet test ${{ env.SOLUTION }} -c Release --no-build
+
+  windows-installer:
+    runs-on: [self-hosted, windows, x64]
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.x
+      - name: Restore
+        run: dotnet restore ${{ env.PROJECT }}
+      - name: Tools
+        run: dotnet tool restore
+      - name: Publish
+        run: dotnet publish ${{ env.PROJECT }} -r win-x64 --self-contained -c Release -o publish-win
+      - name: Show Version
+        run: dotnet tool run dotnet-gitversion
+      - name: Installer
+        run: |
+          $VERSION=(dotnet tool run dotnet-gitversion /showvariable SemVer)
+          & 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' lumidex-installer-win.iss /DMyAppProductVersion=${VERSION}
+      - uses: actions/upload-artifact@v4
+        with:
+          if-no-files-found: error
+          retention-days: 7
+          name: windows-installer
+          path: dist/win/*.exe
+
+  release:
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-installer
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title="${GITHUB_REPOSITORY#*/} ${tag#v}" \
+            --generate-notes \
+            --draft \
+            ./dist/win/*.exe

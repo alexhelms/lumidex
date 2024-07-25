@@ -1,11 +1,10 @@
-name: Installer
+name: Create Windows Installer
 
 on: workflow_dispatch
 
 
 env:
   PROJECT: Lumidex.Desktop/Lumidex.Desktop.csproj
-  ISCC: C:\Program Files (x86)\Inno Setup 6\ISCC.exe
 
 jobs:
   installer:
@@ -31,7 +30,7 @@ jobs:
       - name: Installer
         run: |
           $VERSION=(dotnet tool run dotnet-gitversion /showvariable SemVer)
-          & '${{ env.ISCC }}' lumidex-installer-win.iss /DMyAppProductVersion=${VERSION}
+          & 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' lumidex-installer-win.iss /DMyAppProductVersion=${VERSION}
       - uses: LanceMcCarthy/Action-AzureBlobUpload@v3.1.3
         with:
           connection_string: ${{ secrets.INSTALLERBLOBCONNECTIONSTRING }}
