@@ -31,11 +31,9 @@ jobs:
         run: |
           $VERSION=(dotnet tool run dotnet-gitversion /showvariable SemVer)
           & 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' lumidex-installer-win.iss /DMyAppProductVersion=${VERSION}
-      - uses: LanceMcCarthy/Action-AzureBlobUpload@v3.1.3
+      - uses: actions/upload-artifact@v4
         with:
-          connection_string: ${{ secrets.INSTALLERBLOBCONNECTIONSTRING }}
-          fail_if_source_empty: true
-          is_recursive: true
-          container_name: installers
-          source_folder: dist\
-          destination_folder: \
+          if-no-files-found: error
+          retention-days: 7
+          name: windows-installer
+          path: dist/win/*.exe
