@@ -311,7 +311,7 @@
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
                             Binding="{Binding Elevation}"
-                            Header="Elevation (&#186;)"
+                            Header="Elevation (m)"
                             IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:ElevationFilter}}" />
 
                         <DataGridTextColumn
