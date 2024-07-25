@@ -87,13 +87,18 @@
                     CommandParameter="{Binding #AdvancedFilterComboBox.SelectedItem}"
                     Content="Add"
                     DockPanel.Dock="Right" />
-                <ComboBox
+				<ComboBox
                     x:Name="AdvancedFilterComboBox"
                     HorizontalAlignment="Stretch"
-                    DisplayMemberBinding="{Binding DisplayName}"
                     ItemsSource="{Binding AllFilters}"
                     PlaceholderForeground="Gray"
-                    PlaceholderText="Select a Filter" />
+                    PlaceholderText="Select a Filter">
+					<ComboBox.ItemTemplate>
+						<DataTemplate DataType="filter:FilterViewModelBase">
+							<TextBlock Text="{Binding DisplayName}"/>
+						</DataTemplate>
+					</ComboBox.ItemTemplate>
+				</ComboBox>
             </DockPanel>
         </DockPanel>
 
