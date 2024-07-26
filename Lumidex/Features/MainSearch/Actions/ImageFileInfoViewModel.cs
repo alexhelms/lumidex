@@ -1,8 +1,7 @@
-﻿using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Controls;
-using Lumidex.Core.Data;
+﻿using Lumidex.Core.Data;
 using Lumidex.Features.MainSearch.Editing.Messages;
 using System.Reflection;
+using Lumidex.Services;
 
 namespace Lumidex.Features.MainSearch.Actions;
 
@@ -10,6 +9,7 @@ public partial class ImageFileInfoViewModel : ActionViewModelBase,
     IRecipient<ImageFilesEdited>
 {
     private readonly static List<PropertyInfo> UserEditableProperties;
+    private readonly Func<ImageFileInfoItem> _imageFileInfoFactory;
 
     [ObservableProperty] ObservableCollectionEx<ImageFileInfoItem> _items = new();
 
@@ -21,8 +21,9 @@ public partial class ImageFileInfoViewModel : ActionViewModelBase,
             .ToList();
     }
 
-    public ImageFileInfoViewModel()
+    public ImageFileInfoViewModel(Func<ImageFileInfoItem> imageFileInfoFactory)
     {
+        _imageFileInfoFactory = imageFileInfoFactory;
         DisplayName = "Info";
     }
 
@@ -65,12 +66,9 @@ public partial class ImageFileInfoViewModel : ActionViewModelBase,
             HashSet<object?> values = lookup[property];
             object? value = values.FirstOrDefault();
 
-            var item = new ImageFileInfoItem
-            {
-                Name = property.Name,
-                Value = values.Count > 1 ? "<Multiple Values>" : value?.ToString(),
-            };
-
+            var item = _imageFileInfoFactory();
+            item.Name = property.Name;
+            item.Value = values.Count > 1 ? "<Multiple Values>" : value?.ToString();
             items.Add(item);
         }
 
@@ -78,19 +76,18 @@ public partial class ImageFileInfoViewModel : ActionViewModelBase,
     }
 }
 
-public partial class ImageFileInfoItem : ObservableObject
+public partial class ImageFileInfoItem : ViewModelBase
 {
+    private readonly SystemService _systemService;
+
     [ObservableProperty] string _name = string.Empty;
     [ObservableProperty] string? _value = string.Empty;
 
-    [RelayCommand]
-    private async Task Copy()
+    public ImageFileInfoItem(SystemService systemService)
     {
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop &&
-            TopLevel.GetTopLevel(desktop.MainWindow) is { } topLevel &&
-            topLevel.Clipboard is not null)
-        {
-            await topLevel.Clipboard.SetTextAsync(Value ?? string.Empty);
-        }
+        _systemService = systemService;
     }
+
+    [RelayCommand]
+    private async Task Copy() => await _systemService.SetClipboard(Value);
 }

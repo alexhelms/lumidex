@@ -8,9 +8,7 @@ using Lumidex.Features.MainSearch.Filters;
 using Lumidex.Features.MainSearch.Messages;
 using Lumidex.Features.Tags.Messages;
 using Lumidex.Services;
-using System.Diagnostics;
 using System.IO.Abstractions;
-using System.Runtime.InteropServices;
 
 namespace Lumidex.Features.MainSearch;
 
@@ -23,6 +21,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
     IRecipient<ImageFilesEdited>
 {
     private readonly IFileSystem _fileSystem;
+    private readonly SystemService _systemService;
     private readonly DialogService _dialogService;
     private readonly Func<EditItemsViewModel> _editItemsViewModelFactory;
 
@@ -47,11 +46,13 @@ public partial class SearchResultsViewModel : ViewModelBase,
     
     public SearchResultsViewModel(
         IFileSystem fileSystem,
+        SystemService systemService,
         DialogService dialogService,
         ActionsContainerViewModel actionsViewModel,
         Func<EditItemsViewModel> editItemsViewModelFactory)
     {
         _fileSystem = fileSystem;
+        _systemService = systemService;
         _dialogService = dialogService;
 
         ActionsViewModel = actionsViewModel;
@@ -206,7 +207,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
         IFileInfo fileInfo = _fileSystem.FileInfo.New(imageFile.Path);
         if (fileInfo.Exists)
         {
-            await OpenFileInProcess("explorer.exe", Path.GetDirectoryName(fileInfo.FullName)!);
+            await _systemService.StartProcess("explorer.exe", Path.GetDirectoryName(fileInfo.FullName)!);
         }
     }
 
@@ -217,28 +218,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
         if (fileInfo.Exists)
         {
             // TODO: Application setting to specify PixInsight.exe path?
-            await OpenFileInProcess(@"C:\Program Files\PixInsight\bin\PixInsight.exe", fileInfo.FullName);
-        }
-    }
-
-    private async Task OpenFileInProcess(string process, string argument)
-    {
-        // TODO: move file dialog operations into a service.
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            try
-            {
-                Process.Start(process, $"\"{argument}\"");
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Failed to start {Process} {Argument}", process, argument);
-                await _dialogService.ShowMessageDialog("Failed to open file.");
-            }
-        }
-        else
-        {
-            await _dialogService.ShowMessageDialog($"Show In Explorer not implemented for {RuntimeInformation.OSDescription}");
+            await _systemService.StartProcess(@"C:\Program Files\PixInsight\bin\PixInsight.exe", fileInfo.FullName);
         }
     }
 }

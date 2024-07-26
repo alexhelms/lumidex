@@ -4,12 +4,17 @@ using Lumidex.Features.MainSearch;
 using Lumidex.Features.SideNavBar;
 using Lumidex.Messages;
 using Lumidex.Features.Aliases;
+using Avalonia.Controls.ApplicationLifetimes;
+using Lumidex.Services;
 
 namespace Lumidex.Features.Main;
 
 public partial class MainViewModel : ViewModelBase,
     IRecipient<ChangeSideTabMessage>
 {
+    private readonly SystemService _systemService;
+    private readonly DialogService _dialogService;
+    private readonly AboutViewModel _aboutViewModel;
     private readonly MainSearchViewModel _mainSearchViewModel;
     private readonly AliasManagerViewModel _aliasManagerViewModel;
     private readonly TagManagerViewModel _tagManagerViewModel;
@@ -19,12 +24,18 @@ public partial class MainViewModel : ViewModelBase,
     [ObservableProperty] private object? _selectedTab;
 
     public MainViewModel(
+        SystemService systemService,
+        DialogService dialogService,
+        AboutViewModel aboutViewModel,
         SideNavBarViewModel sideNavBarViewModel,
         MainSearchViewModel mainSearchViewModel,
         AliasManagerViewModel aliasManagerViewModel,
         TagManagerViewModel tagManagerViewModel,
         LibraryManagerViewModel libraryManagerViewModel)
     {
+        _systemService = systemService;
+        _dialogService = dialogService;
+        _aboutViewModel = aboutViewModel;
         _sideNavBarViewModel = sideNavBarViewModel;
         _mainSearchViewModel = mainSearchViewModel;
         _aliasManagerViewModel = aliasManagerViewModel;
@@ -60,4 +71,22 @@ public partial class MainViewModel : ViewModelBase,
             _ => throw new NotImplementedException(),
         };
     }
+
+    [RelayCommand]
+    private void ExitApplication()
+    {
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopApp)
+        {
+            desktopApp.Shutdown();
+        }
+    }
+
+    [RelayCommand]
+    private Task ReportBug() => _systemService.OpenUrl("https://github.com/alexhelms/lumidex/issues/new?labels=bug&template=bug_report.md&projects=Lumidex");
+
+    [RelayCommand]
+    private Task RequestFeature() => _systemService.OpenUrl("https://github.com/alexhelms/lumidex/issues/new?labels=enhancement&template=feature_request.md&projects=Lumidex");
+
+    [RelayCommand]
+    private Task OpenAboutDialog() => _dialogService.ShowDialog(_aboutViewModel);
 }

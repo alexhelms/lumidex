@@ -41,7 +41,10 @@
                             <ColumnDefinition Width="*" SharedSizeGroup="Value" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="{Binding Name, Converter={StaticResource HumanizeString}}" />
-                        <TextBlock Grid.Column="1" Text="{Binding Value}">
+                        <TextBlock
+                            Grid.Column="1"
+                            Background="Transparent"
+                            Text="{Binding Value}">
                             <TextBlock.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Command="{Binding CopyCommand}" Header="Copy" />

@@ -1,4 +1,5 @@
-﻿using Lumidex.Features.MainSearch.Editing;
+﻿using Lumidex.Features.MainSearch.Actions;
+using Lumidex.Features.MainSearch.Editing;
 using Lumidex.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,8 +16,10 @@ public static class DependencyInjection
         RegisterAllDerivedTypes<Avalonia.Controls.UserControl>(services);
 
         services.AddTransient<Func<EditItemsViewModel>>(p => () => p.GetRequiredService<EditItemsViewModel>());
+        services.AddTransient<Func<ImageFileInfoItem>>(p => () => p.GetRequiredService<ImageFileInfoItem>());
 
         services.AddSingleton<DialogService>();
+        services.AddSingleton<SystemService>();
     }
 
     private static IEnumerable<Type> GetDerivedTypes<T>()
