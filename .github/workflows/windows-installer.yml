@@ -1,20 +1,24 @@
-name: Create Windows Installer
+# Create the windows installer and attach it to the release for this tag.
+# This workflow runs on release tags by creating a release on github.
 
-on: workflow_dispatch
+name: Create and Upload Windows Installer
 
+on:
+  push:
+    tags:
+      - 'v*'
 
 env:
   PROJECT: Lumidex.Desktop/Lumidex.Desktop.csproj
 
 jobs:
-  installer:
+  windows-installer:
     runs-on: [self-hosted, windows, x64]
     permissions:
-      contents: read
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
       - uses: actions/setup-dotnet@v4
         with:
@@ -31,9 +35,8 @@ jobs:
         run: |
           $VERSION=(dotnet tool run dotnet-gitversion /showvariable SemVer)
           & 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' lumidex-installer-win.iss /DMyAppProductVersion=${VERSION}
-      - uses: actions/upload-artifact@v4
-        with:
-          if-no-files-found: error
-          retention-days: 7
-          name: windows-installer
-          path: dist/win/*.exe
+      - name: Upload to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload $env:GITHUB_REF_NAME (Get-Item .\dist\win\Lumidex-*.exe).FullName

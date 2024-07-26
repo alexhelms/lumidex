@@ -31,6 +31,8 @@ OutputBaseFilename={#MyAppName}-{#MyAppProductVersion}-win
 SetupIconFile=Lumidex\Assets\lumidex-icon.ico
 Compression=lzma2
 SolidCompression=yes
+LZMAUseSeparateProcess=yes
+LZMANumBlockThreads=6
 WizardStyle=modern
 UninstallDisplayIcon={app}\{#MyAppExeName}
 
