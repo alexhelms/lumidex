@@ -39,4 +39,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload "$GITHUB_REF_NAME" dist/win/Lumidex-*.exe
+          gh release upload $env:GITHUB_REF_NAME .\dist\win\Lumidex-*.exe
