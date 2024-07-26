@@ -38,8 +38,5 @@ jobs:
       - name: Upload to release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref_name }}
         run: |
-          gh release upload "$GITHUB_REF_NAME" \
-            --repo="$GITHUB_REPOSITORY" \
-            Lumidex-*.exe
+          gh release upload "$GITHUB_REF_NAME" Lumidex-*.exe
