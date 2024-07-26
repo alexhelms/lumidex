@@ -3,7 +3,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-	<!-- Application -->
+    <!-- Application -->
     <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Controls.ColorPicker " Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
@@ -32,22 +32,20 @@
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageVersion Include="System.Threading.Tasks.Dataflow" Version="8.0.0" />
-    <PackageVersion Include="TestableIO.System.IO.Abstractions.Wrappers" Version="21.0.22" />
-    
+    <PackageVersion Include="TestableIO.System.IO.Abstractions.Wrappers" Version="21.0.26" />
     <!-- Development Tools -->
     <PackageVersion Include="HotAvalonia" Version="1.1.1" />
     <PackageVersion Include="HotAvalonia.Extensions" Version="1.1.1" />
     <PackageVersion Include="Avalonia.Markup.Xaml.Loader" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="GitVersion.MsBuild" Version="5.12" />
-
-	  <!-- Testing -->
-   <PackageVersion Include="coverlet.collector" Version="6.0.2" />
-   <PackageVersion Include="FluentAssertions" Version="6.12.0" />
-   <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
-   <PackageVersion Include="Moq" Version="4.20.70" />
-	 <PackageVersion Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="21.0.22" />  
-   <PackageVersion Include="xunit" Version="2.8.1" />
-   <PackageVersion Include="xunit.analyzers" Version="1.14.0" />
-   <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.1" />
+    <!-- Testing -->
+    <PackageVersion Include="coverlet.collector" Version="6.0.2" />
+    <PackageVersion Include="FluentAssertions" Version="6.12.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+    <PackageVersion Include="Moq" Version="4.20.70" />
+    <PackageVersion Include="System.IO.Abstractions.TestingHelpers" Version="21.0.26" />
+    <PackageVersion Include="xunit" Version="2.8.1" />
+    <PackageVersion Include="xunit.analyzers" Version="1.14.0" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.1" />
   </ItemGroup>
 </Project>

@@ -4,6 +4,7 @@ public class ImageHeader
 {
     public int Width { get; set; }
     public int Height { get; set; }
+    public string FileExtension { get; set; } = string.Empty;
     public List<IHeaderEntry> Items { get; set; } = new();
 
     public IHeaderEntry? GetEntry(string keyword)

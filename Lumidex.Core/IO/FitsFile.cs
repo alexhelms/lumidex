@@ -112,6 +112,7 @@ public partial class FitsFile : IDisposable
 
         var header = new ImageHeader
         {
+            FileExtension = ".fits",
             Width = (int) naxes[0],
             Height = (int) naxes[1],
         };

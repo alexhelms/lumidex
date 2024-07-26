@@ -9,7 +9,7 @@ namespace Lumidex.Core.Detection;
 
 public class HeaderReader
 {
-    public ImageFile Process(IFileInfo fileInfo, string headerHash)
+    public ImageFile Process(IFileInfo fileInfo)
     {
         if (!fileInfo.Exists)
         {
@@ -17,15 +17,18 @@ public class HeaderReader
         }
 
         var header = GetHeader(fileInfo);
-        
-        var imageFile = new ImageFile
-        {
-            HeaderHash = headerHash,
-            Path = fileInfo.FullName,
-        };
+        var imageFile = Process(header);
+        imageFile.Path = fileInfo.FullName;
+
+        return imageFile;
+    }
+
+    public ImageFile Process(ImageHeader header)
+    {
+        ImageFile imageFile = new();
 
         imageFile.Type = DetermineImageType(header);
-        imageFile.Kind = DetermineImageKind(header, imageFile.Type, fileInfo.Extension);
+        imageFile.Kind = DetermineImageKind(header, imageFile.Type, header.FileExtension);
 
         ExtractCameraKeywords(header, imageFile);
         ExtractFocuserKeywords(header, imageFile);

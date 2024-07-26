@@ -267,7 +267,8 @@ public class LibraryIngestPipeline
             try
             {
                 var reader = new HeaderReader();
-                var imageFile = reader.Process(fileInfo, headerHash);
+                var imageFile = reader.Process(fileInfo);
+                imageFile.HeaderHash = headerHash;
                 imageFile.LibraryId = libraryId;
                 UpdateNonHeaderFields(fileInfo, imageFile);
                 return Result.Ok(new EntityMessage(fileInfo, imageFile));
