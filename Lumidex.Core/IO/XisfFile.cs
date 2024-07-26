@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using System.Buffers;
+using System.Globalization;
 using System.Xml.Linq;
 
 namespace Lumidex.Core.IO;
@@ -46,6 +47,7 @@ public class XisfFile
         headerLength = Math.Min(headerLength, (int)fileInfo.Length);
 
         var header = new ImageHeader();
+        header.FileExtension = ".xisf";
 
         // Read the xml header
         var buffer = ArrayPool<byte>.Shared.Rent(headerLength);
@@ -85,12 +87,12 @@ public class XisfFile
                             header.Items.Add(new BooleanHeaderEntry(keyword, rawValueLower == "t", comment));
                         }
                         // Floating point
-                        else if (rawValue.Contains('.') && double.TryParse(rawValue, out var d))
+                        else if (rawValue.Contains('.') && double.TryParse(rawValue, CultureInfo.InvariantCulture, out var d))
                         {
                             header.Items.Add(new FloatHeaderEntry(keyword, d, comment));
                         }
                         // Integer
-                        else if (int.TryParse(rawValue, out var i))
+                        else if (int.TryParse(rawValue, CultureInfo.InvariantCulture, out var i))
                         {
                             header.Items.Add(new IntegerHeaderEntry(keyword, i, comment));
                         }
