@@ -15,7 +15,7 @@ public class LocalDateTimeConverter : IValueConverter
             return dt.ToLocalTime();
         }
 
-        return new BindingNotification(new InvalidCastException(), BindingErrorType.Error);
+        return null;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -25,6 +25,6 @@ public class LocalDateTimeConverter : IValueConverter
             return dt.ToUniversalTime();
         }
 
-        return new BindingNotification(new InvalidCastException(), BindingErrorType.Error);
+        return null;
     }
 }
