@@ -1,0 +1,65 @@
+<UserControl
+    x:Class="Lumidex.Features.Main.AboutView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dialogHost="using:DialogHostAvalonia"
+    xmlns:main="using:Lumidex.Features.Main"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Width="500"
+    Height="400"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="main:AboutViewModel"
+    mc:Ignorable="d">
+    <Grid>
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal">
+                <Image
+                    Width="72"
+                    Height="72"
+                    Source="/Assets/lumidex-icon.png" />
+                <TextBlock
+                    Margin="16,10,0,0"
+                    VerticalAlignment="Center"
+                    FontSize="48"
+                    Text="Lumidex" />
+            </StackPanel>
+            <TextBlock
+                Margin="0,12,0,0"
+                Text="{Binding Copyright, Mode=OneTime}"
+                TextAlignment="Center" />
+            <TextBlock
+                Margin="0,12,0,0"
+                Text="{Binding Version, Mode=OneTime}"
+                TextAlignment="Center"
+                ToolTip.Tip="{Binding VersionToolTip, Mode=OneTime}">
+                <TextBlock.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem
+                            Command="{Binding SetClipboardCommand}"
+                            CommandParameter="{Binding Version}"
+                            Header="Copy Version" />
+                        <MenuItem
+                            Command="{Binding SetClipboardCommand}"
+                            CommandParameter="{Binding VersionToolTip}"
+                            Header="Copy Detailed Version" />
+                    </ContextMenu>
+                </TextBlock.ContextMenu>
+            </TextBlock>
+            <TextBlock
+                Margin="0,12,0,0"
+                Text="{Binding CommitDate, Mode=OneTime, StringFormat={}Built on {0:yyyy-MM-dd}}"
+                TextAlignment="Center" />
+        </StackPanel>
+        <Button
+            Width="75"
+            Margin="16"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Bottom"
+            HorizontalContentAlignment="Center"
+            Classes="accent"
+            Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dialogHost:DialogHost}, Path=CloseDialogCommand}"
+            Content="Ok" />
+    </Grid>
+</UserControl>
