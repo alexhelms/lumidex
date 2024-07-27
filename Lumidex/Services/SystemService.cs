@@ -32,7 +32,7 @@ public class SystemService
         {
             try
             {
-                Process.Start(executable, $"\"{args}\"");
+                Process.Start(executable, args);
             }
             catch (Exception e)
             {
