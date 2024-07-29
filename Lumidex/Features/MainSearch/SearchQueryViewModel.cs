@@ -144,7 +144,7 @@ public partial class SearchQueryViewModel : ViewModelBase
     [RelayCommand]
     private void Search()
     {
-        Messenger.Send(new SearchMessage
+        Messenger.Send(new Search
         {
             Filters = ActiveFilters,
         });

@@ -1,6 +1,6 @@
-﻿namespace Lumidex.Features.MainSearch.Editing.Messages;
+﻿namespace Lumidex.Features.MainSearch.Messages;
 
-public class ImageFilesEdited
+public class RemoveImageFiles
 {
     public required IReadOnlyList<ImageFileViewModel> ImageFiles { get; init; } = [];
 }

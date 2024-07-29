@@ -18,14 +18,15 @@ public partial class SearchResultsViewModel : ViewModelBase,
     IRecipient<SearchComplete>,
     IRecipient<TagCreated>,
     IRecipient<TagDeleted>,
-    IRecipient<ImageFilesEdited>
+    IRecipient<ImageFilesEdited>,
+    IRecipient<ImageFilesRemoved>
 {
     private readonly IFileSystem _fileSystem;
     private readonly SystemService _systemService;
     private readonly DialogService _dialogService;
     private readonly Func<EditItemsViewModel> _editItemsViewModelFactory;
 
-    [ObservableProperty] bool _isSearching;
+    [ObservableProperty] bool _isBusy;
     [ObservableProperty] string? _totalIntegration;
     [ObservableProperty] string? _typeAggregate;
     [ObservableProperty] int _lightCount;
@@ -79,7 +80,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
     {
         Dispatcher.UIThread.Invoke(() =>
         {
-            IsSearching = true;
+            IsBusy = true;
             ActiveFilters = new(message.Filters);
             SearchResults.Clear();
             IntegrationStats.Clear();
@@ -97,7 +98,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
 
     public void Receive(SearchComplete message)
     {
-        Dispatcher.UIThread.Invoke(() => IsSearching = false);
+        Dispatcher.UIThread.Invoke(() => IsBusy = false);
     }
 
     public void Receive(SearchResultsReady message)
@@ -147,18 +148,39 @@ public partial class SearchResultsViewModel : ViewModelBase,
 
     public void Receive(TagCreated message)
     {
-        if (!AllTags.Contains(message.Tag))
-            AllTags.Add(message.Tag);
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            if (!AllTags.Contains(message.Tag))
+                AllTags.Add(message.Tag);
+        });
     }
 
     public void Receive(TagDeleted message)
     {
-        AllTags.Remove(message.Tag);
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            AllTags.Remove(message.Tag);
+        });
     }
 
     public void Receive(ImageFilesEdited message)
     {
-        DistinctObjectNames = new(GetDistinctObjectNames(SearchResults));
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            DistinctObjectNames = new(GetDistinctObjectNames(SearchResults));
+        });
+    }
+
+    public void Receive(ImageFilesRemoved message)
+    {
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            foreach (var imageFile in message.ImageFiles)
+            {
+                SearchResults.Remove(imageFile);
+                SelectedSearchResults.Remove(imageFile);
+            }
+        });
     }
 
     [RelayCommand]
@@ -170,6 +192,35 @@ public partial class SearchResultsViewModel : ViewModelBase,
         {
             vm.CloseDialog = () => e.Session.Close();
         });
+    }
+
+    [RelayCommand]
+    public async Task RemoveSelectedItems()
+    {
+        var confirmationMessage = $"Are you sure you want to remove the selected {"images".ToQuantity(SelectedSearchResults.Count)}?" +
+            Environment.NewLine +
+            Environment.NewLine +
+            "Files on disk will not be altered or deleted.";
+
+        if (await _dialogService.ShowConfirmationDialog(confirmationMessage))
+        {
+            try
+            {
+                IsBusy = true;
+
+                await Task.Run(() =>
+                {
+                    Messenger.Send(new RemoveImageFiles
+                    {
+                        ImageFiles = SelectedSearchResults,
+                    });
+                });
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
     }
 
     [RelayCommand]

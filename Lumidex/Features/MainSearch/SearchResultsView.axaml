@@ -123,6 +123,7 @@
                                 <Setter.Value>
                                     <ContextMenu>
                                         <MenuItem Command="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ShowEditDialogCommand}" Header="Edit" />
+                                        <MenuItem Command="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).RemoveSelectedItemsCommand}" Header="Remove" />
                                         <Separator />
                                         <MenuItem
                                             Header="Add Tag"
@@ -434,7 +435,7 @@
         <Border
             Grid.Column="0"
             Background="#11ffffff"
-            IsVisible="{Binding IsSearching, FallbackValue=False}">
+            IsVisible="{Binding IsBusy, FallbackValue=False}">
             <i:Icon
                 Animation="Pulse"
                 FontSize="48"
