@@ -87,18 +87,18 @@
                     CommandParameter="{Binding #AdvancedFilterComboBox.SelectedItem}"
                     Content="Add"
                     DockPanel.Dock="Right" />
-				<ComboBox
+                <ComboBox
                     x:Name="AdvancedFilterComboBox"
                     HorizontalAlignment="Stretch"
                     ItemsSource="{Binding AllFilters}"
                     PlaceholderForeground="Gray"
                     PlaceholderText="Select a Filter">
-					<ComboBox.ItemTemplate>
-						<DataTemplate DataType="filter:FilterViewModelBase">
-							<TextBlock Text="{Binding DisplayName}"/>
-						</DataTemplate>
-					</ComboBox.ItemTemplate>
-				</ComboBox>
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate DataType="filter:FilterViewModelBase">
+                            <TextBlock Text="{Binding DisplayName}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
             </DockPanel>
         </DockPanel>
 
@@ -1000,7 +1000,7 @@
                             <TextBlock
                                 Grid.Column="0"
                                 VerticalAlignment="Center"
-                                Text="Mount Name" />
+                                Text="Telescope Name" />
                             <DockPanel Grid.Column="1">
                                 <Button
                                     Margin="5,0,0,0"
