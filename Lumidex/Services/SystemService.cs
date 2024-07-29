@@ -22,27 +22,32 @@ public class SystemService
         }
         else
         {
-            await _dialogService.ShowMessageDialog($"OpenUrl not implemented for {RuntimeInformation.OSDescription}");
+            await _dialogService.ShowMessageDialog($"{nameof(OpenUrl)} not implemented for {RuntimeInformation.OSDescription}");
+        }
+    }
+
+    public async Task OpenInExplorer(string path)
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            await StartProcess("explorer.exe", $"/select,\"{path}\"");
+        }
+        else
+        {
+            await _dialogService.ShowMessageDialog($"{nameof(OpenInExplorer)} not implemented for {RuntimeInformation.OSDescription}");
         }
     }
 
     public async Task StartProcess(string executable, string args)
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        try
         {
-            try
-            {
-                Process.Start(executable, args);
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Failed to start {Process} {Argument}", executable, args);
-                await _dialogService.ShowMessageDialog($"Failed to start {executable}");
-            }
+            Process.Start(executable, args);
         }
-        else
+        catch (Exception e)
         {
-            await _dialogService.ShowMessageDialog($"StartProcess not implemented for {RuntimeInformation.OSDescription}");
+            Log.Error(e, "Failed to start {Process} {Argument}", executable, args);
+            await _dialogService.ShowMessageDialog($"Failed to start {executable}");
         }
     }
 

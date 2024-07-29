@@ -14,127 +14,208 @@
     <UserControl.Resources>
         <converters:LocalDateTimeConverter x:Key="LocalDateTimeConverter" />
     </UserControl.Resources>
-    <StackPanel Margin="16,12">
+    <UniformGrid Columns="2" Rows="1">
 
-        <DockPanel>
-            <TextBlock
-                VerticalAlignment="Center"
-                DockPanel.Dock="Left"
-                Text="Name" />
-            <TextBox
-                Width="300"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Center"
-                Text="{Binding Name}"
-                Watermark="Library Name" />
-        </DockPanel>
+        <DockPanel Margin="16,12">
+            <StackPanel DockPanel.Dock="Top">
 
-        <DockPanel Margin="0,16,0,0">
-            <TextBlock
-                VerticalAlignment="Center"
-                DockPanel.Dock="Left"
-                Text="Files" />
-            <TextBlock
-                VerticalAlignment="Center"
-                Text="{Binding FileCount}"
-                TextAlignment="Right" />
-        </DockPanel>
+                <DockPanel>
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        DockPanel.Dock="Left"
+                        Text="Name" />
+                    <TextBox
+                        Width="300"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Text="{Binding Name}"
+                        Watermark="Library Name" />
+                </DockPanel>
 
-        <DockPanel Margin="0,16,0,0">
-            <TextBlock
-                VerticalAlignment="Center"
-                DockPanel.Dock="Left"
-                Text="Last Scan" />
-            <TextBlock
-                VerticalAlignment="Center"
-                Text="{Binding LastScan, StringFormat={}f, TargetNullValue=Never, Converter={StaticResource LocalDateTimeConverter}}"
-                TextAlignment="Right" />
-        </DockPanel>
+                <DockPanel Margin="0,16,0,0">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        DockPanel.Dock="Left"
+                        Text="Files" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Text="{Binding FileCount}"
+                        TextAlignment="Right" />
+                </DockPanel>
 
-        <DockPanel Margin="0,16,0,0">
-            <TextBlock
-                VerticalAlignment="Top"
-                DockPanel.Dock="Left"
-                Text="Path" />
-            <DockPanel Width="300" HorizontalAlignment="Right">
+                <DockPanel Margin="0,16,0,0">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        DockPanel.Dock="Left"
+                        Text="Last Scan" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Text="{Binding LastScan, StringFormat={}f, TargetNullValue=Never, Converter={StaticResource LocalDateTimeConverter}}"
+                        TextAlignment="Right" />
+                </DockPanel>
+
+                <DockPanel Margin="0,16,0,0">
+                    <TextBlock
+                        VerticalAlignment="Top"
+                        DockPanel.Dock="Left"
+                        Text="Path" />
+                    <DockPanel Width="300" HorizontalAlignment="Right">
+                        <Button
+                            Margin="5,0,0,0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Command="{Binding ChangeLibraryPathCommand}"
+                            Content="..."
+                            DockPanel.Dock="Right" />
+                        <TextBox Text="{Binding Path}" />
+                    </DockPanel>
+                </DockPanel>
+
                 <Button
-                    Margin="5,0,0,0"
+                    Margin="0,16,0,0"
                     HorizontalAlignment="Right"
-                    VerticalAlignment="Top"
-                    Command="{Binding ChangeLibraryPathCommand}"
-                    Content="..."
-                    DockPanel.Dock="Right" />
-                <TextBox Text="{Binding Path}" />
+                    Background="Red"
+                    Command="{Binding DeleteLibraryCommand}"
+                    Content="Delete Library" />
+
+                <TextBlock
+                    Margin="0,6,0,0"
+                    HorizontalAlignment="Right"
+                    FontSize="12"
+                    Foreground="#99ffffff"
+                    Text="Deleting a library does not alter files on disk." />
+
+                <Rectangle
+                    Height="1"
+                    Margin="0,16"
+                    Fill="#656565" />
+
+                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                    <Button
+                        Background="Red"
+                        Command="{Binding ScanLibraryCancelCommand}"
+                        Content="Cancel"
+                        IsVisible="{Binding Scanning}" />
+                    <ProgressBar
+                        Width="235"
+                        Height="20"
+                        Margin="12,0"
+                        IsIndeterminate="{Binding ProgressIndeterminate}"
+                        IsVisible="{Binding ShowProgress}"
+                        Maximum="{Binding ScanTotalCount}"
+                        Minimum="0"
+                        ProgressTextFormat="{}{0}/{3} Files ({1:0}%)"
+                        ShowProgressText="{Binding !ProgressIndeterminate}"
+                        Value="{Binding ScanProgressCount}" />
+                    <Button
+                        Margin="0,0,12,0"
+                        Classes="accent"
+                        Command="{Binding QuickScanLibraryCommand}"
+                        Content="Quick Scan"
+                        IsVisible="{Binding CanQuickScanLibrary}" />
+                    <Button
+                        Classes="accent"
+                        Command="{Binding ScanLibraryCommand}"
+                        Content="Scan" />
+                </StackPanel>
+
+                <TextBlock Margin="0,12" Text="{Binding ScanSummary}" />
+            </StackPanel>
+            <DockPanel IsVisible="{Binding !!ScanErrors.Count, FallbackValue=False}">
+                <TextBlock
+                    Margin="0,12"
+                    DockPanel.Dock="Top"
+                    FontSize="16"
+                    Text="Errors" />
+                <DataGrid
+                    x:Name="ErrorsDataGrid"
+                    BorderBrush="#656565"
+                    BorderThickness="1"
+                    GridLinesVisibility="Horizontal"
+                    IsReadOnly="true"
+                    ItemsSource="{Binding ScanErrors}"
+                    SelectionMode="Single">
+                    <DataGrid.Styles>
+                        <Style Selector="DataGridColumnHeader">
+                            <Setter Property="Foreground" Value="White" />
+                        </Style>
+                        <Style Selector="DataGridRow">
+                            <Setter Property="ContextMenu">
+                                <Setter.Value>
+                                    <ContextMenu>
+                                        <MenuItem
+                                            Command="{Binding #ErrorsDataGrid.((library:LibraryViewModel)DataContext).OpenInExplorerCommand}"
+                                            CommandParameter="{ReflectionBinding Filename}"
+                                            Header="Open in Explorer" />
+                                    </ContextMenu>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGrid.Styles>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding Error}" Header="Error" />
+                        <DataGridTextColumn Binding="{Binding Filename}" Header="Filename" />
+                    </DataGrid.Columns>
+                </DataGrid>
             </DockPanel>
         </DockPanel>
 
-        <Button
-            Margin="0,16,0,0"
-            HorizontalAlignment="Right"
-            Background="Red"
-            Command="{Binding DeleteLibraryCommand}"
-            Content="Delete Library" />
+        <DockPanel Margin="0,0,12,0">
+            <TextBlock
+                DockPanel.Dock="Top"
+                FontSize="16"
+                Text="Duplicates" />
+            <TextBlock
+                Margin="0,6"
+                DockPanel.Dock="Top"
+                TextWrapping="Wrap">
+                Each group below has been identified as having identical headers.
+                For each group, manually delete all files except one item.
+                Then run Scrub Duplicates to remove the deleted items from the Lumidex database.
+            </TextBlock>
+            <DockPanel Margin="0,6" DockPanel.Dock="Top">
+                <CheckBox
+                    Content="Lights Only"
+                    DockPanel.Dock="Left"
+                    IsChecked="{Binding OnlyDuplicateLights}" />
+                <Button
+                    HorizontalAlignment="Right"
+                    Classes="accent"
+                    Command="{Binding ScrubDuplicatesCommand}"
+                    Content="Scrub Duplicates"
+                    DockPanel.Dock="Right" />
+            </DockPanel>
+            <DataGrid
+                x:Name="DuplicatesDataGrid"
+                BorderBrush="#656565"
+                BorderThickness="1"
+                GridLinesVisibility="Horizontal"
+                IsReadOnly="true"
+                ItemsSource="{Binding DuplicatesView}"
+                SelectionMode="Single">
+                <DataGrid.Styles>
+                    <Style Selector="DataGridColumnHeader">
+                        <Setter Property="Foreground" Value="White" />
+                    </Style>
+                    <Style Selector="DataGridRow">
+                        <Setter Property="ContextMenu">
+                            <Setter.Value>
+                                <ContextMenu>
+                                    <MenuItem
+                                        Command="{Binding #DuplicatesDataGrid.((library:LibraryViewModel)DataContext).OpenInExplorerCommand}"
+                                        CommandParameter="{ReflectionBinding Filename}"
+                                        Header="Open in Explorer" />
+                                </ContextMenu>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </DataGrid.Styles>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{ReflectionBinding ImageType}" Header="Type" />
+                    <DataGridTextColumn Binding="{ReflectionBinding Filename}" Header="Filename" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </DockPanel>
 
-        <TextBlock
-            Margin="0,6,0,0"
-            HorizontalAlignment="Right"
-            FontSize="12"
-            Foreground="#99ffffff"
-            Text="Deleting a library does not alter files on disk." />
-
-        <Rectangle
-            Height="1"
-            Margin="0,16"
-            Fill="#656565" />
-
-        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-            <Button
-                Background="Red"
-                Command="{Binding ScanLibraryCancelCommand}"
-                Content="Cancel"
-                IsVisible="{Binding Scanning}" />
-            <ProgressBar
-                Width="235"
-                Height="20"
-                Margin="12,0"
-                IsIndeterminate="{Binding ProgressIndeterminate}"
-                IsVisible="{Binding ShowProgress}"
-                Maximum="{Binding ScanTotalCount}"
-                Minimum="0"
-                ProgressTextFormat="{}{0}/{3} Files ({1:0}%)"
-                ShowProgressText="{Binding !ProgressIndeterminate}"
-                Value="{Binding ScanProgressCount}" />
-            <Button
-                Margin="0,0,12,0"
-                Classes="accent"
-                Command="{Binding QuickScanLibraryCommand}"
-                Content="Quick Scan"
-                IsVisible="{Binding CanQuickScanLibrary}" />
-            <Button
-                Classes="accent"
-                Command="{Binding ScanLibraryCommand}"
-                Content="Scan" />
-        </StackPanel>
-
-        <TextBlock Margin="0,12" Text="{Binding ScanSummary}" />
-
-        <TextBlock
-            Margin="0,12"
-            IsVisible="{Binding !!ScanErrors.Count}"
-            Text="Errors" />
-
-        <DataGrid
-            Height="200"
-            BorderBrush="#656565"
-            BorderThickness="1"
-            IsReadOnly="true"
-            IsVisible="{Binding !!ScanErrors.Count}"
-            ItemsSource="{Binding ScanErrors}">
-            <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding Error}" Header="Error" />
-                <DataGridTextColumn Binding="{Binding Path}" Header="Filename" />
-            </DataGrid.Columns>
-        </DataGrid>
-
-    </StackPanel>
+    </UniformGrid>
 </UserControl>

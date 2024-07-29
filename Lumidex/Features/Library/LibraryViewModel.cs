@@ -5,12 +5,15 @@ using Lumidex.Services;
 using Lumidex.Validation;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.IO.Abstractions;
 
 namespace Lumidex.Features.Library;
 
 public partial class LibraryViewModel : ValidatableViewModelBase
 {
+    private readonly IFileSystem _fileSystem;
     private readonly DialogService _dialogService;
+    private readonly SystemService _systemService;
     private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
     private readonly Func<LibraryIngestPipeline> _pipelineFactory;
 
@@ -23,6 +26,10 @@ public partial class LibraryViewModel : ValidatableViewModelBase
     [ObservableProperty] int _scanTotalCount;
     [ObservableProperty] int _scanProgressCount;
     [ObservableProperty] string? _scanSummary;
+    [ObservableProperty] ObservableCollectionEx<FileErrorViewModel>? _scanErrors;
+
+    [ObservableProperty] DataGridCollectionView? _duplicatesView;
+    [ObservableProperty] bool _onlyDuplicateLights = true;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(QuickScanLibraryCommand))]
@@ -45,14 +52,16 @@ public partial class LibraryViewModel : ValidatableViewModelBase
     [NotifyCanExecuteChangedFor(nameof(QuickScanLibraryCommand))]
     string _path = string.Empty;
 
-    public ObservableCollectionEx<FileErrorViewModel> ScanErrors { get; } = new();
-
     public LibraryViewModel(
+        IFileSystem fileSystem,
         DialogService dialogService,
+        SystemService systemService,
         IDbContextFactory<LumidexDbContext> dbContextFactory,
         Func<LibraryIngestPipeline> pipelineFactory)
     {
+        _fileSystem = fileSystem;
         _dialogService = dialogService;
+        _systemService = systemService;
         _dbContextFactory = dbContextFactory;
         _pipelineFactory = pipelineFactory;
     }
@@ -75,6 +84,8 @@ public partial class LibraryViewModel : ValidatableViewModelBase
 
         FileCount = dbContext.ImageFiles.Count(f => f.LibraryId == Id);
         OnPropertyChanged(nameof(CanQuickScanLibrary));
+
+        RefreshDuplicates();
     }
 
     partial void OnNameChanged(string? oldValue, string newValue)
@@ -91,6 +102,54 @@ public partial class LibraryViewModel : ValidatableViewModelBase
         {
             SaveChanges();
         }
+    }
+
+    partial void OnOnlyDuplicateLightsChanged(bool value)
+    {
+        DuplicatesView?.Refresh();
+    }
+
+    private void RefreshDuplicates()
+    {
+        using var dbContext = _dbContextFactory.CreateDbContext();
+        var duplicateImageFiles = dbContext.ImageFiles
+            .GroupBy(f => f.HeaderHash)
+            .Where(grp => grp.Count() > 1)
+            .Select(grp => grp.Key)
+            .SelectMany(hash => dbContext.ImageFiles.Where(f => f.HeaderHash == hash))
+            .Select(f => new DuplicateHashViewModel
+            {
+                Id = f.Id,
+                Group = f.HeaderHash,
+                Filename = f.Path,
+                ImageType = f.Type,
+            })
+            .ToList();
+
+        // EF cant translate this in the select above so set the group name to something better for the user.
+        int groupCount = 1;
+        foreach (var group in duplicateImageFiles.GroupBy(vm => vm.Group))
+        {
+            foreach (var vm in group)
+            {
+                vm.Group = $"Group {groupCount}";
+            }
+
+            groupCount++;
+        }
+
+        DuplicatesView = new(duplicateImageFiles);
+        DuplicatesView.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(DuplicateHashViewModel.Group)));
+        DuplicatesView.Filter = obj =>
+        {
+            if (obj is DuplicateHashViewModel duplicate)
+            {
+                if (OnlyDuplicateLights && duplicate.ImageType != ImageType.Light)
+                    return false;
+            }
+
+            return true;
+        };
     }
 
     private void SaveChanges()
@@ -130,7 +189,8 @@ public partial class LibraryViewModel : ValidatableViewModelBase
             ScanProgressCount = 0;
             ScanTotalCount = 1;
             ScanSummary = null;
-            ScanErrors.Clear();
+            ScanErrors = null;
+            DuplicatesView = null;
 
             var pipeline = _pipelineFactory();
             ScanTotalCount = await pipeline.GetEstimatedTotalFiles(
@@ -155,12 +215,13 @@ public partial class LibraryViewModel : ValidatableViewModelBase
             var errors = pipeline.Errors.Count;
             var elapsed = pipeline.Elapsed;
             ScanSummary = $"{added} added, {updated} updated, {skipped} skipped, {errors} errors in {elapsed.TotalSeconds:F3} seconds";
-            ScanErrors.AddRange(pipeline.Errors
+            ScanErrors = new(pipeline.Errors
                 .Select(error => new FileErrorViewModel
                 {
-                    Path = error.FileInfo.FullName,
                     Error = error.Message,
+                    Filename = error.FileInfo.FullName,
                 }));
+            RefreshDuplicates();
 
             Messenger.Send(new LibraryScanned
             {
@@ -254,10 +315,64 @@ public partial class LibraryViewModel : ValidatableViewModelBase
             return dbContext.Libraries.Count() > 1;
         }
     }
+
+    [RelayCommand]
+    private async Task OpenInExplorer(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return;
+
+        IFileInfo fileInfo = _fileSystem.FileInfo.New(path);
+        if (fileInfo.Exists)
+        {
+            await _systemService.OpenInExplorer(fileInfo.FullName);
+        }
+    }
+
+    [RelayCommand]
+    private async Task ScrubDuplicates()
+    {
+        if (DuplicatesView is null || DuplicatesView.Count == 0) return;
+
+        var confirmationMessage = "Are you sure you want to scrub the database of duplicates for this library?" +
+            Environment.NewLine + Environment.NewLine +
+            "Duplicate image files will be removed from the database." +
+            Environment.NewLine + Environment.NewLine +
+            "No file on disk will be deleted.";
+
+        if (await _dialogService.ShowConfirmationDialog(confirmationMessage))
+        {
+            await Task.Run(() =>
+            {
+                var idsToRemove = new HashSet<int>(DuplicatesView.Count);
+
+                foreach (var item in DuplicatesView.OfType<DuplicateHashViewModel>().Where(vm => vm.Filename != null))
+                {
+                    var fileInfo = _fileSystem.FileInfo.New(item.Filename!);
+                    if (!fileInfo.Exists)
+                        idsToRemove.Add(item.Id);
+                }
+
+                using var dbContext = _dbContextFactory.CreateDbContext();
+                dbContext.ImageFiles
+                    .Where(f => idsToRemove.Contains(f.Id))
+                    .ExecuteDelete();
+            });
+
+            RefreshDuplicates();
+        }
+    }
 }
 
-public partial class FileErrorViewModel : ViewModelBase
+public partial class FileErrorViewModel : ObservableObject
 {
-    [ObservableProperty] string? _path;
     [ObservableProperty] string? _error;
+    [ObservableProperty] string? _filename;
+}
+
+public partial class DuplicateHashViewModel : ObservableObject
+{
+    [ObservableProperty] int _id;
+    [ObservableProperty] string? _group;
+    [ObservableProperty] string? _filename;
+    [ObservableProperty] ImageType? _imageType;
 }

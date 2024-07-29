@@ -173,14 +173,7 @@ public class LibraryIngestPipeline
         {
             try
             {
-                string extension = message.FileInfo.Extension.ToLowerInvariant();
-                HeaderHasher hasher = extension switch
-                {
-                    ".xisf" => new XisfHeaderHasher(),
-                    ".fits" => new FitsHeaderHasher(),
-                    ".fit" => new FitsHeaderHasher(),
-                    _ => throw new Exception($"Unsupported file extension: {extension}"),
-                };
+                HeaderHasher hasher = HeaderHasher.FromExtension(message.FileInfo.Extension);
                 byte[] hash = await hasher.ComputeHashAsync(message.FileInfo.FullName);
                 string headerHash = string.Concat(hash.Select(h => h.ToString("x2")));
                 return Result.Ok(new HashMessage(message.FileInfo, message.LibraryId, headerHash));
@@ -246,10 +239,12 @@ public class LibraryIngestPipeline
                 int count = dbContext.SaveChanges();
                 updatedProgressBlock.Post(updateStatuses);
                 skippedProgressBlock.Post(skipStatuses);
-                existingHashes = imageFiles.Select(f => f.HeaderHash).ToHashSet();
+                existingHashes = imageFiles
+                    .Select(f => f.HeaderHash + "|" + f.Path)
+                    .ToHashSet(StringComparer.InvariantCultureIgnoreCase);
             }
 
-            return messages.Where(m => !existingHashes.Contains(m.Value.HeaderHash));
+            return messages.Where(m => !existingHashes.Contains(m.Value.HeaderHash + "|" + m.Value.FileInfo.FullName));
 
         },
         new ExecutionDataflowBlockOptions
