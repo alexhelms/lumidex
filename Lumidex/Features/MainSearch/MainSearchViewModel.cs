@@ -1,4 +1,5 @@
-﻿using Lumidex.Core.Data;
+﻿using Avalonia.Threading;
+using Lumidex.Core.Data;
 using Lumidex.Features.MainSearch.Filters;
 using Lumidex.Features.MainSearch.Messages;
 using Lumidex.Features.Tags.Messages;
@@ -9,8 +10,10 @@ using System.Text;
 namespace Lumidex.Features.MainSearch;
 
 public partial class MainSearchViewModel : ViewModelBase,
-    IRecipient<SearchMessage>,
-    IRecipient<TagEdited>
+    IRecipient<Search>,
+    IRecipient<RemoveImageFiles>,
+    IRecipient<TagEdited>,
+    IRecipient<ImageFilesRemoved>
 {
     private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
 
@@ -106,7 +109,7 @@ public partial class MainSearchViewModel : ViewModelBase,
         return imageFiles;
     }
 
-    public async void Receive(SearchMessage message)
+    public async void Receive(Search message)
     {
         bool success = true;
 
@@ -143,16 +146,57 @@ public partial class MainSearchViewModel : ViewModelBase,
         }
     }
 
+    public void Receive(RemoveImageFiles message)
+    {
+        if (!message.ImageFiles.Any()) return;
+
+        var idLookup = message.ImageFiles.Select(f => f.Id).ToHashSet();
+        try
+        {
+            var dbContext = _dbContextFactory.CreateDbContext();
+            int count = dbContext.ImageFiles
+                .Where(f => idLookup.Contains(f.Id))
+                .ExecuteDelete();
+            if (count > 0)
+            {
+                Messenger.Send(new ImageFilesRemoved
+                {
+                    // Send a copy of the list to avoid enumerable exceptions when items are removed
+                    ImageFiles = message.ImageFiles.ToList(),
+                });
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, "Error removing image files");
+        }
+        
+    }
+
     public void Receive(TagEdited message)
     {
-        var tags = SearchResults
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            var tags = SearchResults
             .SelectMany(f => f.Tags)
             .Where(t => t.Id == message.Tag.Id);
 
-        foreach (var tag in tags)
+            foreach (var tag in tags)
+            {
+                tag.Name = message.Tag.Name;
+                tag.Color = message.Tag.Color;
+            }
+        });
+    }
+
+    public void Receive(ImageFilesRemoved message)
+    {
+        Dispatcher.UIThread.Invoke(() =>
         {
-            tag.Name = message.Tag.Name;
-            tag.Color = message.Tag.Color;
-        }
+            foreach (var imageFile in message.ImageFiles)
+            {
+                SearchResults.Remove(imageFile);
+            }
+        });
     }
 }

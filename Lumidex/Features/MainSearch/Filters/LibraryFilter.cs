@@ -1,4 +1,5 @@
-﻿using Lumidex.Core.Data;
+﻿using Avalonia.Threading;
+using Lumidex.Core.Data;
 using Lumidex.Features.Library.Messages;
 
 namespace Lumidex.Features.MainSearch.Filters;
@@ -28,30 +29,40 @@ public partial class LibraryFilter : FilterViewModelBase,
 
     public void Receive(LibraryCreated message)
     {
-        if (!Libraries.Contains(message.Library))
-            Libraries.Add(message.Library);
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            if (!Libraries.Contains(message.Library))
+                Libraries.Add(message.Library);
+        });
     }
 
     public void Receive(LibraryDeleted message)
     {
-        Libraries.Remove(message.Library);
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            Libraries.Remove(message.Library);
+        });
     }
 
     public void Receive(LibraryEdited message)
     {
-        if (Libraries.FirstOrDefault(library => library == message.Library) is { } existingLibrary)
+        Dispatcher.UIThread.Invoke(() =>
         {
-            // Retain a reference to the selected library, if one exists. Removing it from the list deselects!
-            LibraryViewModel? selectedLibrary = Library;
 
-            var index = Libraries.IndexOf(existingLibrary);
-            Libraries.RemoveAt(index);
-            Libraries.Insert(index, message.Library);
+            if (Libraries.FirstOrDefault(library => library == message.Library) is { } existingLibrary)
+            {
+                // Retain a reference to the selected library, if one exists. Removing it from the list deselects!
+                LibraryViewModel? selectedLibrary = Library;
 
-            // Retain user selection
-            if (selectedLibrary is not null && selectedLibrary == message.Library)
-                Library = message.Library;
-        }
+                var index = Libraries.IndexOf(existingLibrary);
+                Libraries.RemoveAt(index);
+                Libraries.Insert(index, message.Library);
+
+                // Retain user selection
+                if (selectedLibrary is not null && selectedLibrary == message.Library)
+                    Library = message.Library;
+            }
+        });
     }
 
     public override string ToString() => $"{DisplayName} = {Library?.Name}";

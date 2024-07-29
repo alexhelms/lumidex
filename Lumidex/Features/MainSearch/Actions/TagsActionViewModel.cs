@@ -31,13 +31,19 @@ public partial class TagsActionViewModel : ActionViewModelBase,
 
     public void Receive(TagCreated message)
     {
-        if (!AllTags.Contains(message.Tag))
-            AllTags.Add(message.Tag);
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            if (!AllTags.Contains(message.Tag))
+                AllTags.Add(message.Tag);
+        });
     }
 
     public void Receive(TagDeleted message)
     {
-        AllTags.Remove(message.Tag);
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            AllTags.Remove(message.Tag);
+        });
     }
 
     public void Receive(TagAdded message)

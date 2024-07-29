@@ -1,4 +1,5 @@
-﻿using Lumidex.Core.Data;
+﻿using Avalonia.Threading;
+using Lumidex.Core.Data;
 using Lumidex.Features.Tags.Messages;
 
 namespace Lumidex.Features.MainSearch.Filters;
@@ -27,13 +28,19 @@ public partial class TagFilter : FilterViewModelBase,
 
     public void Receive(TagCreated message)
     {
-        if (!AllTags.Contains(message.Tag))
-            AllTags.Add(message.Tag);
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            if (!AllTags.Contains(message.Tag))
+                AllTags.Add(message.Tag);
+        });
     }
 
     public void Receive(TagDeleted message)
     {
-        AllTags.Remove(message.Tag);
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            AllTags.Remove(message.Tag);
+        });
     }
 
     public override string ToString() => $"{DisplayName} = ({string.Join(", ", SelectedTags.Select(t => t.Name))})";

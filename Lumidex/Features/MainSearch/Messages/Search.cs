@@ -2,7 +2,7 @@
 
 namespace Lumidex.Features.MainSearch.Messages;
 
-public class SearchMessage
+public class Search
 {
     public IReadOnlyList<FilterViewModelBase> Filters { get; init; } = [];
 }

@@ -1,4 +1,5 @@
-﻿using Lumidex.Core.Data;
+﻿using Avalonia.Threading;
+using Lumidex.Core.Data;
 using Lumidex.Features.Aliases.Messages;
 using Lumidex.Features.Library.Messages;
 using Lumidex.Features.MainSearch.Editing.Messages;
@@ -86,7 +87,7 @@ public partial class AliasManagerViewModel : ValidatableViewModelBase,
 
     public void Receive(LibraryScanned message)
     {
-        RefreshObjectNamesAndAliases();
+        Dispatcher.UIThread.Invoke(RefreshObjectNamesAndAliases);
     }
 
     public void Receive(CreateAlias message)
@@ -169,24 +170,27 @@ public partial class AliasManagerViewModel : ValidatableViewModelBase,
 
     public void Receive(AliasDeleted message)
     {
-        if (Aliases.Contains(message.Alias))
+        Dispatcher.UIThread.Invoke(() =>
         {
-            Aliases.Remove(message.Alias);
-
-            var objectNames = ObjectNames.Where(o => o.ObjectName.Equals(message.Alias.ObjectName, StringComparison.InvariantCultureIgnoreCase));
-            foreach (var objectName in objectNames)
+            if (Aliases.Contains(message.Alias))
             {
-                if (objectName.Aliases.FirstOrDefault(a => a.Id == message.Alias.Id) is { } alias)
+                Aliases.Remove(message.Alias);
+
+                var objectNames = ObjectNames.Where(o => o.ObjectName.Equals(message.Alias.ObjectName, StringComparison.InvariantCultureIgnoreCase));
+                foreach (var objectName in objectNames)
                 {
-                    objectName.Aliases.Remove(alias);
+                    if (objectName.Aliases.FirstOrDefault(a => a.Id == message.Alias.Id) is { } alias)
+                    {
+                        objectName.Aliases.Remove(alias);
+                    }
                 }
             }
-        }
+        });
     }
 
     public void Receive(ImageFilesEdited message)
     {
-        RefreshObjectNamesAndAliases();
+        Dispatcher.UIThread.Invoke(RefreshObjectNamesAndAliases);
     }
 
     [RelayCommand]

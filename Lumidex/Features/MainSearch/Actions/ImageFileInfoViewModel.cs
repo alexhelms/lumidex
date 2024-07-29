@@ -2,6 +2,7 @@
 using Lumidex.Features.MainSearch.Editing.Messages;
 using System.Reflection;
 using Lumidex.Services;
+using Avalonia.Threading;
 
 namespace Lumidex.Features.MainSearch.Actions;
 
@@ -34,7 +35,7 @@ public partial class ImageFileInfoViewModel : ActionViewModelBase,
 
     public void Receive(ImageFilesEdited message)
     {
-        UpdateInfoItems();
+        Dispatcher.UIThread.Invoke(UpdateInfoItems);
     }
 
     private void UpdateInfoItems()

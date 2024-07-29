@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Threading;
 using Lumidex.Core.Data;
 using Lumidex.Features.Tags.Messages;
 using Lumidex.Services;
@@ -368,13 +369,19 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
 
     public void Receive(TagCreated message)
     {
-        if (!Tags.Contains(message.Tag))
-            Tags.Add(message.Tag);
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            if (!Tags.Contains(message.Tag))
+                Tags.Add(message.Tag);
+        });
     }
 
     public void Receive(TagDeleted message)
     {
-        Tags.Remove(message.Tag);
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            Tags.Remove(message.Tag);
+        });
     }
 
     [RelayCommand]
