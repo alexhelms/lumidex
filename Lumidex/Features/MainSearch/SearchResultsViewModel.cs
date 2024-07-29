@@ -258,7 +258,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
         IFileInfo fileInfo = _fileSystem.FileInfo.New(imageFile.Path);
         if (fileInfo.Exists)
         {
-            await _systemService.StartProcess("explorer.exe", $"/select,\"{fileInfo.FullName}\"");
+            await _systemService.OpenInExplorer(fileInfo.FullName);
         }
     }
 
