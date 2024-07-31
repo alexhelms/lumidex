@@ -1,0 +1,127 @@
+<UserControl
+    x:Class="Lumidex.Features.Settings.AstrobinSettingsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:common="using:Lumidex.Common"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:exporter="using:Lumidex.Core.Exporters"
+    xmlns:i="https://github.com/projektanker/icons.avalonia"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:settings="using:Lumidex.Features.Settings"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="settings:AstrobinSettingsViewModel"
+    mc:Ignorable="d">
+    <Grid ColumnDefinitions="*,*">
+        <DockPanel>
+
+            <StackPanel DockPanel.Dock="Top">
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center" Text="Astrobin Filter Name" />
+                    <Border Margin="8,0,0,0" Background="Transparent">
+                        <i:Icon FontSize="20" Value="mdi-information-outline" />
+                        <ToolTip.Tip>
+                            <TextBlock LineSpacing="5" TextWrapping="Wrap">
+                                Astrobin requires filters added to acquisition details must come from their database.
+                                Use the textbox below to search Astrobin for a filter by name and select Add. Once
+                                added to Your Filters you can assign Astrobin filters to you data when exporting a
+                                CSV for Astrobin acquisition details.
+                            </TextBlock>
+                        </ToolTip.Tip>
+                    </Border>
+                </StackPanel>
+                <DockPanel Margin="0,8,0,0">
+                    <Button
+                        Width="80"
+                        Margin="5,0,0,0"
+                        VerticalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        Classes="accent"
+                        Command="{Binding AddFilterCommand}"
+                        Content="Add"
+                        DockPanel.Dock="Right"
+                        IsDefault="True" />
+                    <AutoCompleteBox
+                        AsyncPopulator="{Binding AsyncPopulator}"
+                        FilterMode="Contains"
+                        IsTextCompletionEnabled="True"
+                        MinimumPopulateDelay="00:00:00.300"
+                        MinimumPrefixLength="3"
+                        SelectedItem="{Binding SelectedFilter}"
+                        Text="{Binding SearchText, Mode=TwoWay}"
+                        ValueMemberBinding="{ReflectionBinding Name}"
+                        Watermark="Enter a filter name">
+                        <AutoCompleteBox.DataTemplates>
+                            <DataTemplate x:DataType="exporter:AstrobinFilter">
+                                <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </AutoCompleteBox.DataTemplates>
+                        <AutoCompleteBox.InnerRightContent>
+                            <i:Icon
+                                Margin="0,0,5,0"
+                                Animation="Spin"
+                                FontSize="20"
+                                IsVisible="{Binding IsQueryingAstrobin}"
+                                Value="fa-spinner" />
+                        </AutoCompleteBox.InnerRightContent>
+                    </AutoCompleteBox>
+                </DockPanel>
+
+                <TextBlock
+                    Margin="0,8,0,0"
+                    VerticalAlignment="Center"
+                    Foreground="Red"
+                    IsVisible="{Binding AstrobinUnavailableMessage, TargetNullValue=False, Converter={x:Static ObjectConverters.IsNotNull}}"
+                    Text="{Binding AstrobinUnavailableMessage}" />
+
+            </StackPanel>
+
+            <DockPanel Margin="0,24,0,0">
+
+                <TextBlock DockPanel.Dock="Top" Text="Your Filters" />
+
+                <TextBlock
+                    Margin="0,16,0,0"
+                    DockPanel.Dock="Top"
+                    IsVisible="{Binding !AstrobinFilters.Count}"
+                    Text="You have not added any filters."
+                    TextAlignment="Center" />
+
+                <ScrollViewer Margin="0,8,0,0">
+                    <ItemsControl x:Name="AstrobinFiltersItemsControl" ItemsSource="{Binding AstrobinFilters}">
+                        <ItemsControl.Styles>
+                            <Style Selector="ItemsControl > ContentPresenter">
+                                <Setter Property="Padding" Value="5" />
+                            </Style>
+                        </ItemsControl.Styles>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="common:AstrobinFilterViewModel">
+                                <DockPanel>
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        DockPanel.Dock="Left"
+                                        Text="{Binding Name}" />
+                                    <Button
+                                        HorizontalAlignment="Right"
+                                        Background="Red"
+                                        Command="{Binding #AstrobinFiltersItemsControl.((settings:AstrobinSettingsViewModel)DataContext).RemoveFilterCommand}"
+                                        CommandParameter="{Binding}"
+                                        Content="Remove" />
+                                </DockPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+            </DockPanel>
+
+        </DockPanel>
+    </Grid>
+</UserControl>

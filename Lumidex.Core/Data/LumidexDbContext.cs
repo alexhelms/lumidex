@@ -25,6 +25,7 @@ public class LumidexDbContext : DbContext
     public DbSet<Tag> Tags { get; set; }
     public DbSet<ImageFile> ImageFiles { get; set; }
     public DbSet<ObjectAlias> ObjectAliases { get; set; }
+    public DbSet<AstrobinFilter> AstrobinFilters { get; set; }
 
     public string DbPath { get; }
 

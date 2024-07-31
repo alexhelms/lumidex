@@ -46,15 +46,10 @@ public static class Bootstrapper
     private static void LogApplicationInfo()
     {
         var launchTimeUtc = DateTime.UtcNow;
-        var executingAssembly = Assembly.GetExecutingAssembly();
-        var fileVersionInfo = FileVersionInfo.GetVersionInfo(executingAssembly.Location);
-        var version = fileVersionInfo.ProductVersion;
-        var processArch = RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant();
-        var osArch = RuntimeInformation.OSArchitecture.ToString().ToLowerInvariant();
 
-        Log.Information("Welcome to Lumidex {Version} {Architecture}", version, processArch);
+        Log.Information("Welcome to Lumidex {Version} {Architecture}", LumidexUtil.InformationalVersion, LumidexUtil.ProcessArchitecture);
         Log.Information("Launched at {TimestampUtc:s} UTC ({TimestampLocal:s} Local)", launchTimeUtc, launchTimeUtc.ToLocalTime());
-        Log.Information("{OS} {Architecture}", RuntimeInformation.OSDescription, osArch);
+        Log.Information("{OS} {Architecture}", LumidexUtil.OSDescription, LumidexUtil.OSArchitecture);
         Log.Information("{Dotnet} {RuntimeIdentifier}", RuntimeInformation.FrameworkDescription, RuntimeInformation.RuntimeIdentifier);
         Log.Information("Logs located at {Path}", LogPath);
     }

@@ -1,0 +1,29 @@
+<UserControl
+    x:Class="Lumidex.Features.Settings.MainSettingsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:settings="using:Lumidex.Features.Settings"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="settings:MainSettingsViewModel"
+    mc:Ignorable="d">
+    <Grid Margin="8" ColumnDefinitions="1*,4*">
+
+        <ListBox
+            Grid.Column="0"
+            BorderBrush="#656565"
+            BorderThickness="1"
+            DisplayMemberBinding="{Binding DisplayName}"
+            ItemsSource="{Binding ViewModels}"
+            SelectedItem="{Binding SelectedViewModel}"
+            SelectionMode="Single,AlwaysSelected" />
+
+        <ContentControl
+            Grid.Column="1"
+            Margin="8"
+            Content="{Binding SelectedViewModel}" />
+
+    </Grid>
+</UserControl>

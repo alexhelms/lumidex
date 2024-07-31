@@ -1,6 +1,5 @@
 ﻿using Lumidex.Core;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
 
 namespace Lumidex;
 

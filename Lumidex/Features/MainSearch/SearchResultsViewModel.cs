@@ -1,6 +1,7 @@
 ﻿using Avalonia.Threading;
 using Humanizer;
 using Lumidex.Core.Data;
+using Lumidex.Features.AstrobinExport;
 using Lumidex.Features.MainSearch.Actions;
 using Lumidex.Features.MainSearch.Editing;
 using Lumidex.Features.MainSearch.Editing.Messages;
@@ -25,6 +26,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
     private readonly SystemService _systemService;
     private readonly DialogService _dialogService;
     private readonly Func<EditItemsViewModel> _editItemsViewModelFactory;
+    private readonly Func<AstrobinExportViewModel> _astrobinExportViewModelFactory;
 
     [ObservableProperty] bool _isBusy;
     [ObservableProperty] string? _totalIntegration;
@@ -50,7 +52,8 @@ public partial class SearchResultsViewModel : ViewModelBase,
         SystemService systemService,
         DialogService dialogService,
         ActionsContainerViewModel actionsViewModel,
-        Func<EditItemsViewModel> editItemsViewModelFactory)
+        Func<EditItemsViewModel> editItemsViewModelFactory,
+        Func<AstrobinExportViewModel> astrobinExportViewModelFactory)
     {
         _fileSystem = fileSystem;
         _systemService = systemService;
@@ -58,6 +61,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
 
         ActionsViewModel = actionsViewModel;
         _editItemsViewModelFactory = editItemsViewModelFactory;
+        _astrobinExportViewModelFactory = astrobinExportViewModelFactory;
     }
 
     private IEnumerable<string> GetDistinctObjectNames(IEnumerable<ImageFileViewModel> items)
@@ -187,6 +191,17 @@ public partial class SearchResultsViewModel : ViewModelBase,
     private async Task ShowEditDialog()
     {
         var vm = _editItemsViewModelFactory();
+        vm.SelectedItems = SelectedSearchResults;
+        _ = await _dialogService.ShowDialog(vm, onOpen: (o, e) =>
+        {
+            vm.CloseDialog = () => e.Session.Close();
+        });
+    }
+
+    [RelayCommand]
+    private async Task ShowAstrobinExportDialog()
+    {
+        var vm = _astrobinExportViewModelFactory();
         vm.SelectedItems = SelectedSearchResults;
         _ = await _dialogService.ShowDialog(vm, onOpen: (o, e) =>
         {

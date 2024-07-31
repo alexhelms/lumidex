@@ -4,16 +4,21 @@ namespace Lumidex.Features.SideNavBar;
 
 public partial class SideNavBarViewModel : ViewModelBase
 {
+    // Upper Tabs
     public const string SearchTabName = "Search";
     public const string AliasTabName = "Alias";
     public const string TagsTabName = "Tags";
     public const string LibraryTabName = "Library";
 
-    public ObservableCollectionEx<SideNavBarItemViewModel> Tabs { get; }
+    // Lower Tabs
+    public const string SettingsTabName = "Settings";
+
+    public ObservableCollectionEx<SideNavBarItemViewModel> UpperTabs { get; }
+    public ObservableCollectionEx<SideNavBarItemViewModel> LowerTabs { get; }
 
     public SideNavBarViewModel()
     {
-        Tabs = new()
+        UpperTabs = new()
         {
             new()
             {
@@ -40,6 +45,16 @@ public partial class SideNavBarViewModel : ViewModelBase
                 Icon = "mdi-bookshelf",
             },
         };
+
+        LowerTabs = new()
+        {
+            new()
+            {
+                Name = SettingsTabName,
+                ToolTipText = "Lumidex Settings",
+                Icon = "mdi-cog",
+            },
+        };
     }
 
     protected override void OnInitialActivated()
@@ -51,12 +66,14 @@ public partial class SideNavBarViewModel : ViewModelBase
     [RelayCommand]
     private void ChangeTab(string tabName)
     {
-        foreach (var item in Tabs)
+        var allTabs = LowerTabs.Concat(UpperTabs);
+
+        foreach (var item in allTabs)
         {
             item.IsSelected = false;
         }
 
-        if (Tabs.FirstOrDefault(t => t.Name == tabName) is { } tab)
+        if (allTabs.FirstOrDefault(t => t.Name == tabName) is { } tab)
         {
             tab.IsSelected = true;
         }
