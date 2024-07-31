@@ -32,6 +32,8 @@
     <PackageReference Include="AvaloniaDialogs" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="DialogHost.Avalonia" />
+    <PackageReference Include="Flurl" />
+    <PackageReference Include="Flurl.Http" />
     <PackageReference Include="Humanizer" />
     <PackageReference Include="Microsoft.Extensions.Logging" />
     <PackageReference Include="ObservableCollectionEx" />

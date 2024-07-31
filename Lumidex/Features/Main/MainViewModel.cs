@@ -6,6 +6,7 @@ using Lumidex.Messages;
 using Lumidex.Features.Aliases;
 using Avalonia.Controls.ApplicationLifetimes;
 using Lumidex.Services;
+using Lumidex.Features.Settings;
 
 namespace Lumidex.Features.Main;
 
@@ -19,6 +20,7 @@ public partial class MainViewModel : ViewModelBase,
     private readonly AliasManagerViewModel _aliasManagerViewModel;
     private readonly TagManagerViewModel _tagManagerViewModel;
     private readonly LibraryManagerViewModel _libraryManagerViewModel;
+    private readonly MainSettingsViewModel _settingsViewModel;
 
     [ObservableProperty] private SideNavBarViewModel _sideNavBarViewModel = null!;
     [ObservableProperty] private object? _selectedTab;
@@ -31,7 +33,8 @@ public partial class MainViewModel : ViewModelBase,
         MainSearchViewModel mainSearchViewModel,
         AliasManagerViewModel aliasManagerViewModel,
         TagManagerViewModel tagManagerViewModel,
-        LibraryManagerViewModel libraryManagerViewModel)
+        LibraryManagerViewModel libraryManagerViewModel,
+        MainSettingsViewModel settingsViewModel)
     {
         _systemService = systemService;
         _dialogService = dialogService;
@@ -41,6 +44,7 @@ public partial class MainViewModel : ViewModelBase,
         _aliasManagerViewModel = aliasManagerViewModel;
         _tagManagerViewModel = tagManagerViewModel;
         _libraryManagerViewModel = libraryManagerViewModel;
+        _settingsViewModel = settingsViewModel;
     }
 
     protected override void OnActivated()
@@ -64,10 +68,13 @@ public partial class MainViewModel : ViewModelBase,
     {
         SelectedTab = message.TabName switch
         {
+            // Upper Tabs
             SideNavBarViewModel.SearchTabName => _mainSearchViewModel,
             SideNavBarViewModel.AliasTabName => _aliasManagerViewModel,
             SideNavBarViewModel.TagsTabName => _tagManagerViewModel,
             SideNavBarViewModel.LibraryTabName => _libraryManagerViewModel,
+            // Lower Tabs
+            SideNavBarViewModel.SettingsTabName => _settingsViewModel,
             _ => throw new NotImplementedException(),
         };
     }

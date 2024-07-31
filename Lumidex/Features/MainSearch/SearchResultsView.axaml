@@ -151,6 +151,8 @@
                                             Header="Remove Tags"
                                             IsEnabled="{ReflectionBinding !!Tags.Count}" />
                                         <Separator />
+                                        <MenuItem Command="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ShowAstrobinExportDialogCommand}" Header="Export Astrobin CSV" />
+                                        <Separator />
                                         <MenuItem
                                             Command="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).OpenInPixInsightCommand}"
                                             CommandParameter="{Binding}"

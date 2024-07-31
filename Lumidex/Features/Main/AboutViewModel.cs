@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+﻿using Lumidex.Core;
 using Lumidex.Services;
 
 namespace Lumidex.Features.Main;
@@ -7,27 +7,14 @@ public partial class AboutViewModel : ViewModelBase
 {
     private readonly SystemService _systemService;
 
-    public string? Copyright { get; }
-    public string? Version { get; }
-    public string? VersionToolTip { get; }
-    public DateTime? CommitDate { get; }
+    public string? Copyright { get; } = LumidexUtil.Copyright;
+    public string? Version { get; } = LumidexUtil.Version;
+    public string? VersionToolTip { get; } = LumidexUtil.InformationalVersion;
+    public DateTime? CommitDate { get; } = LumidexUtil.CommitDate;
 
     public AboutViewModel(SystemService systemService)
     {
         _systemService = systemService;
-
-        Copyright = "© 2024 Alex Helms and Contributors";
-
-        if (Assembly.GetExecutingAssembly().GetType("GitVersionInformation") is { } versionType)
-        {
-            var fields = versionType.GetFields();
-            Version = GetFieldValue(fields, "SemVer");
-            VersionToolTip = GetFieldValue(fields, "InformationalVersion");
-            CommitDate = DateTime.Parse(GetFieldValue(fields, "CommitDate"));
-        }
-
-        static string GetFieldValue(IEnumerable<FieldInfo> fields, string fieldName)
-            => (string)fields.First(f => f.Name == fieldName).GetValue(null)!;
     }
 
     [RelayCommand]

@@ -1,4 +1,5 @@
-﻿using Lumidex.Features.MainSearch.Actions;
+﻿using Lumidex.Features.AstrobinExport;
+using Lumidex.Features.MainSearch.Actions;
 using Lumidex.Features.MainSearch.Editing;
 using Lumidex.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +18,7 @@ public static class DependencyInjection
 
         services.AddTransient<Func<EditItemsViewModel>>(p => () => p.GetRequiredService<EditItemsViewModel>());
         services.AddTransient<Func<ImageFileInfoItem>>(p => () => p.GetRequiredService<ImageFileInfoItem>());
+        services.AddTransient<Func<AstrobinExportViewModel>>(p => () => p.GetRequiredService<AstrobinExportViewModel>());
 
         services.AddSingleton<DialogService>();
         services.AddSingleton<SystemService>();

@@ -10,35 +10,44 @@
     d:DesignWidth="800"
     x:DataType="sidenavbar:SideNavBarViewModel"
     mc:Ignorable="d">
+	<UserControl.DataTemplates>
+		<DataTemplate DataType="sidenavbar:SideNavBarItemViewModel">
+			<ToggleButton
+				Height="48"
+				HorizontalAlignment="Stretch"
+				Background="Transparent"
+				Command="{Binding $parent[ItemsControl].((sidenavbar:SideNavBarViewModel)DataContext).ChangeTabCommand}}"
+				CommandParameter="{Binding Name}"
+				IsChecked="{Binding IsSelected}"
+				ToolTip.Tip="{Binding ToolTipText}">
+				<i:Icon
+					FontSize="24"
+					Foreground="White"
+					Value="{Binding Icon}" />
+			</ToggleButton>
+		</DataTemplate>
+	</UserControl.DataTemplates>
     <Border
         Width="48"
         HorizontalAlignment="Left"
         BorderBrush="#656565"
         BorderThickness="0,0,1,0">
-        <ItemsControl VerticalAlignment="Top" ItemsSource="{Binding Tabs}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.DataTemplates>
-                <DataTemplate DataType="sidenavbar:SideNavBarItemViewModel">
-                    <ToggleButton
-                        Height="48"
-                        HorizontalAlignment="Stretch"
-                        Background="Transparent"
-                        Command="{Binding $parent[ItemsControl].((sidenavbar:SideNavBarViewModel)DataContext).ChangeTabCommand}}"
-                        CommandParameter="{Binding Name}"
-                        IsChecked="{Binding IsSelected}"
-                        ToolTip.Tip="{Binding ToolTipText}">
-                        <i:Icon
-                            FontSize="24"
-                            Foreground="White"
-                            Value="{Binding Icon}" />
-                    </ToggleButton>
-                </DataTemplate>
-            </ItemsControl.DataTemplates>
-        </ItemsControl>
-    </Border>
+		<DockPanel>
+			<ItemsControl VerticalAlignment="Top" ItemsSource="{Binding UpperTabs}" DockPanel.Dock="Top">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<StackPanel />
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+			</ItemsControl>
+		<ItemsControl VerticalAlignment="Bottom" ItemsSource="{Binding LowerTabs}" DockPanel.Dock="Bottom">
+			<ItemsControl.ItemsPanel>
+				<ItemsPanelTemplate>
+					<StackPanel />
+				</ItemsPanelTemplate>
+			</ItemsControl.ItemsPanel>
+		</ItemsControl>
+		</DockPanel>
+	</Border>
 
 </UserControl>

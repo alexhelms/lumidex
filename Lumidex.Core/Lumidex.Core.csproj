@@ -14,6 +14,8 @@
 
   <ItemGroup>
     <PackageReference Include="FluentResults" />
+    <PackageReference Include="Flurl" />
+    <PackageReference Include="Flurl.Http" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
