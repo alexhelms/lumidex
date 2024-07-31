@@ -25,6 +25,12 @@ public partial class AstrobinExportViewModel : ViewModelBase,
         _systemService = systemService;
     }
 
+    protected override void OnDeactivated()
+    {
+        base.OnDeactivated();
+        Messenger.UnregisterAll(this);
+    }
+
     private void RenderCsvContent()
     {
         try

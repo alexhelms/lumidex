@@ -77,12 +77,12 @@ public partial class AstrobinSettingsViewModel : ViewModelBase, ISettingsViewMod
     [RelayCommand(CanExecute = nameof(CanAddFilter))]
     private void AddFilter()
     {
-        if (SelectedFilter is not Core.Exporters.AstrobinFilter filter)
+        if (SelectedFilter is not Core.Exporters.AstrobinFilter astrobinFilter)
             return;
 
         using var dbContext = _dbContextFactory.CreateDbContext();
 
-        var alreadyExists = dbContext.AstrobinFilters.Any(f => f.AstrobinId == filter.Id);
+        var alreadyExists = dbContext.AstrobinFilters.Any(f => f.AstrobinId == astrobinFilter.Id);
         if (alreadyExists)
         {
             SearchText = null;
@@ -90,11 +90,13 @@ public partial class AstrobinSettingsViewModel : ViewModelBase, ISettingsViewMod
             return;
         }
 
-        dbContext.AstrobinFilters.Add(new Core.Data.AstrobinFilter
+        var filter = new Core.Data.AstrobinFilter
         {
-            AstrobinId = filter.Id,
-            Name = filter.Name,
-        });
+            AstrobinId = astrobinFilter.Id,
+            Name = astrobinFilter.Name,
+        };
+
+        dbContext.AstrobinFilters.Add(filter);
 
         if (dbContext.SaveChanges() > 0)
         {
@@ -102,8 +104,9 @@ public partial class AstrobinSettingsViewModel : ViewModelBase, ISettingsViewMod
             SelectedFilter = null;
             AstrobinFilters.Add(new AstrobinFilterViewModel
             {
-                AstrobinId = filter.Id,
-                Name = filter.Name,
+                Id = filter.Id,
+                AstrobinId = astrobinFilter.Id,
+                Name = astrobinFilter.Name,
             });
         }
     }
