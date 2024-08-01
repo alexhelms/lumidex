@@ -2,6 +2,7 @@
 using Humanizer;
 using Lumidex.Core.Data;
 using Lumidex.Features.AstrobinExport;
+using Lumidex.Features.FileExport;
 using Lumidex.Features.MainSearch.Actions;
 using Lumidex.Features.MainSearch.Editing;
 using Lumidex.Features.MainSearch.Editing.Messages;
@@ -27,6 +28,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
     private readonly DialogService _dialogService;
     private readonly Func<EditItemsViewModel> _editItemsViewModelFactory;
     private readonly Func<AstrobinExportViewModel> _astrobinExportViewModelFactory;
+    private readonly Func<FileExportViewModel> _fileExportViewModelFactory;
 
     [ObservableProperty] bool _isBusy;
     [ObservableProperty] string? _totalIntegration;
@@ -53,7 +55,8 @@ public partial class SearchResultsViewModel : ViewModelBase,
         DialogService dialogService,
         ActionsContainerViewModel actionsViewModel,
         Func<EditItemsViewModel> editItemsViewModelFactory,
-        Func<AstrobinExportViewModel> astrobinExportViewModelFactory)
+        Func<AstrobinExportViewModel> astrobinExportViewModelFactory,
+        Func<FileExportViewModel> fileExportViewModelFactory)
     {
         _fileSystem = fileSystem;
         _systemService = systemService;
@@ -62,6 +65,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
         ActionsViewModel = actionsViewModel;
         _editItemsViewModelFactory = editItemsViewModelFactory;
         _astrobinExportViewModelFactory = astrobinExportViewModelFactory;
+        _fileExportViewModelFactory = fileExportViewModelFactory;
     }
 
     private IEnumerable<string> GetDistinctObjectNames(IEnumerable<ImageFileViewModel> items)
@@ -207,6 +211,31 @@ public partial class SearchResultsViewModel : ViewModelBase,
         {
             vm.CloseDialog = () => e.Session.Close();
         });
+    }
+
+    [RelayCommand]
+    private async Task ShowFileExportDialog()
+    {
+        var dirs = await _dialogService.ShowFolderPicker(new Avalonia.Platform.Storage.FolderPickerOpenOptions
+        {
+            AllowMultiple = false,
+            Title = "Export Destination",
+        });
+
+        if (dirs?.Count == 1)
+        {
+            var destinationDirectory = Uri.UnescapeDataString(dirs[0].Path.AbsolutePath);
+            if (Directory.Exists(destinationDirectory))
+            {
+                var vm = _fileExportViewModelFactory();
+                vm.DestinationDirectory = destinationDirectory;
+                vm.SelectedItems = SelectedSearchResults;
+                _ = await _dialogService.ShowDialog(vm, onOpen: (o, e) =>
+                {
+                    vm.CloseDialog = () => e.Session.Close();
+                });
+            }
+        }
     }
 
     [RelayCommand]

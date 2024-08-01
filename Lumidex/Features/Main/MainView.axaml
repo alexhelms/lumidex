@@ -12,26 +12,36 @@
     mc:Ignorable="d">
     <DockPanel>
 
-        <DockPanel Height="32" DockPanel.Dock="Top">
-            <Panel Width="48" DockPanel.Dock="Left">
+        <Grid
+            Height="32"
+            ColumnDefinitions="Auto,1*,1*,1*"
+            DockPanel.Dock="Top">
+            <Panel Grid.Column="0" Width="48">
                 <Image
                     Width="24"
                     Height="24"
                     HorizontalAlignment="Center"
                     Source="/Assets/lumidex-icon-small.png" />
             </Panel>
-            <Menu Background="{x:Null}">
+            <Menu Grid.Column="1" Background="{x:Null}">
                 <MenuItem Header="_File">
                     <MenuItem Command="{Binding ExitApplicationCommand}" Header="E_xit" />
                 </MenuItem>
                 <MenuItem Header="_Help">
-                    <MenuItem Command="{Binding ReportBugCommand}" Header="_Report Bug" />
-                    <MenuItem Command="{Binding RequestFeatureCommand}" Header="_Request Feature" />
-                    <Separator />
+                    <MenuItem Command="{Binding ReportBugCommand}" Header="Report _Bug" />
+                    <MenuItem Command="{Binding RequestFeatureCommand}" Header="Request _Feature" />
+                    <MenuItem Command="{Binding OpenLogFolderCommand}" Header="_Logs" />
                     <MenuItem Command="{Binding OpenAboutDialogCommand}" Header="_About" />
                 </MenuItem>
             </Menu>
-        </DockPanel>
+            <TextBlock
+                Grid.Column="0"
+                Grid.ColumnSpan="999"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                IsHitTestVisible="False"
+                Text="Lumidex" />
+        </Grid>
 
         <Rectangle
             Height="1"

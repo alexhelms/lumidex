@@ -7,6 +7,7 @@ using Lumidex.Features.Aliases;
 using Avalonia.Controls.ApplicationLifetimes;
 using Lumidex.Services;
 using Lumidex.Features.Settings;
+using Lumidex.Core.IO;
 
 namespace Lumidex.Features.Main;
 
@@ -96,4 +97,7 @@ public partial class MainViewModel : ViewModelBase,
 
     [RelayCommand]
     private Task OpenAboutDialog() => _dialogService.ShowDialog(_aboutViewModel);
+
+    [RelayCommand]
+    private Task OpenLogFolder() => _systemService.OpenInExplorer(LumidexPaths.Logs);
 }
