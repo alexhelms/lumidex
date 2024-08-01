@@ -113,6 +113,7 @@ public partial class LibraryViewModel : ValidatableViewModelBase
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
         var duplicateImageFiles = dbContext.ImageFiles
+            .Where(f => f.LibraryId == Id)
             .GroupBy(f => f.HeaderHash)
             .Where(grp => grp.Count() > 1)
             .Select(grp => grp.Key)
