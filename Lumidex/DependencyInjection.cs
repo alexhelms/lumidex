@@ -1,4 +1,5 @@
 ﻿using Lumidex.Features.AstrobinExport;
+using Lumidex.Features.FileExport;
 using Lumidex.Features.MainSearch.Actions;
 using Lumidex.Features.MainSearch.Editing;
 using Lumidex.Services;
@@ -19,6 +20,7 @@ public static class DependencyInjection
         services.AddTransient<Func<EditItemsViewModel>>(p => () => p.GetRequiredService<EditItemsViewModel>());
         services.AddTransient<Func<ImageFileInfoItem>>(p => () => p.GetRequiredService<ImageFileInfoItem>());
         services.AddTransient<Func<AstrobinExportViewModel>>(p => () => p.GetRequiredService<AstrobinExportViewModel>());
+        services.AddTransient<Func<FileExportViewModel>>(p => () => p.GetRequiredService<FileExportViewModel>());
 
         services.AddSingleton<DialogService>();
         services.AddSingleton<SystemService>();
