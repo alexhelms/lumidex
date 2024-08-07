@@ -18,7 +18,7 @@ public class SystemService
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            await StartProcess("explorer.exe", url);
+            await StartProcess("explorer.exe", $"\"{url}\"");
         }
         else
         {
