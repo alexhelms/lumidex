@@ -302,7 +302,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
         IFileInfo fileInfo = _fileSystem.FileInfo.New(imageFile.Path);
         if (fileInfo.Exists)
         {
-            await _systemService.OpenInExplorer(fileInfo.FullName);
+            await _systemService.OpenInExplorer($"\"{fileInfo.FullName}\"");
         }
     }
 
@@ -313,7 +313,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
         if (fileInfo.Exists)
         {
             // TODO: Application setting to specify PixInsight.exe path?
-            await _systemService.StartProcess(@"C:\Program Files\PixInsight\bin\PixInsight.exe", fileInfo.FullName);
+            await _systemService.StartProcess(@"C:\Program Files\PixInsight\bin\PixInsight.exe", $"\"{fileInfo.FullName}\"");
         }
     }
 }
