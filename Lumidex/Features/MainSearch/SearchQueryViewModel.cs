@@ -3,7 +3,8 @@ using Lumidex.Features.MainSearch.Messages;
 
 namespace Lumidex.Features.MainSearch;
 
-public partial class SearchQueryViewModel : ViewModelBase
+public partial class SearchQueryViewModel : ViewModelBase,
+    IRecipient<ObjectNameSearchFill>
 {
     [ObservableProperty] ObservableCollectionEx<FilterViewModelBase> _allFilters = new();
     [ObservableProperty] ObservableCollectionEx<FilterViewModelBase> _activeFilters = new();
@@ -188,5 +189,19 @@ public partial class SearchQueryViewModel : ViewModelBase
             filter.DateBegin = DateTime.UtcNow.AddDays(-30);
             Search();
         }
+    }
+
+    public void Receive(ObjectNameSearchFill message)
+    {
+        var filter = ActiveFilters.OfType<ObjectNameFilter>().FirstOrDefault();
+        if (filter is null)
+        {
+            filter = AllFilters.OfType<ObjectNameFilter>().First();
+            AllFilters.Remove(filter);
+            ActiveFilters.Insert(0, filter);
+        }
+
+        filter.Name = message.ObjectName;
+        Search();
     }
 }
