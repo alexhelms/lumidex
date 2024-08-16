@@ -269,6 +269,18 @@ public partial class SearchResultsViewModel : ViewModelBase,
     }
 
     [RelayCommand]
+    private void SearchObjectName(string? objectName)
+    {
+        if (objectName is null) return;
+
+        Messenger.Send(new ObjectNameSearchFill
+        {
+            ObjectName = objectName,
+        });
+    }
+
+
+    [RelayCommand]
     private void AddTag(TagViewModel tag)
     {
         Messenger.Send(new AddTag
