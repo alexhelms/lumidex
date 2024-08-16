@@ -12,6 +12,7 @@
     xmlns:interactivity="using:Avalonia.Xaml.Interactivity"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:search="using:Lumidex.Features.MainSearch"
+    xmlns:system="using:System"
     d:DesignHeight="800"
     d:DesignWidth="1200"
     x:DataType="search:SearchResultsViewModel"
@@ -557,7 +558,25 @@
                             </Setter.Value>
                         </Setter>
                     </Style>
+					<Style Selector="ListBoxItem">
+						<Setter Property="Padding" Value="0" />
+						<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+					</Style>
                 </ListBox.Styles>
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="system:String">
+                        <TextBlock
+							Padding="12,9,12,12"
+                            Background="Transparent"
+                            Text="{Binding}">
+                            <interactivity:Interaction.Behaviors>
+                                <ia:EventTriggerBehavior EventName="DoubleTapped">
+                                    <ia:InvokeCommandAction Command="{Binding #ObjectNameListBox.((search:SearchResultsViewModel)DataContext).SearchObjectNameCommand}" CommandParameter="{Binding}" />
+                                </ia:EventTriggerBehavior>
+                            </interactivity:Interaction.Behaviors>
+                        </TextBlock>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
             </ListBox>
         </StackPanel>
     </Grid>
