@@ -71,6 +71,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
     private IEnumerable<string> GetDistinctObjectNames(IEnumerable<ImageFileViewModel> items)
     {
         return items
+            .Where(x => x.Type == ImageType.Light)
             .Where(x => x.ObjectName != null)
             .Select(x => x.ObjectName)
             .Distinct()
