@@ -78,6 +78,7 @@ public partial class MainViewModel : ViewModelBase,
             SideNavBarViewModel.SettingsTabName => _settingsViewModel,
             _ => throw new NotImplementedException(),
         };
+        Messenger.Send(new SetSelectedTabMessage(message.TabName));
     }
 
     [RelayCommand]

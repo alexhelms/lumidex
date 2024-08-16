@@ -36,12 +36,27 @@
             ColumnDefinitions="2*,3*">
 
             <ListBox
+                x:Name="ObjectNameListBox"
                 Grid.Column="0"
                 BorderBrush="#656565"
                 BorderThickness="1"
                 DisplayMemberBinding="{Binding ObjectName}"
                 ItemsSource="{Binding ObjectNames}"
-                SelectedItem="{Binding SelectedItem}" />
+                SelectedItem="{Binding SelectedItem}">
+                <ListBox.Styles>
+                    <Style Selector="ListBoxItem">
+                        <Setter Property="ContextMenu">
+                            <Setter.Value>
+                                <ContextMenu>
+                                    <MenuItem
+                                        Command="{Binding #ObjectNameListBox.((alias:AliasManagerViewModel)DataContext).SearchObjectNameCommand}"
+                                        Header="Search" />
+                                </ContextMenu>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.Styles>
+            </ListBox>
 
             <ContentControl Grid.Column="1" Content="{Binding SelectedItem}" />
 
