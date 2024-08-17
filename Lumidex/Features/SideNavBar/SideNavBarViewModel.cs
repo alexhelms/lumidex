@@ -1,9 +1,9 @@
-﻿using Lumidex.Messages;
+﻿using Lumidex.Features.Main.Messages;
 
 namespace Lumidex.Features.SideNavBar;
 
 public partial class SideNavBarViewModel : ViewModelBase,
-    IRecipient<SetSelectedTabMessage>
+    IRecipient<ChangeSideTab>
 {
     // Upper Tabs
     public const string SearchTabName = "Search";
@@ -64,13 +64,7 @@ public partial class SideNavBarViewModel : ViewModelBase,
         ChangeTab(SearchTabName);
     }
 
-    [RelayCommand]
-    private void ChangeTab(string tabName)
-    {
-        Messenger.Send(new ChangeSideTabMessage(tabName));
-    }
-
-    public void Receive(SetSelectedTabMessage message)
+    public void Receive(ChangeSideTab message)
     {
         var allTabs = LowerTabs.Concat(UpperTabs);
 
@@ -83,5 +77,11 @@ public partial class SideNavBarViewModel : ViewModelBase,
         {
             tab.IsSelected = true;
         }
+    }
+
+    [RelayCommand]
+    private void ChangeTab(string tabName)
+    {
+        Messenger.Send(new ChangeSideTab(tabName));
     }
 }

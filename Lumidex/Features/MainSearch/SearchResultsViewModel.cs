@@ -273,10 +273,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
     {
         if (objectName is null) return;
 
-        Messenger.Send(new ObjectNameSearchFill
-        {
-            ObjectName = objectName,
-        });
+        Messenger.Send(new ObjectNameSearchFill(objectName));
     }
 
 

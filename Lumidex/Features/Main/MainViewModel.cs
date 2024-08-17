@@ -2,17 +2,17 @@
 using Lumidex.Features.Library;
 using Lumidex.Features.MainSearch;
 using Lumidex.Features.SideNavBar;
-using Lumidex.Messages;
 using Lumidex.Features.Aliases;
 using Avalonia.Controls.ApplicationLifetimes;
 using Lumidex.Services;
 using Lumidex.Features.Settings;
 using Lumidex.Core.IO;
+using Lumidex.Features.Main.Messages;
 
 namespace Lumidex.Features.Main;
 
 public partial class MainViewModel : ViewModelBase,
-    IRecipient<ChangeSideTabMessage>
+    IRecipient<ChangeSideTab>
 {
     private readonly SystemService _systemService;
     private readonly DialogService _dialogService;
@@ -65,7 +65,7 @@ public partial class MainViewModel : ViewModelBase,
         }
     }
 
-    public void Receive(ChangeSideTabMessage message)
+    public void Receive(ChangeSideTab message)
     {
         SelectedTab = message.TabName switch
         {
@@ -78,7 +78,6 @@ public partial class MainViewModel : ViewModelBase,
             SideNavBarViewModel.SettingsTabName => _settingsViewModel,
             _ => throw new NotImplementedException(),
         };
-        Messenger.Send(new SetSelectedTabMessage(message.TabName));
     }
 
     [RelayCommand]
