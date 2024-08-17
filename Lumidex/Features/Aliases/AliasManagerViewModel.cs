@@ -2,7 +2,10 @@
 using Lumidex.Core.Data;
 using Lumidex.Features.Aliases.Messages;
 using Lumidex.Features.Library.Messages;
+using Lumidex.Features.Main.Messages;
 using Lumidex.Features.MainSearch.Editing.Messages;
+using Lumidex.Features.MainSearch.Messages;
+using Lumidex.Features.SideNavBar;
 using Lumidex.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -224,6 +227,16 @@ public partial class AliasManagerViewModel : ValidatableViewModelBase,
             {
                 Id = alias.Id,
             });
+        }
+    }
+
+    [RelayCommand]
+    private void SearchObjectName()
+    {
+        if (SelectedItem?.ObjectName is { } objectName)
+        {
+            Messenger.Send(new ObjectNameSearchFill(objectName));
+            Messenger.Send(new ChangeSideTab(SideNavBarViewModel.SearchTabName));
         }
     }
 }
