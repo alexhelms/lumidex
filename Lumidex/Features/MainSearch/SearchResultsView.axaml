@@ -481,9 +481,22 @@
                     TextAlignment="Right" />
             </Grid>
 
+            <Button
+                Margin="0,5,0,0"
+                HorizontalAlignment="Right"
+                ToolTip.Placement="LeftEdgeAlignedTop"
+                ToolTip.Tip="Copy Integration Summary"
+                ToolTip.VerticalOffset="0"
+				Command="{Binding CopyIntegrationSummaryCommand}">
+                <i:Icon
+                    FontSize="16"
+                    Foreground="White"
+                    Value="mdi-content-copy" />
+            </Button>
+
             <DataGrid
                 Height="300"
-                Margin="0,12,0,0"
+                Margin="0,8,0,0"
                 Background="#333538"
                 BorderBrush="#55656565"
                 BorderThickness="1"
@@ -514,7 +527,7 @@
                         SortMemberPath="TotalIntegration" />
                     <DataGridTextColumn
                         x:DataType="search:IntegrationStatistic"
-                        Binding="{Binding CountDisplay}"
+                        Binding="{Binding Count}"
                         Header="Count" />
                 </DataGrid.Columns>
             </DataGrid>

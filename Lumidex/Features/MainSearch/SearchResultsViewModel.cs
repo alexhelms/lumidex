@@ -10,8 +10,8 @@ using Lumidex.Features.MainSearch.Filters;
 using Lumidex.Features.MainSearch.Messages;
 using Lumidex.Features.Tags.Messages;
 using Lumidex.Services;
-using System.Collections;
 using System.IO.Abstractions;
+using System.Text;
 
 namespace Lumidex.Features.MainSearch;
 
@@ -334,6 +334,35 @@ public partial class SearchResultsViewModel : ViewModelBase,
             await _systemService.StartProcess(@"C:\Program Files\PixInsight\bin\PixInsight.exe", $"\"{fileInfo.FullName}\"");
         }
     }
+
+    [RelayCommand]
+    private async Task CopyIntegrationSummary()
+    {
+        if (StatsView is null) return;
+
+        var sb = new StringBuilder(512);
+
+        sb.Append("Total Integration: ");
+        sb.Append(TotalIntegration);
+        sb.Append(" hr");
+        sb.AppendLine();
+
+        // Use StatsView because it maintains the user's sort.
+        foreach (var item in StatsView.OfType<IntegrationStatistic>())
+        {
+            sb.Append(item.Filter);
+            sb.Append(": ");
+            sb.Append(item.TotalIntegrationDisplay);
+            sb.Append(" hr");
+            sb.AppendLine();
+        }
+
+        var summary = sb.ToString().TrimEnd();
+        if (summary.Length > 0)
+        {
+            await _systemService.SetClipboard(summary);
+        }
+    }
 }
 
 public class IntegrationStatistic
@@ -342,7 +371,6 @@ public class IntegrationStatistic
     public int Count { get; init; }
     public TimeSpan TotalIntegration { get; init; }
 
-    public string CountDisplay => Count.ToString();
     public string TotalIntegrationDisplay
     {
         get
