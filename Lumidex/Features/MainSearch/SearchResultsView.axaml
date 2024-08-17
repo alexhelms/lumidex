@@ -453,145 +453,155 @@
             Background="#55656565"
             ResizeDirection="Columns" />
 
-        <StackPanel Grid.Column="2">
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" MinHeight="200" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" MinHeight="200" />
+            </Grid.RowDefinitions>
+            <DockPanel Grid.Row="0">
+                <Grid Margin="0,8,0,0" DockPanel.Dock="Top">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-            <Grid Margin="0,8,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Total Disk" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Text="{Binding TotalFileSize, TargetNullValue={}--}"
+                        TextAlignment="Right" />
+                </Grid>
 
-                <TextBlock Grid.Column="0" Text="Total Disk" />
-                <TextBlock
-                    Grid.Column="1"
-                    Text="{Binding TotalFileSize, TargetNullValue={}--}"
-                    TextAlignment="Right" />
-            </Grid>
+                <Grid Margin="0,8,0,0" DockPanel.Dock="Top">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-            <Grid Margin="0,8,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Total Integration" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Text="{Binding TotalIntegration, TargetNullValue={}--, StringFormat={}{0} hr}"
+                        TextAlignment="Right" />
+                </Grid>
 
-                <TextBlock Grid.Column="0" Text="Total Integration" />
-                <TextBlock
-                    Grid.Column="1"
-                    Text="{Binding TotalIntegration, TargetNullValue={}--, StringFormat={}{0} hr}"
-                    TextAlignment="Right" />
-            </Grid>
+                <Button
+                    Margin="0,5,0,0"
+                    HorizontalAlignment="Right"
+                    Command="{Binding CopyIntegrationSummaryCommand}"
+                    DockPanel.Dock="Top"
+                    ToolTip.Placement="LeftEdgeAlignedTop"
+                    ToolTip.Tip="Copy Integration Summary"
+                    ToolTip.VerticalOffset="0">
+                    <i:Icon
+                        FontSize="16"
+                        Foreground="White"
+                        Value="mdi-content-copy" />
+                </Button>
 
-            <Button
-                Margin="0,5,0,0"
-                HorizontalAlignment="Right"
-                ToolTip.Placement="LeftEdgeAlignedTop"
-                ToolTip.Tip="Copy Integration Summary"
-                ToolTip.VerticalOffset="0"
-				Command="{Binding CopyIntegrationSummaryCommand}">
-                <i:Icon
-                    FontSize="16"
-                    Foreground="White"
-                    Value="mdi-content-copy" />
-            </Button>
+                <DataGrid
+                    Margin="0,8,0,0"
+                    Background="#333538"
+                    BorderBrush="#55656565"
+                    BorderThickness="1"
+                    CanUserReorderColumns="False"
+                    CanUserResizeColumns="True"
+                    CanUserSortColumns="True"
+                    GridLinesVisibility="Horizontal"
+                    IsReadOnly="True"
+                    ItemsSource="{Binding StatsView}"
+                    SelectionMode="Single">
+                    <DataGrid.Styles>
+                        <Style Selector="ScrollBar">
+                            <Setter Property="AllowAutoHide" Value="False" />
+                        </Style>
+                        <Style Selector="DataGridColumnHeader">
+                            <Setter Property="Foreground" Value="White" />
+                        </Style>
+                    </DataGrid.Styles>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            x:DataType="search:IntegrationStatistic"
+                            Binding="{Binding Filter}"
+                            Header="Filter" />
+                        <DataGridTextColumn
+                            x:DataType="search:IntegrationStatistic"
+                            Binding="{Binding TotalIntegrationDisplay}"
+                            Header="Total (hr)"
+                            SortMemberPath="TotalIntegration" />
+                        <DataGridTextColumn
+                            x:DataType="search:IntegrationStatistic"
+                            Binding="{Binding Count}"
+                            Header="Count" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
 
-            <DataGrid
-                Height="300"
-                Margin="0,8,0,0"
-                Background="#333538"
-                BorderBrush="#55656565"
-                BorderThickness="1"
-                CanUserReorderColumns="False"
-                CanUserResizeColumns="True"
-                CanUserSortColumns="True"
-                GridLinesVisibility="Horizontal"
-                IsReadOnly="True"
-                ItemsSource="{Binding StatsView}"
-                SelectionMode="Single">
-                <DataGrid.Styles>
-                    <Style Selector="ScrollBar">
-                        <Setter Property="AllowAutoHide" Value="False" />
-                    </Style>
-                    <Style Selector="DataGridColumnHeader">
-                        <Setter Property="Foreground" Value="White" />
-                    </Style>
-                </DataGrid.Styles>
-                <DataGrid.Columns>
-                    <DataGridTextColumn
-                        x:DataType="search:IntegrationStatistic"
-                        Binding="{Binding Filter}"
-                        Header="Filter" />
-                    <DataGridTextColumn
-                        x:DataType="search:IntegrationStatistic"
-                        Binding="{Binding TotalIntegrationDisplay}"
-                        Header="Total (hr)"
-                        SortMemberPath="TotalIntegration" />
-                    <DataGridTextColumn
-                        x:DataType="search:IntegrationStatistic"
-                        Binding="{Binding Count}"
-                        Header="Count" />
-                </DataGrid.Columns>
-            </DataGrid>
+            <GridSplitter
+                Grid.Row="1"
+                MinHeight="4"
+                Margin="0,4"
+                Background="#55656565"
+                ResizeDirection="Rows" />
 
-            <Rectangle
-                Height="1"
-                Margin="8,12"
-                Fill="#55656565" />
+            <DockPanel Grid.Row="2">
+                <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Objects"/>
+                    <TextBlock
+                        Grid.Column="1"
+						VerticalAlignment="Center"
+                        Text="{Binding DistinctObjectNames.Count}"
+                        TextAlignment="Right" />
 
-                <TextBlock Grid.Column="0" Text="Objects" />
-                <TextBlock
-                    Grid.Column="1"
-                    Text="{Binding DistinctObjectNames.Count}"
-                    TextAlignment="Right" />
+                </Grid>
 
-            </Grid>
-
-            <ListBox
-                x:Name="ObjectNameListBox"
-                Height="300"
-                Margin="0,12,0,0"
-                Background="#333538"
-                BorderBrush="#55656565"
-                BorderThickness="1"
-                ItemsSource="{Binding DistinctObjectNames}">
-                <ListBox.Styles>
-                    <Style Selector="ListBoxItem">
-                        <Setter Property="ContextMenu">
-                            <Setter.Value>
-                                <ContextMenu>
-                                    <MenuItem
-                                        Command="{Binding #ObjectNameListBox.((search:SearchResultsViewModel)DataContext).SearchObjectNameCommand}"
-                                        CommandParameter="{Binding}"
-                                        Header="Search" />
-                                </ContextMenu>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                    <Style Selector="ListBoxItem">
-                        <Setter Property="Padding" Value="0" />
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    </Style>
-                </ListBox.Styles>
-                <ListBox.ItemTemplate>
-                    <DataTemplate DataType="system:String">
-                        <TextBlock
-                            Padding="12,9,12,12"
-                            Background="Transparent"
-                            Text="{Binding}">
-                            <interactivity:Interaction.Behaviors>
-                                <ia:EventTriggerBehavior EventName="DoubleTapped">
-                                    <ia:InvokeCommandAction Command="{Binding #ObjectNameListBox.((search:SearchResultsViewModel)DataContext).SearchObjectNameCommand}" CommandParameter="{Binding}" />
-                                </ia:EventTriggerBehavior>
-                            </interactivity:Interaction.Behaviors>
-                        </TextBlock>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </StackPanel>
+                <ListBox
+                    x:Name="ObjectNameListBox"
+                    Margin="0,12,0,0"
+                    Background="#333538"
+                    BorderBrush="#55656565"
+                    BorderThickness="1"
+                    ItemsSource="{Binding DistinctObjectNames}">
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="ContextMenu">
+                                <Setter.Value>
+                                    <ContextMenu>
+                                        <MenuItem
+                                            Command="{Binding #ObjectNameListBox.((search:SearchResultsViewModel)DataContext).SearchObjectNameCommand}"
+                                            CommandParameter="{Binding}"
+                                            Header="Search" />
+                                    </ContextMenu>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        </Style>
+                    </ListBox.Styles>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="system:String">
+                            <TextBlock
+                                Padding="12,9,12,12"
+                                Background="Transparent"
+                                Text="{Binding}">
+                                <interactivity:Interaction.Behaviors>
+                                    <ia:EventTriggerBehavior EventName="DoubleTapped">
+                                        <ia:InvokeCommandAction Command="{Binding #ObjectNameListBox.((search:SearchResultsViewModel)DataContext).SearchObjectNameCommand}" CommandParameter="{Binding}" />
+                                    </ia:EventTriggerBehavior>
+                                </interactivity:Interaction.Behaviors>
+                            </TextBlock>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Grid>
     </Grid>
 </UserControl>
