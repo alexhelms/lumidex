@@ -10,6 +10,7 @@ using Lumidex.Features.MainSearch.Filters;
 using Lumidex.Features.MainSearch.Messages;
 using Lumidex.Features.Tags.Messages;
 using Lumidex.Services;
+using System.Collections;
 using System.IO.Abstractions;
 
 namespace Lumidex.Features.MainSearch;
@@ -44,6 +45,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
     [ObservableProperty] ObservableCollectionEx<FilterViewModelBase> _activeFilters = new();
     [ObservableProperty] ObservableCollectionEx<ImageFileViewModel> _selectedSearchResults = new();
     [ObservableProperty] ObservableCollectionEx<IntegrationStatistic> _integrationStats = new();
+    [ObservableProperty] DataGridCollectionView? _statsView;
     [ObservableProperty] ObservableCollectionEx<string> _distinctObjectNames = new();
     [ObservableProperty] int _selectedSearchResultsCount;
 
@@ -93,6 +95,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
             ActiveFilters = new(message.Filters);
             SearchResults.Clear();
             IntegrationStats.Clear();
+            StatsView = null;
             DistinctObjectNames.Clear();
             TotalIntegration = null;
             TypeAggregate = null;
@@ -116,6 +119,11 @@ public partial class SearchResultsViewModel : ViewModelBase,
         {
             var stats = ComputeIntegrationStatistics(message.SearchResults);
             IntegrationStats.AddRange(stats);
+            StatsView = new DataGridCollectionView(IntegrationStats);
+            StatsView.SortDescriptions.Add(DataGridSortDescription.FromPath(
+                nameof(IntegrationStatistic.TotalIntegration),
+                System.ComponentModel.ListSortDirection.Descending,
+                Comparer<TimeSpan>.Default));
 
             double totalIntegrationSum = IntegrationStats.Sum(x => x.TotalIntegration.TotalHours);
             TotalIntegration = totalIntegrationSum < 1
