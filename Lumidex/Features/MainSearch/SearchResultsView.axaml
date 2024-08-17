@@ -492,7 +492,7 @@
                 CanUserSortColumns="True"
                 GridLinesVisibility="Horizontal"
                 IsReadOnly="True"
-                ItemsSource="{Binding IntegrationStats}"
+                ItemsSource="{Binding StatsView}"
                 SelectionMode="Single">
                 <DataGrid.Styles>
                     <Style Selector="ScrollBar">
@@ -510,7 +510,8 @@
                     <DataGridTextColumn
                         x:DataType="search:IntegrationStatistic"
                         Binding="{Binding TotalIntegrationDisplay}"
-                        Header="Total (hr)" />
+                        Header="Total (hr)"
+                        SortMemberPath="TotalIntegration" />
                     <DataGridTextColumn
                         x:DataType="search:IntegrationStatistic"
                         Binding="{Binding CountDisplay}"
@@ -558,15 +559,15 @@
                             </Setter.Value>
                         </Setter>
                     </Style>
-					<Style Selector="ListBoxItem">
-						<Setter Property="Padding" Value="0" />
-						<Setter Property="HorizontalContentAlignment" Value="Stretch" />
-					</Style>
+                    <Style Selector="ListBoxItem">
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
                 </ListBox.Styles>
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="system:String">
                         <TextBlock
-							Padding="12,9,12,12"
+                            Padding="12,9,12,12"
                             Background="Transparent"
                             Text="{Binding}">
                             <interactivity:Interaction.Behaviors>
