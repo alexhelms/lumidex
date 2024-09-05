@@ -11,6 +11,9 @@
     </Application.DataTemplates>
 
     <Application.Styles>
+        <Style Selector="Window[WindowState=Maximized]">
+            <Setter Property="Padding" Value="8" />
+        </Style>
         <FluentTheme>
             <FluentTheme.Palettes>
                 <ColorPaletteResources
@@ -48,5 +51,4 @@
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
         <dialogHostAvalonia:DialogHostStyles />
     </Application.Styles>
-
 </Application>
