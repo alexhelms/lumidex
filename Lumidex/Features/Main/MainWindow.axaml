@@ -26,9 +26,4 @@
         OverlayBackground="#44dddddd">
         <main:MainView />
     </dialogs:ReactiveDialogHost>
-    <Window.Styles>
-        <Style Selector="Window[WindowState=Maximized]">
-            <Setter Property="Padding" Value="8" />
-        </Style>
-    </Window.Styles>
 </Window>
