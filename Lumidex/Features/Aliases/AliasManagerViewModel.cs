@@ -235,7 +235,7 @@ public partial class AliasManagerViewModel : ValidatableViewModelBase,
     {
         if (SelectedItem?.ObjectName is { } objectName)
         {
-            Messenger.Send(new ObjectNameSearchFill(objectName));
+            Messenger.Send(new ObjectNameSearchFill($"\"{objectName}\""));
             Messenger.Send(new ChangeSideTab(SideNavBarViewModel.SearchTabName));
         }
     }

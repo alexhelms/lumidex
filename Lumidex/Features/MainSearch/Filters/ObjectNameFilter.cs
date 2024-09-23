@@ -15,21 +15,30 @@ public partial class ObjectNameFilter : FilterViewModelBase
     {
         if (Name is { Length: > 0 })
         {
-            // Create a set that contains the user's filter, any matching alias, and any matching object name
-            var aliases = new HashSet<string>([Name], StringComparer.InvariantCultureIgnoreCase);
+            if (Name.StartsWith('"') && Name.EndsWith('"'))
+            {
+                var objectName = Name[1..^1];
+                query = query.Where(f => f.ObjectName == objectName);
+            }
+            else 
+            { 
+                // Create a set that contains the user's filter, any matching alias, and any matching object name
+                var aliases = new HashSet<string>([Name], StringComparer.InvariantCultureIgnoreCase);
 
-            aliases.UnionWith(dbContext.ObjectAliases
-                .Where(a => EF.Functions.Like(a.Alias, $"%{Name}%"))
-            .Select(a => a.ObjectName));
+                aliases.UnionWith(dbContext.ObjectAliases
+                    .Where(a => EF.Functions.Like(a.Alias, $"%{Name}%"))
+                .Select(a => a.ObjectName));
 
-            aliases.UnionWith(dbContext.ImageFiles
-                .Where(f => f.ObjectName != null)
-                .Select(f => f.ObjectName)
-                .Where(objectName => EF.Functions.Like(objectName, $"%{Name}%"))!);
+                aliases.UnionWith(dbContext.ImageFiles
+                    .Where(f => f.ObjectName != null)
+                    .Select(f => f.ObjectName)
+                    .Where(objectName => EF.Functions.Like(objectName, $"%{Name}%"))!);
 
-            query = query
-                .Where(f => f.ObjectName != null)
-                .Where(f => aliases.Contains(f.ObjectName!));
+                query = query
+                    .Where(f => f.ObjectName != null)
+                    .Where(f => aliases.Contains(f.ObjectName!));
+            
+            }
         }
 
         return query;
