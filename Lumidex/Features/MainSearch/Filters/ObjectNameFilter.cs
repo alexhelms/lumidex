@@ -15,9 +15,10 @@ public partial class ObjectNameFilter : FilterViewModelBase
     {
         if (Name is { Length: > 0 })
         {
-            if (Name.StartsWith("\"") && Name.EndsWith("\""))
+            if (Name.StartsWith('"') && Name.EndsWith('"'))
             {
-                query = query.Where(f => f.ObjectName == Name.Substring(1, Name.Length - 2));
+                var objectName = Name[1..^1];
+                query = query.Where(f => f.ObjectName == objectName);
             }
             else 
             { 
