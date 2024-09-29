@@ -25,7 +25,7 @@ DisableDirPage=yes
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 DisableProgramGroupPage=yes
-PrivilegesRequired=lowest
+PrivilegesRequired=admin
 OutputDir=dist/win
 OutputBaseFilename={#MyAppName}-{#MyAppProductVersion}-win
 SetupIconFile=Lumidex\Assets\lumidex-icon.ico
@@ -45,6 +45,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "{#MyAppSourceFolder}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "LICENSE.md"; DestDir: "{app}"; Flags: ignoreversion
+Source: "installer\VC_redist.x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; 
@@ -52,3 +53,7 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{tmp}\VC_redist.x64.exe"; \
+  StatusMsg: "Installing VC++ 14.40.33810.0 x64"; \
+  Parameters: "/q /passive /Q:a /c:""msiexec /q /i vcredist.msi"""; Flags: waituntilterminated
+ 
