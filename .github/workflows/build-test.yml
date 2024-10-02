@@ -73,12 +73,13 @@ jobs:
         with:
           if-no-files-found: error
           retention-days: 7
-          name: windows-installer
+          name: lumidex-windows
           path: dist/win/*.exe
 
   # create the app bundle so we know it will work come release
   macos-app-bundle:
     runs-on: ubuntu-24.04
+    needs: [build-win]
     permissions:
       contents: read
     steps:
@@ -97,5 +98,13 @@ jobs:
 
       - name: Build the App Bundle
         run: |
+          VERSION=(dotnet tool run dotnet-gitversion /showvariable SemVer)
           chmod +x scripts/package-macos-app.sh
-          scripts/package-macos-app.sh
+          scripts/package-macos-app.sh $VERSION
+
+      - name: Upload app bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: lumidex-macos
+          path: dist/Lumidex*.app.zip
+          retention-days: 7

@@ -2,6 +2,7 @@
 set -e
 
 APP_NAME="Lumidex"
+VERSION=${1:-"0.0.0"}
 INFO_PLIST="./macos/Info.plist"
 ICON_FILE="./macos/Lumidex.icns"
 PROJECT_NAME="Lumidex.Desktop"
@@ -59,8 +60,8 @@ lipo -create \
 echo "Universal binary created"
 
 echo "Creating app bundle..."
-APP_OUTPUT="dist/${APP_NAME}.app"
-APP_OUTPUT_ZIP="dist/${APP_NAME}.app.zip"
+APP_OUTPUT="dist/${APP_NAME}-${VERSION}.app"
+APP_OUTPUT_ZIP="dist/${APP_NAME}-${VERSION}.app.zip"
 
 rm -rf "${APP_OUTPUT}"
 rm -rf "${APP_OUTPUT_ZIP}"
