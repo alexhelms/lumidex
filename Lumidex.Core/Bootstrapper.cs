@@ -1,8 +1,5 @@
 ﻿using Lumidex.Core.IO;
 using Serilog;
-using System.Diagnostics;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Lumidex.Core;
@@ -11,18 +8,11 @@ public static class Bootstrapper
 {
     private static string LogPath = Path.Combine(LumidexPaths.Logs, "lumidex.log");
 
-#pragma warning disable CA2255 // The 'ModuleInitializer' attribute should not be used in libraries
-    [ModuleInitializer]
-#pragma warning restore CA2255 // The 'ModuleInitializer' attribute should not be used in libraries
-    internal static void InitializeModule()
-    {
-        RuntimeHelpers.RunClassConstructor(typeof(NativeLoader).TypeHandle);
-    }
-
     public static void Start()
     {
         InitializeLogger();
         LogApplicationInfo();
+        NativeLibraryChecks();
     }
 
     public static void Stop()
@@ -52,5 +42,11 @@ public static class Bootstrapper
         Log.Information("{OS} {Architecture}", LumidexUtil.OSDescription, LumidexUtil.OSArchitecture);
         Log.Information("{Dotnet} {RuntimeIdentifier}", RuntimeInformation.FrameworkDescription, RuntimeInformation.RuntimeIdentifier);
         Log.Information("Logs located at {Path}", LogPath);
+    }
+
+    private static void NativeLibraryChecks()
+    {
+        // Invoking this calls the static ctor which checks cfitsio for reentrancy flag.
+        _ = FitsFile.Native.FitsIsReentrant();
     }
 }

@@ -33,23 +33,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="lib\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="lib\linux\libcfitsio.so">
+    <None Update="runtimes\linux-x64\native\libcfitsio.so">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="lib\macos\libcfitsio.dylib">
+    <None Update="runtimes\osx-arm64\native\libcfitsio.dylib">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="lib\windows\cfitsio.dll">
+    <None Update="runtimes\osx-x64\native\libcfitsio.dylib">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="lib\windows\pthreadVC3.dll">
+    <None Update="runtimes\win-x64\native\cfitsio.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="lib\windows\zlib1.dll">
+    <None Update="runtimes\win-x64\native\pthreadVC3.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="runtimes\win-x64\native\zlib1.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

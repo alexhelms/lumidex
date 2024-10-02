@@ -79,7 +79,7 @@ public partial class FitsFile
         {
             // cfitsio MUST be compiled to support reentrancy!
             if (FitsIsReentrant() == false)
-                throw new NotImplementedException();
+                throw new InvalidOperationException("cfitsio was not compiled with the REENTRANT flag");
         }
 
         internal static void ThrowIfNotOk(ErrorCode status)
