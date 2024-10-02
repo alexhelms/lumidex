@@ -98,7 +98,7 @@ jobs:
 
       - name: Build the App Bundle
         run: |
-          VERSION=(dotnet tool run dotnet-gitversion /showvariable SemVer)
+          VERSION=$(dotnet tool run dotnet-gitversion /showvariable SemVer)
           chmod +x scripts/package-macos-app.sh
           scripts/package-macos-app.sh $VERSION
 
