@@ -60,11 +60,11 @@ lipo -create \
 echo "Universal binary created"
 
 echo "Creating app bundle..."
-APP_OUTPUT="dist/${APP_NAME}-${VERSION}.app"
-APP_OUTPUT_ZIP="dist/${APP_NAME}-${VERSION}.app.zip"
+APP_BUNDLE="${APP_NAME}.app"
+APP_OUTPUT="dist/${APP_BUNDLE}"
+APP_OUTPUT_ZIP="${APP_NAME}-${VERSION}-macos.app.zip"
 
 rm -rf "${APP_OUTPUT}"
-rm -rf "${APP_OUTPUT_ZIP}"
 
 mkdir -p "${APP_OUTPUT}"
 mkdir -p "${APP_OUTPUT}/Contents"
@@ -75,11 +75,14 @@ cp "${INFO_PLIST}" "${APP_OUTPUT}/Contents/Info.plist"
 cp "${ICON_FILE}" "${APP_OUTPUT}/Contents/Resources/Lumidex.icns"
 cp -a "${OUTPUT_DIR}/." "${APP_OUTPUT}/Contents/MacOS/"
 
+chmod -R 755 "${APP_OUTPUT}/Contents/MacOS"
+
 echo "Adhoc signing app bundle..."
 ./rcodesign sign "${APP_OUTPUT}"
 
 echo "Zipping app bundle..."
-zip -r "${APP_OUTPUT_ZIP}" "${APP_OUTPUT}"
-zipinfo "${APP_OUTPUT_ZIP}"
+rm -rf "${APP_OUTPUT_ZIP}"
+(cd dist && zip -r - "${APP_BUNDLE}") > "dist/${APP_OUTPUT_ZIP}"
+zipinfo "dist/${APP_OUTPUT_ZIP}"
 
 echo "Done!"
