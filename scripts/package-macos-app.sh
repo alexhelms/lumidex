@@ -6,6 +6,8 @@ INFO_PLIST="./macos/Info.plist"
 ICON_FILE="./macos/Lumidex.icns"
 PROJECT_NAME="Lumidex.Desktop"
 OUTPUT_DIR="publish-osx-universal"
+
+LIPO_URL="https://github.com/konoui/lipo/releases/latest/download/lipo_Linux_amd64"
 RCODESIGN_URL="https://github.com/indygreg/apple-platform-rs/releases/download/apple-codesign%2F0.27.0/apple-codesign-0.27.0-x86_64-unknown-linux-musl.tar.gz"
 
 build_for_arch() {
@@ -24,6 +26,16 @@ build_for_arch() {
 	cp -a "publish-osx-${arch}/runtimes/osx-${arch}/native/." "publish-osx-${arch}/"
 	rm -rf "publish-osx-${arch}/runtimes/"
 }
+
+echo "Getting lipo..."
+curl -L -o /tmp/lipo "${LIPO_URL}"
+chmod +x /tmp/lipo
+sudo mv /tmp/lipo /usr/local/bin
+
+echo "Getting rcodesign..."
+wget -O /tmp/codesign.tar.gz "${RCODESIGN_URL}"
+tar zxvf /tmp/codesign.tar.gz -C /tmp
+mv /tmp/apple-codesign-*/rcodesign .
 
 rm -rf "publish-osx-*"
 build_for_arch "x64"
@@ -63,9 +75,6 @@ cp "${ICON_FILE}" "${APP_OUTPUT}/Contents/Resources/Lumidex.icns"
 cp -a "${OUTPUT_DIR}/." "${APP_OUTPUT}/Contents/MacOS/"
 
 echo "Adhoc signing app bundle..."
-wget -O /tmp/codesign.tar.gz "${RCODESIGN_URL}"
-tar zxvf /tmp/codesign.tar.gz -C /tmp
-mv /tmp/apple-codesign-*/rcodesign .
 ./rcodesign sign "${APP_OUTPUT}"
 
 echo "Zipping app bundle..."
