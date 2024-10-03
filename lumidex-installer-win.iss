@@ -35,6 +35,7 @@ LZMAUseSeparateProcess=yes
 LZMANumBlockThreads=6
 WizardStyle=modern
 UninstallDisplayIcon={app}\{#MyAppExeName}
+RestartIfNeededByRun=no
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -55,5 +56,5 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 Filename: "{tmp}\VC_redist.x64.exe"; \
   StatusMsg: "Installing VC++ 14.40.33810.0 x64"; \
-  Parameters: "/q /passive /Q:a /c:""msiexec /q /i vcredist.msi"""; Flags: waituntilterminated
+  Parameters: "/q /passive /Q:a /c:""msiexec /q /norestart /i vcredist.msi"""; Flags: waituntilterminated
  
