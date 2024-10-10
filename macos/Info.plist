@@ -8,6 +8,8 @@
     <string>com.lumidex</string>
     <key>CFBundleName</key>
     <string>Lumidex</string>
+    <key>CFBundleDisplayName</key>
+    <string>Lumidex</string>
     <key>CFBundleVersion</key>
     <string>1.0.0</string>
     <key>LSMinimumSystemVersion</key>
