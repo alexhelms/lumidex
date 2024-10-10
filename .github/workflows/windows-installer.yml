@@ -17,21 +17,28 @@ jobs:
     permissions:
       contents: write
     steps:
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Restore
         run: dotnet restore ${{ env.PROJECT }}
+
       - name: Tools
         run: dotnet tool restore
+
       - name: Publish
         run: dotnet publish ${{ env.PROJECT }} -r win-x64 --self-contained -c Release -o publish-win
+
       - name: Show Version
         run: dotnet tool run dotnet-gitversion
+
       - name: Installer
         run: |
           $VERSION=(dotnet tool run dotnet-gitversion /showvariable SemVer)
           & 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' lumidex-installer-win.iss /DMyAppProductVersion=${VERSION}
+
       - name: Upload to release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
