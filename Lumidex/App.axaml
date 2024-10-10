@@ -4,7 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:dialogHostAvalonia="using:DialogHostAvalonia"
     xmlns:local="using:Lumidex"
-    RequestedThemeVariant="Dark">
+    RequestedThemeVariant="Dark"
+    Name="Lumidex">
 
     <Application.DataTemplates>
         <local:ViewLocator />
@@ -51,4 +52,9 @@
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
         <dialogHostAvalonia:DialogHostStyles />
     </Application.Styles>
+
+    <NativeMenu.Menu>
+        <NativeMenu />
+    </NativeMenu.Menu>
+
 </Application>
