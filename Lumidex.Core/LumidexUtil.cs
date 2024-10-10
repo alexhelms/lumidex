@@ -36,4 +36,10 @@ public static class LumidexUtil
     public static string OSDescription { get; } = RuntimeInformation.OSDescription;
 
     public static string UserAgent { get; } = $"Lumidex/{Version} ({OSDescription}) ({OSArchitecture})";
+
+    public static bool IsWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+    public static bool IsMacOS => RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+
+    public static bool IsLinux => RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 }

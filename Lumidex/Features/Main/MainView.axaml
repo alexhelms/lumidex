@@ -6,6 +6,7 @@
     xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:Lumidex.Features.Main"
+    xmlns:avalonia="using:Avalonia"
     d:DesignHeight="450"
     d:DesignWidth="800"
     x:DataType="vm:MainViewModel"
@@ -13,16 +14,23 @@
     <DockPanel>
 
         <Grid
-            Height="32"
+            Height="28"
             ColumnDefinitions="Auto,1*,1*,1*"
             DockPanel.Dock="Top">
-            <Panel Grid.Column="0" Width="48">
+            <Border Grid.Column="0" Width="48" Classes.ismacos="{ReflectionBinding Source={x:Static avalonia:Application.Current}, Path=IsMacOS, Mode=OneTime}">
+                <Border.Styles>
+                    <Style Selector="Border.ismacos">
+                        <Style.Setters>
+                            <Setter Property="Margin" Value="56,0,0,0" />
+                        </Style.Setters>
+                    </Style>
+                </Border.Styles>
                 <Image
                     Width="24"
                     Height="24"
                     HorizontalAlignment="Center"
                     Source="/Assets/lumidex-icon-small.png" />
-            </Panel>
+            </Border>
             <Menu Grid.Column="1" Background="{x:Null}">
                 <MenuItem Header="_File">
                     <MenuItem Command="{Binding ExitApplicationCommand}" Header="E_xit" />
