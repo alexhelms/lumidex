@@ -14,7 +14,7 @@
     <DockPanel>
 
         <Grid
-            Height="28"
+            Height="{Binding TopBarHeight}"
             ColumnDefinitions="Auto,1*,1*,1*"
             DockPanel.Dock="Top">
             <Border Grid.Column="0" Width="48" Classes.ismacos="{ReflectionBinding Source={x:Static avalonia:Application.Current}, Path=IsMacOS, Mode=OneTime}">

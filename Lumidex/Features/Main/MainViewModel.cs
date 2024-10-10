@@ -8,6 +8,7 @@ using Lumidex.Services;
 using Lumidex.Features.Settings;
 using Lumidex.Core.IO;
 using Lumidex.Features.Main.Messages;
+using Lumidex.Core;
 
 namespace Lumidex.Features.Main;
 
@@ -25,6 +26,7 @@ public partial class MainViewModel : ViewModelBase,
 
     [ObservableProperty] private SideNavBarViewModel _sideNavBarViewModel = null!;
     [ObservableProperty] private object? _selectedTab;
+    [ObservableProperty] int _topBarHeight;
 
     public MainViewModel(
         SystemService systemService,
@@ -46,6 +48,9 @@ public partial class MainViewModel : ViewModelBase,
         _tagManagerViewModel = tagManagerViewModel;
         _libraryManagerViewModel = libraryManagerViewModel;
         _settingsViewModel = settingsViewModel;
+
+        // 28px for MacOS so traffic light is vertically centered.
+        TopBarHeight = LumidexUtil.IsMacOS ? 28 : 30;
     }
 
     protected override void OnActivated()
