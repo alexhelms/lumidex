@@ -9,6 +9,11 @@ namespace Lumidex;
 
 public partial class App : Application
 {
+    public static readonly StyledProperty<bool> IsMacOSProperty =
+        AvaloniaProperty.Register<App, bool>(nameof(Lumidex.Core.LumidexUtil.IsMacOS),
+            defaultValue: Lumidex.Core.LumidexUtil.IsMacOS,
+            defaultBindingMode: Avalonia.Data.BindingMode.OneWay);
+
     public override void Initialize()
     {
         this.EnableHotReload();
