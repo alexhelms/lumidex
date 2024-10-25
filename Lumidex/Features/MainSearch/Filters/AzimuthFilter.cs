@@ -17,16 +17,24 @@ public partial class AzimuthFilter : FilterViewModelBase
 
     public override IQueryable<ImageFile> ApplyFilter(LumidexDbContext dbContext, IQueryable<ImageFile> query)
     {
-        if (MinValue is { } min)
-        {
-            var minimum = (double)min;
-            query = query.Where(f => f.Azimuth >= minimum);
-        }
+        double minimum = MinValue.HasValue ? (double)MinValue.Value : 0;
+        double maximum = MaxValue.HasValue ? (double)MaxValue.Value : double.MaxValue;
 
-        if (MaxValue is { } max)
+        if (minimum > maximum)
         {
-            var maximum = (double)max;
-            query = query.Where(f => f.Azimuth <= maximum);
+            query = query.Where(f => f.Azimuth >= minimum || f.Azimuth <= maximum);
+        }
+        else
+        {
+            if (minimum > 0)
+            {
+                query = query.Where(f => f.Azimuth >= minimum);
+            }
+
+            if (maximum < double.MaxValue)
+            {
+                query = query.Where(f => f.Azimuth <= maximum);
+            }
         }
 
         return query;
