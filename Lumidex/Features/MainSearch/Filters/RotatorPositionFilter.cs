@@ -17,8 +17,8 @@ public partial class RotatorPositionFilter : FilterViewModelBase
 
     public override IQueryable<ImageFile> ApplyFilter(LumidexDbContext dbContext, IQueryable<ImageFile> query)
     {
-        var minimum = (double?)(MinValue is { } min ? min : 0);
-        var maximum = (double?)MaxValue is { } max ? max : double.MaxValue;
+        double minimum = MinValue.HasValue ? (double)MinValue.Value : 0;
+        double maximum = MaxValue.HasValue ? (double)MaxValue.Value : double.MaxValue;
 
         if (minimum > maximum)
         {
