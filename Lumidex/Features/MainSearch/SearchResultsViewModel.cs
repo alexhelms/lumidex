@@ -11,6 +11,7 @@ using Lumidex.Features.MainSearch.Messages;
 using Lumidex.Features.Tags.Messages;
 using Lumidex.Services;
 using System.IO.Abstractions;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Lumidex.Features.MainSearch;
@@ -320,7 +321,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
         IFileInfo fileInfo = _fileSystem.FileInfo.New(imageFile.Path);
         if (fileInfo.Exists)
         {
-            await _systemService.OpenInExplorer($"\"{fileInfo.FullName}\"");
+            await _systemService.OpenInExplorer(fileInfo.FullName);
         }
     }
 
@@ -330,8 +331,15 @@ public partial class SearchResultsViewModel : ViewModelBase,
         IFileInfo fileInfo = _fileSystem.FileInfo.New(imageFile.Path);
         if (fileInfo.Exists)
         {
-            // TODO: Application setting to specify PixInsight.exe path?
-            await _systemService.StartProcess(@"C:\Program Files\PixInsight\bin\PixInsight.exe", $"\"{fileInfo.FullName}\"");
+            // TODO: Application setting to specify PixInsight path?
+
+            string pixPath = @"C:\Program Files\PixInsight\bin\PixInsight.exe";
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                pixPath = @"/Applications/PixInsight/PixInsight.app/Contents/MacOS/PixInsight";
+            }
+
+            await _systemService.StartProcess(pixPath, $"\"{fileInfo.FullName}\"");
         }
     }
 

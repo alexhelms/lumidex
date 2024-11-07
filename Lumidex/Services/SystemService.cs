@@ -18,7 +18,11 @@ public class SystemService
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            await StartProcess("explorer.exe", $"\"{url}\"");
+            await StartProcess("explorer", $"\"{url}\"");
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            await StartProcess("open", $"-u \"{url}\"");
         }
         else
         {
@@ -30,7 +34,11 @@ public class SystemService
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            await StartProcess("explorer.exe", $"/select,\"{path}\"");
+            await StartProcess("explorer", $"/select,\"{path}\"");
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            await StartProcess("open", $"-R \"{path}\"");
         }
         else
         {
