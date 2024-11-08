@@ -46,8 +46,8 @@ jobs:
           path: dist/Lumidex*.app.zip
           retention-days: 7
 
-      # - name: Upload to release
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   run: |
-      #     gh release upload ${GITHUB_REF_NAME} .\dist\Lumidex-*.app.zip
+      - name: Upload to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${GITHUB_REF_NAME} .\dist\Lumidex-*.app.zip

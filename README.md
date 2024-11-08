@@ -3,12 +3,13 @@
 Organize your astrophotography library.
 
 Lumidex scans folders with your image files, reads the headers, and builds a database.
-Data is never altered in any way.
+You original data is never altered.
 
 ## Features
-- Windows only for now, Linux and MacOS support soon
+- Windows and MacOS support
+  - Debian-based linux distros should also work but no dpkg is available
 - .FITS and .XISF files
-- Multiple libraries
+- Multiple libraries support scanning files in multiple locations
 - Search -> Search your library to find the images you're looking for
 - Aliases -> Assign multiple names to object names from the headers
 - Tags -> Group your images with tags
@@ -22,7 +23,7 @@ Data is never altered in any way.
 
 ## Get Lumidex
 
-Check out the repo [releases](https://github.com/alexhelms/lumidex/releases) to download an installer.
+Check out the [releases](https://github.com/alexhelms/lumidex/releases) to download Lumidex.
 
 ## Screenshots
 
