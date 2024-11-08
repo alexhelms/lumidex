@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="https://github.com/projektanker/icons.avalonia"
     xmlns:library="using:Lumidex.Features.Library"
+    xmlns:lumidex="using:Lumidex"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="450"
     d:DesignWidth="800"
@@ -146,7 +147,7 @@
                                         <MenuItem
                                             Command="{Binding #ErrorsDataGrid.((library:LibraryViewModel)DataContext).OpenInExplorerCommand}"
                                             CommandParameter="{ReflectionBinding Filename}"
-                                            Header="Open in Explorer" />
+                                            Header="{Binding Source={x:Static lumidex:Constants.OpenInExplorer}}" />
                                     </ContextMenu>
                                 </Setter.Value>
                             </Setter>
@@ -204,7 +205,7 @@
                                     <MenuItem
                                         Command="{Binding #DuplicatesDataGrid.((library:LibraryViewModel)DataContext).OpenInExplorerCommand}"
                                         CommandParameter="{ReflectionBinding Filename}"
-                                        Header="Open in Explorer" />
+                                        Header="{Binding Source={x:Static lumidex:Constants.OpenInExplorer}}" />
                                 </ContextMenu>
                             </Setter.Value>
                         </Setter>

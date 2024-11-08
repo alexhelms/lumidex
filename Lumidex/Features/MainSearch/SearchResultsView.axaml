@@ -10,6 +10,7 @@
     xmlns:i="https://github.com/projektanker/icons.avalonia"
     xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
     xmlns:interactivity="using:Avalonia.Xaml.Interactivity"
+    xmlns:lumidex="using:Lumidex"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:search="using:Lumidex.Features.MainSearch"
     xmlns:system="using:System"
@@ -163,7 +164,7 @@
                                         <MenuItem
                                             Command="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).OpenInExplorerCommand}"
                                             CommandParameter="{Binding}"
-                                            Header="Open in Explorer"
+                                            Header="{Binding Source={x:Static lumidex:Constants.OpenInExplorer}}"
                                             IsEnabled="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).SelectedSearchResultsCount, Converter={x:Static converter:FuncConverters.EqualToOne}}" />
                                     </ContextMenu>
                                 </Setter.Value>
@@ -546,16 +547,16 @@
                 ResizeDirection="Rows" />
 
             <DockPanel Grid.Row="2">
-                <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+                <Grid Margin="5,5,5,0" DockPanel.Dock="Top">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Column="0" Text="Objects"/>
+                    <TextBlock Grid.Column="0" Text="Objects" />
                     <TextBlock
                         Grid.Column="1"
-						VerticalAlignment="Center"
+                        VerticalAlignment="Center"
                         Text="{Binding DistinctObjectNames.Count}"
                         TextAlignment="Right" />
 
