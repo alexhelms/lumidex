@@ -1,5 +1,6 @@
 ﻿using Projektanker.Icons.Avalonia.FontAwesome;
 using Serilog;
+using System.Diagnostics;
 
 namespace Lumidex.Desktop;
 
@@ -21,6 +22,11 @@ class Program
         {
             Log.Fatal(e, "Unhandled application exception");
             // TODO: Try to open some kind of message box
+
+            if (Debugger.IsAttached)
+            {
+                Debugger.Break();
+            }
         }
         finally
         {
