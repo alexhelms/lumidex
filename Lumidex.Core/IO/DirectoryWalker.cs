@@ -28,6 +28,12 @@ public static class DirectoryWalker
             yield break;
         }
 
+        // $ are windows system folders we can skip
+        if (dirInfo.Name.StartsWith('$'))
+        {
+            yield break;
+        }
+
         var patternString = string.Join('|', extensions.Select(ext => $@"\.{ext}"));
         var pattern = new Regex(patternString, RegexOptions.IgnoreCase);
         var stack = new Stack<IDirectoryInfo>();
@@ -43,12 +49,11 @@ public static class DirectoryWalker
             {
                 files = currentDir
                     .EnumerateFiles()
+                    .IgnoreExceptions()
                     .Where(fileInfo => pattern.IsMatch(fileInfo.Extension));
             }
-            catch (UnauthorizedAccessException)
-            {
-                continue;
-            }
+            catch (UnauthorizedAccessException) { }
+            catch (PathTooLongException) { }
 
             foreach (var file in files)
             {
@@ -65,8 +70,23 @@ public static class DirectoryWalker
                 }
             }
 
-            foreach (var dir in currentDir.EnumerateDirectories())
+            IEnumerable<IDirectoryInfo> directories = [];
+
+            try
             {
+                directories = currentDir
+                    .EnumerateDirectories()
+                    .IgnoreExceptions();
+            }
+            catch (UnauthorizedAccessException) { }
+            catch (PathTooLongException) { }
+
+            foreach (var dir in directories)
+            {
+                // $ are windows system folders we can skip
+                if (dir.Name.StartsWith('$'))
+                    continue;
+
                 stack.Push(dir);
             }
         }
