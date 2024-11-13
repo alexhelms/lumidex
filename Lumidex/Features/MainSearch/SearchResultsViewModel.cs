@@ -234,7 +234,7 @@ public partial class SearchResultsViewModel : ViewModelBase,
 
         if (dirs?.Count == 1)
         {
-            var destinationDirectory = Uri.UnescapeDataString(dirs[0].Path.AbsolutePath);
+            var destinationDirectory = dirs[0].Path.ToPath();
             if (Directory.Exists(destinationDirectory))
             {
                 var vm = _fileExportViewModelFactory();
