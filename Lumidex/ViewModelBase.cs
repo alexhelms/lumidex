@@ -91,8 +91,6 @@ public class ValidatableViewModelBase : ObservableValidator, IViewModelBase, IAc
 
     protected ValidatableViewModelBase(IMessenger messenger)
     {
-        ArgumentNullException.ThrowIfNull(nameof(messenger));
-
         Messenger = messenger;
     }
 
