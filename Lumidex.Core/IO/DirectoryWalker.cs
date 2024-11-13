@@ -37,8 +37,20 @@ public static class DirectoryWalker
         while (stack.Count > 0)
         {
             var currentDir = stack.Pop();
-            var files = currentDir.EnumerateFiles()
-                .Where(fileInfo => pattern.IsMatch(fileInfo.Extension));
+
+            IEnumerable<IFileInfo>? files = [];
+
+            try
+            {
+                files = currentDir
+                    .EnumerateFiles()
+                    .Where(fileInfo => pattern.IsMatch(fileInfo.Extension));
+            }
+            catch (UnauthorizedAccessException)
+            {
+                continue;
+            }
+
             foreach (var file in files)
             {
                 if (startDateUtc.HasValue)
