@@ -1,5 +1,6 @@
 ﻿using Lumidex.Core.IO;
 using Serilog;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace Lumidex.Core;
@@ -10,6 +11,8 @@ public static class Bootstrapper
 
     public static void Start()
     {
+        NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), DllImportResolver);
+
         InitializeLogger();
         LogApplicationInfo();
         NativeLibraryChecks();
@@ -48,5 +51,26 @@ public static class Bootstrapper
     {
         // Invoking this calls the static ctor which checks cfitsio for reentrancy flag.
         _ = FitsFile.Native.FitsIsReentrant();
+    }
+
+    private static IntPtr DllImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
+    {
+        var prefix = string.Empty;
+        var extension = ".dll";
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            prefix = "lib";
+            extension = ".so";
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            prefix = "lib";
+            extension = ".dylib";
+        }
+
+        IntPtr handle = IntPtr.Zero;
+        NativeLibrary.TryLoad($"./runtimes/{RuntimeInformation.RuntimeIdentifier}/native/{prefix}{libraryName}{extension}", assembly, searchPath, out handle);
+        return handle;
     }
 }
