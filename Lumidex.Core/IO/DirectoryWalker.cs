@@ -37,7 +37,6 @@ public static class DirectoryWalker
         while (stack.Count > 0)
         {
             var currentDir = stack.Pop();
-
             IEnumerable<IFileInfo>? files = [];
 
             try
