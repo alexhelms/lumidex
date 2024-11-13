@@ -12,37 +12,44 @@ public class XisfHeaderHasher : HeaderHasher
             throw new FileNotFoundException("XISF file not found", filename);
         }
 
-        Memory<byte> headerBuffer = new byte[16];
-
-        await using var fs = new FileStream(filename,FileMode.Open, FileAccess.Read);
-        await fs.ReadExactlyAsync(headerBuffer);
-
-        if (!XisfFile.XisfSignature.AsSpan().SequenceEqual(headerBuffer[..8].Span))
+        try
         {
-            throw new InvalidOperationException("File is not an XISF");
-        }
+            using var sha1 = SHA1.Create();
+            Memory<byte> headerBuffer = new byte[16];
 
-        int headerLength = Math.Max(0, BitConverter.ToInt32(headerBuffer[8..12].Span));
-        headerLength = Math.Min(headerLength, (int) fileInfo.Length);
+            await using var fs = new FileStream(filename,FileMode.Open, FileAccess.Read);
+            await fs.ReadExactlyAsync(headerBuffer, token);
 
-        int count = 0;
-        int offset = 0;
-        byte[] fileBuffer = new byte[8192];
-        using var sha1 = SHA1.Create();
-
-        while ((count = await fs.ReadAsync(fileBuffer, token)) != 0)
-        {
-            sha1.TransformBlock(fileBuffer, 0, count, null, 0);
-
-            if (offset + count >= headerLength)
+            if (!XisfFile.XisfSignature.AsSpan().SequenceEqual(headerBuffer[..8].Span))
             {
-                sha1.TransformFinalBlock(fileBuffer, 0, headerLength - offset);
-                break;
+                throw new InvalidOperationException("File is not an XISF");
             }
 
-            offset += count;
-        }
+            int headerLength = Math.Max(0, BitConverter.ToInt32(headerBuffer[8..12].Span));
+            headerLength = Math.Min(headerLength, (int)fileInfo.Length);
 
-        return sha1.Hash ?? Array.Empty<byte>();
+            int count = 0;
+            int offset = 0;
+            byte[] fileBuffer = new byte[8192];
+
+            while ((count = await fs.ReadAsync(fileBuffer, token)) != 0)
+            {
+                sha1.TransformBlock(fileBuffer, 0, count, null, 0);
+
+                if (offset + count >= headerLength)
+                {
+                    sha1.TransformFinalBlock(fileBuffer, 0, headerLength - offset);
+                    break;
+                }
+
+                offset += count;
+            }
+
+            return sha1.Hash ?? [];
+        }
+        catch (CryptographicUnexpectedOperationException)
+        {
+            return [];
+        }
     }
 }
