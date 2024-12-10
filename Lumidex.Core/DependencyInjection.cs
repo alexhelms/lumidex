@@ -3,6 +3,8 @@ using Lumidex.Core.IO;
 using Lumidex.Core.Pipelines;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Serilog;
 using System.IO.Abstractions;
 
 namespace Lumidex.Core;
@@ -16,7 +18,31 @@ public static class DependencyInjection
         services.AddTransient<Func<LibraryIngestPipeline>>(provider
             => () => provider.GetRequiredService<LibraryIngestPipeline>());
         
-        services.AddDbContextFactory<LumidexDbContext>();
+        services.AddDbContextFactory<LumidexDbContext>(options =>
+        {
+            string connectionString = string.Empty;
+
+            if (Environment.GetEnvironmentVariable("LUMIDEX_TEST") is { Length: > 0 })
+            {
+                var tempFilename = $"lumidex-{Path.GetFileName(Path.GetTempFileName())}.db";
+                var dbPath = Path.Combine(Path.GetTempPath(), "lumidex", tempFilename);
+                connectionString = $"Data Source={dbPath}";
+            }
+            else
+            {
+                Directory.CreateDirectory(LumidexPaths.AppData);
+                var dbPath = Path.Combine(LumidexPaths.AppData, "lumidex-data.db");
+                connectionString = $"Data Source={dbPath}";
+            }
+
+#if DEBUG
+            //ILoggerFactory factory = new LoggerFactory().AddSerilog();
+            //options.UseLoggerFactory(factory);
+#endif
+            options.UseSqlite(connectionString, config => config
+                .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                .EnableSensitiveDataLogging(false);
+        });
     }
 
     public static void UseLumidexCore(this IServiceProvider services)
