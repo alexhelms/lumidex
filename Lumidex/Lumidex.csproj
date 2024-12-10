@@ -35,6 +35,8 @@
     <PackageReference Include="Flurl" />
     <PackageReference Include="Flurl.Http" />
     <PackageReference Include="Humanizer" />
+    <PackageReference Include="LinqKit" />
+    <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.Extensions.Logging" />
     <PackageReference Include="ObservableCollectionEx" />
     <PackageReference Include="Projektanker.Icons.Avalonia.MaterialDesign" />
