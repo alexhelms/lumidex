@@ -7,10 +7,9 @@
     <ApplicationIcon>Assets\lumidex-icon.ico</ApplicationIcon>
   </PropertyGroup>
 
-  <!-- Disabled for dotnet 9, application fails to start: https://github.com/Kir-Antipov/HotAvalonia/issues/14 -->
-  <!--<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <DefineConstants>$(DefineConstants);ENABLE_XAML_HOT_RELOAD</DefineConstants>
-  </PropertyGroup>-->
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Condition="$(DefineConstants.Contains(ENABLE_XAML_HOT_RELOAD))" Include="Avalonia.Markup.Xaml.Loader" />
