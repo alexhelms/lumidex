@@ -1,3 +1,4 @@
+using LinqKit;
 using Lumidex.Core.Data;
 
 namespace Lumidex.Features.MainSearch.Filters;
@@ -14,7 +15,23 @@ public partial class FilterFilter : FilterViewModelBase
     {
         if (Filter is { Length: > 0 } filter)
         {
-            query = query.Where(f => f.FilterName == filter);
+            var items = filter.Split('|');
+            if (items.Length > 0)
+            {
+                var predicate = PredicateBuilder.New<ImageFile>();
+
+                foreach (var item in items)
+                {
+                    string temp = item;
+                    predicate.Or(f => f.FilterName == temp);
+                }
+
+                query = query.Where(predicate);
+            }
+            else
+            {
+                query = query.Where(f => f.FilterName == filter);
+            }
         }
 
         return query;

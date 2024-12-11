@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Lumidex.Core\Lumidex.Core.csproj" />
+    <ProjectReference Include="..\Lumidex\Lumidex.csproj" />
   </ItemGroup>
 
   <ItemGroup>

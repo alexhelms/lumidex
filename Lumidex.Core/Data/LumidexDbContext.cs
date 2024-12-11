@@ -1,9 +1,6 @@
 ﻿using Lumidex.Core.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.Extensions.Logging;
-using Serilog;
-using System.IO.Abstractions;
 
 namespace Lumidex.Core.Data;
 
@@ -12,14 +9,17 @@ public class LumidexDbContextFactory : IDesignTimeDbContextFactory<LumidexDbCont
 {
     public LumidexDbContext CreateDbContext(string[] args)
     {
-        return new LumidexDbContext(new FileSystem());
+        var dbPath = Path.Combine(LumidexPaths.AppData, "lumidex-data.db");
+        var builder = new DbContextOptionsBuilder<LumidexDbContext>();
+        builder = builder.UseSqlite($"Data Source={dbPath}", config => config
+            .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+            .EnableSensitiveDataLogging(false);
+        return new LumidexDbContext(builder.Options);
     }
 }
 
 public class LumidexDbContext : DbContext
 {
-    private readonly IFileSystem _fileSystem;
-
     public DbSet<AppSettings> AppSettings { get; set; }
     public DbSet<Library> Libraries { get; set; }
     public DbSet<Tag> Tags { get; set; }
@@ -27,27 +27,9 @@ public class LumidexDbContext : DbContext
     public DbSet<ObjectAlias> ObjectAliases { get; set; }
     public DbSet<AstrobinFilter> AstrobinFilters { get; set; }
 
-    public string DbPath { get; }
-
-    public LumidexDbContext(
-        IFileSystem fileSystem)
+    public LumidexDbContext(DbContextOptions<LumidexDbContext> options)
+        : base(options)
     {
-        _fileSystem = fileSystem;
-
-        DbPath = fileSystem.Path.Combine(LumidexPaths.AppData, "lumidex-data.db");
-        fileSystem.Directory.CreateDirectory(LumidexPaths.AppData);
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder options)
-    {
-#if DEBUG
-        //ILoggerFactory factory = new LoggerFactory().AddSerilog();
-        //options.UseLoggerFactory(factory);
-#endif
-
-        options.UseSqlite($"Data Source={DbPath}", config => config
-            .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-            .EnableSensitiveDataLogging(false);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
