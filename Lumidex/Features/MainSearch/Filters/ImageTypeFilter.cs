@@ -22,5 +22,25 @@ public partial class ImageTypeFilter : FilterViewModelBase
         return query;
     }
 
+    public override PersistedFilter? Persist() => ImageType is null
+        ? null
+        : new PersistedFilter
+        {
+            Name = "ImageType",
+            Data = ImageType.ToString(),
+        };
+
+    public override bool Restore(PersistedFilter persistedFilter)
+    {
+        if (persistedFilter.Name == "ImageType" &&
+            Enum.TryParse<ImageType>(persistedFilter.Data, out var imageType))
+        {
+            ImageType = imageType;
+            return true;
+        }
+
+        return false;
+    }
+
     public override string ToString() => $"{DisplayName} = {ImageType}";
 }

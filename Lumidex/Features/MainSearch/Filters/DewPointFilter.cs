@@ -32,5 +32,47 @@ public partial class DewPointFilter : FilterViewModelBase
         return query;
     }
 
+    public override PersistedFilter? Persist()
+    {
+        if (MinValue is null && MaxValue is null)
+            return null;
+
+        var min = MinValue.HasValue ? MinValue.Value.ToString() : string.Empty;
+        var max = MaxValue.HasValue ? MaxValue.Value.ToString() : string.Empty;
+
+        return new PersistedFilter
+        {
+            Name = "DewPoint",
+            Data = $"{min}|{max}"
+        };
+    }
+
+    public override bool Restore(PersistedFilter persistedFilter)
+    {
+        var restored = false;
+
+        if (persistedFilter.Name == "DewPoint")
+        {
+            var data = persistedFilter.Data ?? string.Empty;
+            var split = data.Split('|', count: 2);
+            if (split.Length == 2)
+            {
+                if (decimal.TryParse(split[0], out var min))
+                {
+                    MinValue = min;
+                    restored = true;
+                }
+
+                if (decimal.TryParse(split[1], out var max))
+                {
+                    MaxValue = max;
+                    restored = true;
+                }
+            }
+        }
+
+        return restored;
+    }
+
     public override string ToString() => $"{DisplayName} = ({MinValue}, {MaxValue})";
 }

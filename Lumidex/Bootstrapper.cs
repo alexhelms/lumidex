@@ -24,6 +24,15 @@ public static class Bootstrapper
 
     public static void Stop()
     {
+        try
+        {
+            WeakReferenceMessenger.Default.Send(new ExitingMessage());
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, "Error while stopping Lumidex");
+        }
+
         Log.Information("Lumidex exiting, bye");
         (Services as ServiceProvider)?.Dispose();
         Core.Bootstrapper.Stop();

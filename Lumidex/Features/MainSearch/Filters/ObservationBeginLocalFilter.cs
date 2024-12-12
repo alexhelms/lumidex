@@ -1,4 +1,5 @@
 ﻿using Lumidex.Core.Data;
+using System.Globalization;
 
 namespace Lumidex.Features.MainSearch.Filters;
 
@@ -18,6 +19,26 @@ public partial class ObservationBeginLocalFilter : FilterViewModelBase
         }
 
         return query;
+    }
+
+    public override PersistedFilter? Persist() => DateBegin is null
+        ? null
+        : new PersistedFilter
+        {
+            Name = "ObservationBeginLocal",
+            Data = DateBegin.Value.ToString("o"),
+        };
+
+    public override bool Restore(PersistedFilter persistedFilter)
+    {
+        if (persistedFilter.Name == "ObservationBeginLocal" &&
+            DateTime.TryParseExact(persistedFilter.Data, "o", null, DateTimeStyles.None, out var datetime))
+        {
+            DateBegin = datetime;
+            return true;
+        }
+
+        return false;
     }
 
     public override string ToString() => $"{DisplayName} = {DateBegin}";

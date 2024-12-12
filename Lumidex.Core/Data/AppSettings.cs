@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
 
 namespace Lumidex.Core.Data;
 
@@ -6,5 +6,9 @@ public class AppSettings
 {
     public int Id { get; set; }
 
-    public ICollection<AstrobinFilter> AstrobinFilters { get; set; } = new List<AstrobinFilter>();
+    public bool PersistFiltersOnExit { get; set; } = true;
+
+    public ICollection<AstrobinFilter> AstrobinFilters { get; set; } = [];
+
+    public ICollection<PersistedFilter> PersistedFilters { get; set; } = [];
 }

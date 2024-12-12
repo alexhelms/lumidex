@@ -1,6 +1,7 @@
 ﻿using Avalonia.Threading;
 using Lumidex.Core.Data;
 using Lumidex.Features.Library.Messages;
+using System.Xml.Linq;
 
 namespace Lumidex.Features.MainSearch.Filters;
 
@@ -9,6 +10,8 @@ public partial class LibraryFilter : FilterViewModelBase,
     IRecipient<LibraryDeleted>,
     IRecipient<LibraryEdited>
 {
+    private int? _restoredLibraryId;
+
     [ObservableProperty] LibraryViewModel? _library;
     [ObservableProperty] ObservableCollectionEx<LibraryViewModel> _libraries = new();
     
@@ -32,7 +35,18 @@ public partial class LibraryFilter : FilterViewModelBase,
         Dispatcher.UIThread.Invoke(() =>
         {
             if (!Libraries.Contains(message.Library))
+            {
                 Libraries.Add(message.Library);
+                
+                // Set the library to the restored ID.
+                // When the restoration happens, Libraries is empty so
+                // restoring had to be deferred until now.
+                if (_restoredLibraryId.HasValue &&
+                    message.Library.Id == _restoredLibraryId.Value)
+                {
+                    Library = message.Library;
+                }
+            }
         });
     }
 
@@ -63,6 +77,26 @@ public partial class LibraryFilter : FilterViewModelBase,
                     Library = message.Library;
             }
         });
+    }
+
+    public override PersistedFilter? Persist() => Library is null
+        ? null
+        : new PersistedFilter
+        {
+            Name = "Library",
+            Data = Library.Id.ToString(),
+        };
+
+    public override bool Restore(PersistedFilter persistedFilter)
+    {
+        if (persistedFilter.Name == "Library" &&
+            int.TryParse(persistedFilter.Data, out var libraryId))
+        {
+            _restoredLibraryId = libraryId;
+            return true;
+        }
+
+        return false;
     }
 
     public override string ToString() => $"{DisplayName} = {Library?.Name}";
