@@ -10,6 +10,10 @@ namespace Lumidex.Core.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            // Earlier versions were not setting AppSettingsId so its value in the db is null.
+            // There is only one AppSettings row so force the values to 1.
+            migrationBuilder.Sql(@"UPDATE AstrobinFilters SET AppSettingsId = '1' WHERE AppSettingsId IS NULL;");
+
             migrationBuilder.DropForeignKey(
                 name: "FK_AstrobinFilters_AppSettings_AppSettingsId",
                 table: "AstrobinFilters");
