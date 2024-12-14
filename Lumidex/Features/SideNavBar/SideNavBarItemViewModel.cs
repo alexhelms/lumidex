@@ -2,8 +2,15 @@
 
 public partial class SideNavBarItemViewModel : ObservableObject
 {
-    [ObservableProperty] private string _name = string.Empty;
-    [ObservableProperty] private string _toolTipText = string.Empty;
-    [ObservableProperty] private string _icon = string.Empty;
-    [ObservableProperty] private bool _isSelected;
+    [ObservableProperty]
+    public partial string Name { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string ToolTipText { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string Icon { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool IsSelected { get; set; }
 }

@@ -13,8 +13,8 @@ public partial class LibraryManagerViewModel : ViewModelBase,
     private readonly IServiceProvider _serviceProvider;
     private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
 
-    [ObservableProperty] LibraryViewModel? _selectedLibrary;
-
+    [ObservableProperty]
+    public partial LibraryViewModel? SelectedLibrary { get; set; }
     public ObservableCollectionEx<LibraryViewModel> Libraries { get; } = new();
 
     public LibraryManagerViewModel(

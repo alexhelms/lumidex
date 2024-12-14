@@ -10,8 +10,11 @@ public partial class TagFilter : FilterViewModelBase,
 {
     private HashSet<int> _restoredTagIds = [];
 
-    [ObservableProperty] ObservableCollectionEx<TagViewModel> _allTags = new();
-    [ObservableProperty] ObservableCollectionEx<TagViewModel> _selectedTags = new();
+    [ObservableProperty]
+    public partial ObservableCollectionEx<TagViewModel> AllTags { get; set; } = new();
+
+    [ObservableProperty]
+    public partial ObservableCollectionEx<TagViewModel> SelectedTags { get; set; } = new();
 
     public override string DisplayName => "Tags";
 

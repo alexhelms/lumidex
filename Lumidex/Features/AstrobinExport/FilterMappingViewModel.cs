@@ -4,8 +4,11 @@ namespace Lumidex.Features.AstrobinExport;
 
 public partial class FilterMappingViewModel : ViewModelBase
 {
-    [ObservableProperty] string _imageFilterName = string.Empty;
-    [ObservableProperty] AstrobinFilterViewModel? _selectedAstrobinFilter;
+    [ObservableProperty]
+    public partial string ImageFilterName { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial AstrobinFilterViewModel? SelectedAstrobinFilter { get; set; }
 
     partial void OnSelectedAstrobinFilterChanged(AstrobinFilterViewModel? oldValue, AstrobinFilterViewModel? newValue)
     {

@@ -32,24 +32,56 @@ public partial class SearchResultsViewModel : ViewModelBase,
     private readonly Func<AstrobinExportViewModel> _astrobinExportViewModelFactory;
     private readonly Func<FileExportViewModel> _fileExportViewModelFactory;
 
-    [ObservableProperty] bool _isBusy;
-    [ObservableProperty] string? _totalIntegration;
-    [ObservableProperty] string? _typeAggregate;
-    [ObservableProperty] int _lightCount;
-    [ObservableProperty] int _flatCount;
-    [ObservableProperty] int _darkCount;
-    [ObservableProperty] int _biasCount;
-    [ObservableProperty] int _unknownCount;
-    [ObservableProperty] string? _totalFileSize;
-    [ObservableProperty] ObservableCollectionEx<TagViewModel> _allTags = new();
-    [ObservableProperty] ObservableCollectionEx<ImageFileViewModel> _searchResults = new();
-    [ObservableProperty] ObservableCollectionEx<FilterViewModelBase> _activeFilters = new();
-    [ObservableProperty] ObservableCollectionEx<ImageFileViewModel> _selectedSearchResults = new();
-    [ObservableProperty] ObservableCollectionEx<IntegrationStatistic> _integrationStats = new();
-    [ObservableProperty] DataGridCollectionView? _statsView;
-    [ObservableProperty] ObservableCollectionEx<string> _distinctObjectNames = new();
-    [ObservableProperty] int _selectedSearchResultsCount;
+    [ObservableProperty]
+    public partial bool IsBusy { get; set; }
 
+    [ObservableProperty]
+    public partial string? TotalIntegration { get; set; }
+
+    [ObservableProperty]
+    public partial string? TypeAggregate { get; set; }
+
+    [ObservableProperty]
+    public partial int LightCount { get; set; }
+
+    [ObservableProperty]
+    public partial int FlatCount { get; set; }
+
+    [ObservableProperty]
+    public partial int DarkCount { get; set; }
+
+    [ObservableProperty]
+    public partial int BiasCount { get; set; }
+
+    [ObservableProperty]
+    public partial int UnknownCount { get; set; }
+
+    [ObservableProperty]
+    public partial string? TotalFileSize { get; set; }
+
+    [ObservableProperty]
+    public partial ObservableCollectionEx<TagViewModel> AllTags { get; set; } = new();
+
+    [ObservableProperty]
+    public partial ObservableCollectionEx<ImageFileViewModel> SearchResults { get; set; } = new();
+
+    [ObservableProperty]
+    public partial ObservableCollectionEx<FilterViewModelBase> ActiveFilters { get; set; } = new();
+
+    [ObservableProperty]
+    public partial ObservableCollectionEx<ImageFileViewModel> SelectedSearchResults { get; set; } = new();
+
+    [ObservableProperty]
+    public partial ObservableCollectionEx<IntegrationStatistic> IntegrationStats { get; set; } = new();
+
+    [ObservableProperty]
+    public partial DataGridCollectionView? StatsView { get; set; }
+
+    [ObservableProperty]
+    public partial ObservableCollectionEx<string> DistinctObjectNames { get; set; } = new();
+
+    [ObservableProperty]
+    public partial int SelectedSearchResultsCount { get; set; }
     public ActionsContainerViewModel ActionsViewModel { get; }
     
     public SearchResultsViewModel(

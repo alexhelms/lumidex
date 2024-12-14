@@ -12,7 +12,8 @@ public partial class ImageFileInfoViewModel : ActionViewModelBase,
     private readonly static List<PropertyInfo> UserEditableProperties;
     private readonly Func<ImageFileInfoItem> _imageFileInfoFactory;
 
-    [ObservableProperty] ObservableCollectionEx<ImageFileInfoItem> _items = new();
+    [ObservableProperty]
+    public partial ObservableCollectionEx<ImageFileInfoItem> Items { get; set; } = new();
 
     static ImageFileInfoViewModel()
     {
@@ -81,8 +82,11 @@ public partial class ImageFileInfoItem : ViewModelBase
 {
     private readonly SystemService _systemService;
 
-    [ObservableProperty] string _name = string.Empty;
-    [ObservableProperty] string? _value = string.Empty;
+    [ObservableProperty]
+    public partial string Name { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string? Value { get; set; } = string.Empty;
 
     public ImageFileInfoItem(SystemService systemService)
     {

@@ -5,7 +5,8 @@ namespace Lumidex.Features.MainSearch.Filters;
 
 public partial class ReadoutModeFilter : FilterViewModelBase
 {
-    [ObservableProperty] string? _name;
+    [ObservableProperty]
+    public partial string? Name { get; set; }
 
     public override string DisplayName => "Readout Mode";
 

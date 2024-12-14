@@ -5,7 +5,8 @@ namespace Lumidex.Features.MainSearch.Filters;
 
 public partial class ObservationEndLocalFilter : FilterViewModelBase
 {
-    [ObservableProperty] DateTime? _dateEnd;
+    [ObservableProperty]
+    public partial DateTime? DateEnd { get; set; }
 
     public override string DisplayName => "Date End Local";
 

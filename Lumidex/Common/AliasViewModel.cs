@@ -2,9 +2,14 @@
 
 public partial class AliasViewModel : ObservableObject, IEquatable<AliasViewModel?>
 {
-    [ObservableProperty] int _id;
-    [ObservableProperty] string _objectName = string.Empty;
-    [ObservableProperty] string _alias = string.Empty;
+    [ObservableProperty]
+    public partial int Id { get; set; }
+
+    [ObservableProperty]
+    public partial string ObjectName { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string Alias { get; set; } = string.Empty;
 
     #region Equality
 

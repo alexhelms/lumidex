@@ -5,7 +5,8 @@ namespace Lumidex.Features.MainSearch.Filters;
 
 public partial class FocuserNameFilter : FilterViewModelBase
 {
-    [ObservableProperty] string? _name;
+    [ObservableProperty]
+    public partial string? Name { get; set; }
 
     public override string DisplayName => "Focuser Name";
 

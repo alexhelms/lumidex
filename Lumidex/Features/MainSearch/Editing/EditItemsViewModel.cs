@@ -14,9 +14,11 @@ public partial class EditItemsViewModel : ViewModelBase
     private readonly DialogService _dialogService;
     private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
 
-    [ObservableProperty] ObservableCollectionEx<ImageFileViewModel> _selectedItems = new();
-    [ObservableProperty] ObservableCollectionEx<EditFieldViewModel> _properties = new();
+    [ObservableProperty]
+    public partial ObservableCollectionEx<ImageFileViewModel> SelectedItems { get; set; } = new();
 
+    [ObservableProperty]
+    public partial ObservableCollectionEx<EditFieldViewModel> Properties { get; set; } = new();
     public Action CloseDialog { get; set; } = () => { };
 
     public string HeaderText => $"Editing {SelectedItems.Count} {"Item".ToQuantity(SelectedItems.Count, ShowQuantityAs.None)}";
@@ -238,8 +240,11 @@ public partial class EditItemsViewModel : ViewModelBase
 
 public abstract partial class EditFieldViewModel : ObservableObject 
 {
-    [ObservableProperty] bool _editable;
-    [ObservableProperty] bool _hasMultipleValues;
+    [ObservableProperty]
+    public partial bool Editable { get; set; }
+
+    [ObservableProperty]
+    public partial bool HasMultipleValues { get; set; }
     public PropertyInfo PropInfo { get; set; } = null!;
     public string Watermark
     {
@@ -254,13 +259,15 @@ public abstract partial class EditFieldViewModel : ObservableObject
 
 public partial class EnumEditFieldViewModel : EditFieldViewModel
 {
-    [ObservableProperty] object? _value;
+    [ObservableProperty]
+    public partial object? Value { get; set; }
     public List<object> Values { get; set; } = [];
 }
 
 public partial class StringEditFieldViewModel : EditFieldViewModel
 {
-    [ObservableProperty] string? _value;
+    [ObservableProperty]
+    public partial string? Value { get; set; }
 
     [RelayCommand]
     private void ClearValue() => Value = null;
@@ -268,7 +275,8 @@ public partial class StringEditFieldViewModel : EditFieldViewModel
 
 public partial class DoubleEditFieldViewModel : EditFieldViewModel
 {
-    [ObservableProperty] double? _value;
+    [ObservableProperty]
+    public partial double? Value { get; set; }
 
     [RelayCommand]
     private void ClearValue() => Value = null;
@@ -276,7 +284,8 @@ public partial class DoubleEditFieldViewModel : EditFieldViewModel
 
 public partial class IntegerEditFieldViewModel : EditFieldViewModel
 {
-    [ObservableProperty] int? _value;
+    [ObservableProperty]
+    public partial int? Value { get; set; }
 
     [RelayCommand]
     private void ClearValue() => Value = null;
@@ -284,9 +293,14 @@ public partial class IntegerEditFieldViewModel : EditFieldViewModel
 
 public partial class DateTimeEditFieldViewModel : EditFieldViewModel
 {
-    [ObservableProperty] DateTime? _value;
-    [ObservableProperty] DateTimeOffset? _date;
-    [ObservableProperty] TimeSpan? _time;
+    [ObservableProperty]
+    public partial DateTime? Value { get; set; }
+
+    [ObservableProperty]
+    public partial DateTimeOffset? Date { get; set; }
+
+    [ObservableProperty]
+    public partial TimeSpan? Time { get; set; }
 
     partial void OnValueChanged(DateTime? value)
     {

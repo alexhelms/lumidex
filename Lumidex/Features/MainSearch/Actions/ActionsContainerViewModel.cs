@@ -2,14 +2,17 @@
 
 public partial class ActionsContainerViewModel : ViewModelBase
 {
-    [ObservableProperty] ObservableCollectionEx<ActionViewModelBase> _items = new();
-    [ObservableProperty] ActionViewModelBase? _selectedItem;
+    [ObservableProperty]
+    public partial ObservableCollectionEx<ActionViewModelBase> Items { get; set; } = new();
+
+    [ObservableProperty]
+    public partial ActionViewModelBase? SelectedItem { get; set; }
 
     public ActionsContainerViewModel(
         ImageFileInfoViewModel infoViewModel,
         TagsActionViewModel tagsViewModel)
     {
-        _items.AddRange([
+        Items.AddRange([
             infoViewModel,
             tagsViewModel,
         ]);

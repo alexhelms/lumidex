@@ -15,14 +15,21 @@ public partial class AstrobinSettingsViewModel : ViewModelBase, ISettingsViewMod
 
     private readonly AstrobinAcquisitionExporter _exporter = new();
 
-    [ObservableProperty] ObservableCollectionEx<AstrobinFilterViewModel> _astrobinFilters = new();
-    [ObservableProperty] bool _isQueryingAstrobin;
-    [ObservableProperty] string? _astrobinUnavailableMessage;
-    [ObservableProperty] string? _searchText;
+    [ObservableProperty]
+    public partial ObservableCollectionEx<AstrobinFilterViewModel> AstrobinFilters { get; set; } = new();
+
+    [ObservableProperty]
+    public partial bool IsQueryingAstrobin { get; set; }
+
+    [ObservableProperty]
+    public partial string? AstrobinUnavailableMessage { get; set; }
+
+    [ObservableProperty]
+    public partial string? SearchText { get; set; }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(AddFilterCommand))]
-    object? _selectedFilter;
+    public partial object? SelectedFilter { get; set; }
 
     public string DisplayName => "Astrobin";
     public Func<string?, CancellationToken, Task<IEnumerable<object>>>? AsyncPopulator { get; private set; }

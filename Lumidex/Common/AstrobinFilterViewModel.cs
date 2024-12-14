@@ -2,9 +2,14 @@
 
 public partial class AstrobinFilterViewModel : ViewModelBase, IEquatable<AstrobinFilterViewModel?>
 {
-    [ObservableProperty] int _id;
-    [ObservableProperty] int _astrobinId;
-    [ObservableProperty] string _name = string.Empty;
+    [ObservableProperty]
+    public partial int Id { get; set; }
+
+    [ObservableProperty]
+    public partial int AstrobinId { get; set; }
+
+    [ObservableProperty]
+    public partial string Name { get; set; } = string.Empty;
 
     #region Equality
 

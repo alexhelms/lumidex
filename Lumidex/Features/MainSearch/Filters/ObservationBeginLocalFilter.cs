@@ -5,7 +5,8 @@ namespace Lumidex.Features.MainSearch.Filters;
 
 public partial class ObservationBeginLocalFilter : FilterViewModelBase
 {
-    [ObservableProperty] DateTime? _dateBegin;
+    [ObservableProperty]
+    public partial DateTime? DateBegin { get; set; }
 
     public override string DisplayName => "Date Begin Local";
 

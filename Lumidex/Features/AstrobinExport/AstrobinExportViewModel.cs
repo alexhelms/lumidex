@@ -13,11 +13,17 @@ public partial class AstrobinExportViewModel : ViewModelBase,
     
     private Dictionary<string, List<ImageFileViewModel>> _imageGrouping = new();
 
-    [ObservableProperty] ObservableCollectionEx<ImageFileViewModel> _selectedItems = new();
-    [ObservableProperty] ObservableCollectionEx<AstrobinFilterViewModel> _astrobinFilters = new();
-    [ObservableProperty] ObservableCollectionEx<FilterMappingViewModel> _filterMappings = new();
-    [ObservableProperty] string? _csvContent;
+    [ObservableProperty]
+    public partial ObservableCollectionEx<ImageFileViewModel> SelectedItems { get; set; } = new();
 
+    [ObservableProperty]
+    public partial ObservableCollectionEx<AstrobinFilterViewModel> AstrobinFilters { get; set; } = new();
+
+    [ObservableProperty]
+    public partial ObservableCollectionEx<FilterMappingViewModel> FilterMappings { get; set; } = new();
+
+    [ObservableProperty]
+    public partial string? CsvContent { get; set; }
     public Action CloseDialog { get; set; } = () => { };
 
     public AstrobinExportViewModel(SystemService systemService)

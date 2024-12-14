@@ -2,10 +2,17 @@
 
 public partial class LibraryViewModel : ObservableObject, IEquatable<LibraryViewModel?>
 {
-    [ObservableProperty] int _id;
-    [ObservableProperty] string _name = string.Empty;
-    [ObservableProperty] string _path = string.Empty;
-    [ObservableProperty] DateTime? _lastScan;
+    [ObservableProperty]
+    public partial int Id { get; set; }
+
+    [ObservableProperty]
+    public partial string Name { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string Path { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial DateTime? LastScan { get; set; }
 
     #region Equality
 

@@ -24,10 +24,14 @@ public partial class AliasManagerViewModel : ValidatableViewModelBase,
     private readonly DialogService _dialogService;
     private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
 
-    [ObservableProperty] ObjectNameViewModel? _selectedItem;
-    [ObservableProperty] ObservableCollectionEx<ObjectNameViewModel> _objectNames = new();
-    [ObservableProperty] ObservableCollectionEx<AliasViewModel> _aliases = new();
+    [ObservableProperty]
+    public partial ObjectNameViewModel? SelectedItem { get; set; }
 
+    [ObservableProperty]
+    public partial ObservableCollectionEx<ObjectNameViewModel> ObjectNames { get; set; } = new();
+
+    [ObservableProperty]
+    public partial ObservableCollectionEx<AliasViewModel> Aliases { get; set; } = new();
     public DataGridCollectionView ObjectNameView { get; private set; } = new(Array.Empty<ObjectNameViewModel>());
     public DataGridCollectionView AliasView { get; private set; } = new(Array.Empty<AliasViewModel>());
 

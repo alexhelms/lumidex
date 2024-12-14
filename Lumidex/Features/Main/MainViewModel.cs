@@ -24,9 +24,14 @@ public partial class MainViewModel : ViewModelBase,
     private readonly LibraryManagerViewModel _libraryManagerViewModel;
     private readonly MainSettingsViewModel _settingsViewModel;
 
-    [ObservableProperty] private SideNavBarViewModel _sideNavBarViewModel = null!;
-    [ObservableProperty] private object? _selectedTab;
-    [ObservableProperty] int _topBarHeight;
+    [ObservableProperty]
+    public partial SideNavBarViewModel SideNavBarViewModel { get; set; } = null!;
+
+    [ObservableProperty]
+    public partial object? SelectedTab { get; set; }
+
+    [ObservableProperty]
+    public partial int TopBarHeight { get; set; }
 
     public MainViewModel(
         SystemService systemService,
@@ -42,7 +47,7 @@ public partial class MainViewModel : ViewModelBase,
         _systemService = systemService;
         _dialogService = dialogService;
         _aboutViewModel = aboutViewModel;
-        _sideNavBarViewModel = sideNavBarViewModel;
+        SideNavBarViewModel = sideNavBarViewModel;
         _mainSearchViewModel = mainSearchViewModel;
         _aliasManagerViewModel = aliasManagerViewModel;
         _tagManagerViewModel = tagManagerViewModel;

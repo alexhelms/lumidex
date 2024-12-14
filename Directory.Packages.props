@@ -14,7 +14,7 @@
     <PackageVersion Include="Avalonia.Xaml.Behaviors" Version="11.2.0.1" />
     <PackageVersion Include="Avalonia.Xaml.Interactivity" Version="11.2.0.1" />
     <PackageVersion Include="AvaloniaDialogs" Version="3.6.1" />
-    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageVersion Include="DialogHost.Avalonia" Version="0.8.1" />
     <PackageVersion Include="FluentResults" Version="3.16.0" />
     <PackageVersion Include="Flurl" Version="4.0.0" />

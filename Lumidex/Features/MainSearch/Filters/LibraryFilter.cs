@@ -12,9 +12,12 @@ public partial class LibraryFilter : FilterViewModelBase,
 {
     private int? _restoredLibraryId;
 
-    [ObservableProperty] LibraryViewModel? _library;
-    [ObservableProperty] ObservableCollectionEx<LibraryViewModel> _libraries = new();
-    
+    [ObservableProperty]
+    public partial LibraryViewModel? Library { get; set; }
+
+    [ObservableProperty]
+    public partial ObservableCollectionEx<LibraryViewModel> Libraries { get; set; } = new();
+
     public override string DisplayName => "Library";
 
     protected override void OnClear() => Library = null;

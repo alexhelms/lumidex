@@ -33,11 +33,16 @@ public partial class TagManagerViewModel : ValidatableViewModelBase,
     [Required(ErrorMessage = "Name is required.", AllowEmptyStrings = false)]
     [MaxLength(128, ErrorMessage = "128 character maximum.")]
     [NotifyCanExecuteChangedFor(nameof(CreateTagCommand))]
-    private string? _name;
+    public partial string? Name { get; set; }
 
-    [ObservableProperty] Color _color = DefaultColor;
-    [ObservableProperty] ObservableCollectionEx<TagViewModel> _tags = new();
-    [ObservableProperty] TagViewModel? _selectedTag;
+    [ObservableProperty]
+    public partial Color Color { get; set; } = DefaultColor;
+
+    [ObservableProperty]
+    public partial ObservableCollectionEx<TagViewModel> Tags { get; set; } = new();
+
+    [ObservableProperty]
+    public partial TagViewModel? SelectedTag { get; set; }
 
     public TagManagerViewModel(
         DialogService dialogService,
