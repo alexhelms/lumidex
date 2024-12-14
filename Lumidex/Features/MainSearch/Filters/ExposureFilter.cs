@@ -32,5 +32,47 @@ public partial class ExposureFilter : FilterViewModelBase
         return query;
     }
 
+    public override PersistedFilter? Persist()
+    {
+        if (ExposureMin is null && ExposureMax is null)
+            return null;
+
+        var min = ExposureMin.HasValue ? ExposureMin.Value.ToString() : string.Empty;
+        var max = ExposureMax.HasValue ? ExposureMax.Value.ToString() : string.Empty;
+
+        return new PersistedFilter
+        {
+            Name = "Exposure",
+            Data = $"{min}|{max}"
+        };
+    }
+
+    public override bool Restore(PersistedFilter persistedFilter)
+    {
+        var restored = false;
+
+        if (persistedFilter.Name == "Exposure")
+        {
+            var data = persistedFilter.Data ?? string.Empty;
+            var split = data.Split('|', count: 2);
+            if (split.Length == 2)
+            {
+                if (decimal.TryParse(split[0], out var min))
+                {
+                    ExposureMin = min;
+                    restored = true;
+                }
+
+                if (decimal.TryParse(split[1], out var max))
+                {
+                    ExposureMax = max;
+                    restored = true;
+                }
+            }
+        }
+
+        return restored;
+    }
+
     public override string ToString() => $"{DisplayName} = ({ExposureMin}, {ExposureMax})";
 }

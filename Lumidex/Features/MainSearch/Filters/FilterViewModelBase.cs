@@ -14,4 +14,8 @@ public abstract partial class FilterViewModelBase : ValidatableViewModelBase
     }
 
     protected virtual void OnClear() { }
+
+    public virtual PersistedFilter? Persist() => null;
+
+    public virtual bool Restore(PersistedFilter persistedFilter) => false;
 }

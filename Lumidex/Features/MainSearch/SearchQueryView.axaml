@@ -90,7 +90,7 @@
                 <ComboBox
                     x:Name="AdvancedFilterComboBox"
                     HorizontalAlignment="Stretch"
-                    ItemsSource="{Binding AllFilters}"
+                    ItemsSource="{Binding AvailableFilters}"
                     PlaceholderForeground="Gray"
                     PlaceholderText="Select a Filter">
                     <ComboBox.ItemTemplate>

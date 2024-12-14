@@ -7,10 +7,12 @@ public partial class MainSettingsViewModel : ViewModelBase
     public ObservableCollectionEx<ISettingsViewModel> ViewModels { get; }
 
     public MainSettingsViewModel(
-        AstrobinSettingsViewModel astrobinSettings)
+        AstrobinSettingsViewModel astrobinSettings,
+        SearchSettingsViewModel searchSettings)
     {
         ViewModels = [
             astrobinSettings,
+            searchSettings,
         ];
 
         SelectedViewModel = astrobinSettings;

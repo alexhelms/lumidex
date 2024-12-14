@@ -94,6 +94,7 @@ public partial class AstrobinSettingsViewModel : ViewModelBase, ISettingsViewMod
         {
             AstrobinId = astrobinFilter.Id,
             Name = astrobinFilter.Name,
+            AppSettings = dbContext.AppSettings.First(),
         };
 
         dbContext.AstrobinFilters.Add(filter);

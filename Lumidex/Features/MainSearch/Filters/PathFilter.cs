@@ -21,5 +21,24 @@ public partial class PathFilter : FilterViewModelBase
         return query;
     }
 
+    public override PersistedFilter? Persist() => Name is null
+        ? null
+        : new PersistedFilter
+        {
+            Name = "Path",
+            Data = Name,
+        };
+
+    public override bool Restore(PersistedFilter persistedFilter)
+    {
+        if (persistedFilter.Name == "Path")
+        {
+            Name = persistedFilter.Data;
+            return true;
+        }
+
+        return false;
+    }
+
     public override string ToString() => $"{DisplayName} = {Name}";
 }

@@ -37,5 +37,24 @@ public partial class FilterFilter : FilterViewModelBase
         return query;
     }
 
+    public override PersistedFilter? Persist() => Filter is null
+        ? null
+        : new PersistedFilter
+        {
+            Name = "Filter",
+            Data = Filter,
+        };
+
+    public override bool Restore(PersistedFilter persistedFilter)
+    {
+        if (persistedFilter.Name == "Filter")
+        {
+            Filter = persistedFilter.Data;
+            return true;
+        }
+
+        return false;
+    }
+
     public override string ToString() => $"{DisplayName} = {Filter}";
 }

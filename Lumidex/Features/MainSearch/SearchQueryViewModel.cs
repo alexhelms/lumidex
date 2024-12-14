@@ -1,15 +1,23 @@
-﻿using Lumidex.Features.MainSearch.Filters;
+﻿using Lumidex.Core.Data;
+using Lumidex.Features.MainSearch.Filters;
 using Lumidex.Features.MainSearch.Messages;
+using Microsoft.EntityFrameworkCore;
 
 namespace Lumidex.Features.MainSearch;
 
 public partial class SearchQueryViewModel : ViewModelBase,
-    IRecipient<ObjectNameSearchFill>
+    IRecipient<ObjectNameSearchFill>,
+    IRecipient<ExitingMessage>
 {
-    [ObservableProperty] ObservableCollectionEx<FilterViewModelBase> _allFilters = new();
-    [ObservableProperty] ObservableCollectionEx<FilterViewModelBase> _activeFilters = new();
+    private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
+
+    [ObservableProperty] ObservableCollectionEx<FilterViewModelBase> _availableFilters = [];
+    [ObservableProperty] ObservableCollectionEx<FilterViewModelBase> _activeFilters = [];
+
+    public IEnumerable<FilterViewModelBase> AllFilters => ActiveFilters.Concat(AvailableFilters);
 
     public SearchQueryViewModel(
+        IDbContextFactory<LumidexDbContext> dbContextFactory,
         // Default filters
         ObjectNameFilter nameFilter,
         LibraryFilter libraryFilter,
@@ -53,6 +61,8 @@ public partial class SearchQueryViewModel : ViewModelBase,
         PressureFilter pressureFilter,
         TemperatureFilter temperatureFilter)
     {
+        _dbContextFactory = dbContextFactory;
+
         ActiveFilters.AddRange([
             nameFilter,
             libraryFilter,
@@ -98,13 +108,85 @@ public partial class SearchQueryViewModel : ViewModelBase,
             pressureFilter,
             temperatureFilter,
         ];
-        AllFilters.AddRange(allFilters.OrderBy(f => f.DisplayName));
+
+        AvailableFilters.AddRange(allFilters.OrderBy(f => f.DisplayName));
+        RestoreFilters();
+    }
+
+    private void RestoreFilters()
+    {
+        using var dbContext = _dbContextFactory.CreateDbContext();
+        var settings = dbContext.AppSettings
+            .AsNoTracking()
+            .Include(x => x.PersistedFilters)
+            .FirstOrDefault();
+
+        if (settings is { PersistFiltersOnExit: true })
+        {
+            // Temp list since we can't alter the enumeration while enumerating AllFilters...
+            var filtersToRestore = new List<FilterViewModelBase>();
+
+            // Yes this is slow, but it isn't doing much so it's probably fine.
+            foreach (var filter in AllFilters)
+            {
+                foreach (var item in settings.PersistedFilters)
+                {
+                    try
+                    {
+                        if (filter.Restore(item))
+                        {
+                            filtersToRestore.Add(filter);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error(e, "Error restoring filter {Filter}", filter.DisplayName);
+                    }
+                }
+            }
+
+            foreach (var filter in filtersToRestore)
+            {
+                AddAdvancedFilter(filter);
+            }
+        }
+    }
+
+    public void PersistFilters()
+    {
+        using var dbContext = _dbContextFactory.CreateDbContext();
+        var settings = dbContext.AppSettings
+            .Include(x => x.PersistedFilters)
+            .FirstOrDefault();
+
+        if (settings is { PersistFiltersOnExit: true })
+        {
+            settings.PersistedFilters.Clear();
+
+            foreach (var filter in AllFilters)
+            {
+                try
+                {
+                    var data = filter.Persist();
+                    if (data is not null)
+                    {
+                        settings.PersistedFilters.Add(data);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.Error(e, "Error persisting {Filter}", filter);
+                }
+            }
+
+            dbContext.SaveChanges();
+        }
     }
 
     [RelayCommand]
     private void AddAdvancedFilter(FilterViewModelBase filter)
     {
-        if (AllFilters.Remove(filter))
+        if (AvailableFilters.Remove(filter))
         {
             ActiveFilters.Add(filter);
         }
@@ -118,17 +200,17 @@ public partial class SearchQueryViewModel : ViewModelBase,
             filter.ClearCommand.Execute(null);
 
             // Insert in the list while maintaining alphabetical order
-            var index = AllFilters
+            var index = AvailableFilters
                 .Select(f => f.DisplayName)
                 .ToList()
                 .BinarySearch(filter.DisplayName);
             if (index < 0)
             {
-                AllFilters.Insert(~index, filter);
+                AvailableFilters.Insert(~index, filter);
             }
             else
             {
-                AllFilters.Insert(index, filter);
+                AvailableFilters.Insert(index, filter);
             }
         }
     }
@@ -196,12 +278,17 @@ public partial class SearchQueryViewModel : ViewModelBase,
         var filter = ActiveFilters.OfType<ObjectNameFilter>().FirstOrDefault();
         if (filter is null)
         {
-            filter = AllFilters.OfType<ObjectNameFilter>().First();
-            AllFilters.Remove(filter);
+            filter = AvailableFilters.OfType<ObjectNameFilter>().First();
+            AvailableFilters.Remove(filter);
             ActiveFilters.Insert(0, filter);
         }
 
         filter.Name = message.ObjectName;
         Search();
+    }
+
+    public void Receive(ExitingMessage message)
+    {
+        PersistFilters();
     }
 }

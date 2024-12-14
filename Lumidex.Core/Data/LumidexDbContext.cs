@@ -26,6 +26,7 @@ public class LumidexDbContext : DbContext
     public DbSet<ImageFile> ImageFiles { get; set; }
     public DbSet<ObjectAlias> ObjectAliases { get; set; }
     public DbSet<AstrobinFilter> AstrobinFilters { get; set; }
+    public DbSet<PersistedFilter> PersistedFilters { get; set; }
 
     public LumidexDbContext(DbContextOptions<LumidexDbContext> options)
         : base(options)
@@ -49,7 +50,10 @@ public class LumidexDbContext : DbContext
         modelBuilder.Entity<Tag>()
             .Property(x => x.Color)
             .HasDefaultValue("#ffffffff");
-            
+
+        modelBuilder.Entity<AppSettings>()
+            .Property(x => x.PersistFiltersOnExit)
+            .HasDefaultValue(true);
     }
 
     public override int SaveChanges()

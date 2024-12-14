@@ -22,7 +22,7 @@
 
         <ContentControl
             Grid.Column="1"
-            Margin="8"
+            Margin="8,0,8,8"
             Content="{Binding SelectedViewModel}" />
 
     </Grid>
