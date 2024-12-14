@@ -2,8 +2,8 @@
 
 public partial class MainSettingsViewModel : ViewModelBase
 {
-    [ObservableProperty] ISettingsViewModel _selectedViewModel;
-
+    [ObservableProperty]
+    public partial ISettingsViewModel SelectedViewModel { get; set; }
     public ObservableCollectionEx<ISettingsViewModel> ViewModels { get; }
 
     public MainSettingsViewModel(

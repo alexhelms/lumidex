@@ -4,9 +4,14 @@ namespace Lumidex.Features.Aliases;
 
 public partial class ObjectNameViewModel : ViewModelBase
 {
-    [ObservableProperty] string _objectName = string.Empty;
-    [ObservableProperty] ObservableCollectionEx<AliasViewModel> _aliases = new();
-    [ObservableProperty] string? _newAliasName;
+    [ObservableProperty]
+    public partial string ObjectName { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial ObservableCollectionEx<AliasViewModel> Aliases { get; set; } = new();
+
+    [ObservableProperty]
+    public partial string? NewAliasName { get; set; }
 
     #region Equality
 

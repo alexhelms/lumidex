@@ -7,7 +7,8 @@ public partial class SearchSettingsViewModel : ViewModelBase, ISettingsViewModel
 {
     private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
 
-    [ObservableProperty] bool _persistFiltersOnExit;
+    [ObservableProperty]
+    public partial bool PersistFiltersOnExit { get; set; }
 
     public string DisplayName => "Search";
 

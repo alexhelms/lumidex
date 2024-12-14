@@ -11,8 +11,11 @@ public partial class SearchQueryViewModel : ViewModelBase,
 {
     private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
 
-    [ObservableProperty] ObservableCollectionEx<FilterViewModelBase> _availableFilters = [];
-    [ObservableProperty] ObservableCollectionEx<FilterViewModelBase> _activeFilters = [];
+    [ObservableProperty]
+    public partial ObservableCollectionEx<FilterViewModelBase> AvailableFilters { get; set; } = [];
+
+    [ObservableProperty]
+    public partial ObservableCollectionEx<FilterViewModelBase> ActiveFilters { get; set; } = [];
 
     public IEnumerable<FilterViewModelBase> AllFilters => ActiveFilters.Concat(AvailableFilters);
 

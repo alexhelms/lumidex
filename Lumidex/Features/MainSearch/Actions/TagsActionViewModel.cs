@@ -11,9 +11,14 @@ public partial class TagsActionViewModel : ActionViewModelBase,
     IRecipient<TagRemoved>,
     IRecipient<TagsCleared>
 {
-    [ObservableProperty] ObservableCollectionEx<TagViewModel> _allTags = new();
-    [ObservableProperty] ObservableCollectionEx<TagViewModel> _selectedTags = new();
-    [ObservableProperty] ObservableCollectionEx<TagViewModel> _tagsOfSelectedItems = new();
+    [ObservableProperty]
+    public partial ObservableCollectionEx<TagViewModel> AllTags { get; set; } = new();
+
+    [ObservableProperty]
+    public partial ObservableCollectionEx<TagViewModel> SelectedTags { get; set; } = new();
+
+    [ObservableProperty]
+    public partial ObservableCollectionEx<TagViewModel> TagsOfSelectedItems { get; set; } = new();
 
     public TagsActionViewModel()
     {

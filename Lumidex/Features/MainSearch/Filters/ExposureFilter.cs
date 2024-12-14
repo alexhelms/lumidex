@@ -4,8 +4,11 @@ namespace Lumidex.Features.MainSearch.Filters;
 
 public partial class ExposureFilter : FilterViewModelBase
 {
-    [ObservableProperty] decimal? _exposureMin;
-    [ObservableProperty] decimal? _exposureMax;
+    [ObservableProperty]
+    public partial decimal? ExposureMin { get; set; }
+
+    [ObservableProperty]
+    public partial decimal? ExposureMax { get; set; }
 
     public override string DisplayName => "Exposure";
 

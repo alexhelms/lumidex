@@ -9,15 +9,29 @@ public partial class FileExportViewModel : ViewModelBase
 {
     private readonly DialogService _dialogService;
 
-    [ObservableProperty] string _destinationDirectory = string.Empty;
-    [ObservableProperty] ObservableCollectionEx<ImageFileViewModel> _selectedItems = new();
-    [ObservableProperty] long _bytesTransferred;
-    [ObservableProperty] long _totalBytes;
-    [ObservableProperty] int _filesTransferredCount;
-    [ObservableProperty] int _totalFilesCount;
-    [ObservableProperty] string? _progressText;
-    [ObservableProperty] string? _detailedProgressText;
+    [ObservableProperty]
+    public partial string DestinationDirectory { get; set; } = string.Empty;
 
+    [ObservableProperty]
+    public partial ObservableCollectionEx<ImageFileViewModel> SelectedItems { get; set; } = new();
+
+    [ObservableProperty]
+    public partial long BytesTransferred { get; set; }
+
+    [ObservableProperty]
+    public partial long TotalBytes { get; set; }
+
+    [ObservableProperty]
+    public partial int FilesTransferredCount { get; set; }
+
+    [ObservableProperty]
+    public partial int TotalFilesCount { get; set; }
+
+    [ObservableProperty]
+    public partial string? ProgressText { get; set; }
+
+    [ObservableProperty]
+    public partial string? DetailedProgressText { get; set; }
     public Action CloseDialog { get; set; } = () => { };
 
     public FileExportViewModel(DialogService dialogService)

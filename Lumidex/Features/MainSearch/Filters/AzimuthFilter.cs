@@ -4,8 +4,11 @@ namespace Lumidex.Features.MainSearch.Filters;
 
 public partial class AzimuthFilter : FilterViewModelBase
 {
-    [ObservableProperty] decimal? _minValue;
-    [ObservableProperty] decimal? _maxValue;
+    [ObservableProperty]
+    public partial decimal? MinValue { get; set; }
+
+    [ObservableProperty]
+    public partial decimal? MaxValue { get; set; }
 
     public override string DisplayName => "Azimuth";
 

@@ -5,7 +5,8 @@ namespace Lumidex.Features.MainSearch.Filters;
 
 public partial class FilterFilter : FilterViewModelBase
 {
-    [ObservableProperty] string? _filter;
+    [ObservableProperty]
+    public partial string? Filter { get; set; }
 
     public override string DisplayName => "Filter";
 

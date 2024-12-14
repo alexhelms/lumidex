@@ -17,23 +17,45 @@ public partial class LibraryViewModel : ValidatableViewModelBase
     private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
     private readonly Func<LibraryIngestPipeline> _pipelineFactory;
 
-    [ObservableProperty] int _id;
-    [ObservableProperty] int _fileCount;
-    [ObservableProperty] bool _scanning;
-    [ObservableProperty] bool _progressIndeterminate;
-    [ObservableProperty] bool _showProgress;
-    [ObservableProperty] bool _scanResultsAvailable;
-    [ObservableProperty] int _scanTotalCount;
-    [ObservableProperty] int _scanProgressCount;
-    [ObservableProperty] string? _scanSummary;
-    [ObservableProperty] ObservableCollectionEx<FileErrorViewModel>? _scanErrors;
+    [ObservableProperty]
+    public partial int Id { get; set; }
 
-    [ObservableProperty] DataGridCollectionView? _duplicatesView;
-    [ObservableProperty] bool _onlyDuplicateLights = true;
+    [ObservableProperty]
+    public partial int FileCount { get; set; }
+
+    [ObservableProperty]
+    public partial bool Scanning { get; set; }
+
+    [ObservableProperty]
+    public partial bool ProgressIndeterminate { get; set; }
+
+    [ObservableProperty]
+    public partial bool ShowProgress { get; set; }
+
+    [ObservableProperty]
+    public partial bool ScanResultsAvailable { get; set; }
+
+    [ObservableProperty]
+    public partial int ScanTotalCount { get; set; }
+
+    [ObservableProperty]
+    public partial int ScanProgressCount { get; set; }
+
+    [ObservableProperty]
+    public partial string? ScanSummary { get; set; }
+
+    [ObservableProperty]
+    public partial ObservableCollectionEx<FileErrorViewModel>? ScanErrors { get; set; }
+
+    [ObservableProperty]
+    public partial DataGridCollectionView? DuplicatesView { get; set; }
+
+    [ObservableProperty]
+    public partial bool OnlyDuplicateLights { get; set; } = true;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(QuickScanLibraryCommand))]
-    DateTime? _lastScan;
+    public partial DateTime? LastScan { get; set; }
 
     [ObservableProperty]
     [NotifyDataErrorInfo]
@@ -42,7 +64,7 @@ public partial class LibraryViewModel : ValidatableViewModelBase
     [MaxLength(128, ErrorMessage = "128 character maximum.")]
     [NotifyCanExecuteChangedFor(nameof(ScanLibraryCommand))]
     [NotifyCanExecuteChangedFor(nameof(QuickScanLibraryCommand))]
-    string _name = string.Empty;
+    public partial string Name { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyDataErrorInfo]
@@ -50,7 +72,7 @@ public partial class LibraryViewModel : ValidatableViewModelBase
     [FolderExists]
     [NotifyCanExecuteChangedFor(nameof(ScanLibraryCommand))]
     [NotifyCanExecuteChangedFor(nameof(QuickScanLibraryCommand))]
-    string _path = string.Empty;
+    public partial string Path { get; set; } = string.Empty;
 
     public LibraryViewModel(
         IFileSystem fileSystem,
@@ -88,7 +110,7 @@ public partial class LibraryViewModel : ValidatableViewModelBase
         RefreshDuplicates();
     }
 
-    partial void OnNameChanged(string? oldValue, string newValue)
+    partial void OnNameChanged(string oldValue, string newValue)
     {
         if (IsActive && HasErrors == false)
         {
@@ -96,7 +118,7 @@ public partial class LibraryViewModel : ValidatableViewModelBase
         }
     }
 
-    partial void OnPathChanged(string? oldValue, string newValue)
+    partial void OnPathChanged(string oldValue, string newValue)
     {
         if (IsActive && HasErrors == false)
         {
@@ -366,14 +388,24 @@ public partial class LibraryViewModel : ValidatableViewModelBase
 
 public partial class FileErrorViewModel : ObservableObject
 {
-    [ObservableProperty] string? _error;
-    [ObservableProperty] string? _filename;
+    [ObservableProperty]
+    public partial string? Error { get; set; }
+
+    [ObservableProperty]
+    public partial string? Filename { get; set; }
 }
 
 public partial class DuplicateHashViewModel : ObservableObject
 {
-    [ObservableProperty] int _id;
-    [ObservableProperty] string? _group;
-    [ObservableProperty] string? _filename;
-    [ObservableProperty] ImageType? _imageType;
+    [ObservableProperty]
+    public partial int Id { get; set; }
+
+    [ObservableProperty]
+    public partial string? Group { get; set; }
+
+    [ObservableProperty]
+    public partial string? Filename { get; set; }
+
+    [ObservableProperty]
+    public partial ImageType? ImageType { get; set; }
 }

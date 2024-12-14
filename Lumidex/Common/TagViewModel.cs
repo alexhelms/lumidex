@@ -6,13 +6,23 @@ public partial class TagViewModel : ObservableObject, IEquatable<TagViewModel?>
 {
     private static Dictionary<string, IImmutableBrush> _brushCache = new();
 
-    [ObservableProperty] int _id;
-    [ObservableProperty] string _name = string.Empty;
-    [ObservableProperty] string _color = "#ff808080";
-    [ObservableProperty] ObservableCollectionEx<ImageFileViewModel> _imageFiles = new();
+    [ObservableProperty]
+    public partial int Id { get; set; }
 
-    [ObservableProperty] int _taggedImageCount = new();
-    [ObservableProperty] bool _isSelected;
+    [ObservableProperty]
+    public partial string Name { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string Color { get; set; } = "#ff808080";
+
+    [ObservableProperty]
+    public partial ObservableCollectionEx<ImageFileViewModel> ImageFiles { get; set; } = new();
+
+    [ObservableProperty]
+    public partial int TaggedImageCount { get; set; } = new();
+
+    [ObservableProperty]
+    public partial bool IsSelected { get; set; }
 
     public IImmutableBrush Brush
     {

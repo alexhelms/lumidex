@@ -4,7 +4,8 @@ namespace Lumidex.Features.MainSearch.Filters;
 
 public partial class ImageKindFilter : FilterViewModelBase
 {
-    [ObservableProperty] ImageKind? _imageKind;
+    [ObservableProperty]
+    public partial ImageKind? ImageKind { get; set; }
 
     public override string DisplayName => "Image Kind";
 

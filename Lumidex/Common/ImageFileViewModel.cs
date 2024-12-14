@@ -4,185 +4,194 @@ namespace Lumidex.Common;
 
 public partial class ImageFileViewModel : ObservableObject, IEquatable<ImageFileViewModel?>
 {
-    [ObservableProperty] int _id;
-    [ObservableProperty] string _libraryName = string.Empty;
-    [ObservableProperty] ObservableCollectionEx<TagViewModel> _tags = new();
-    [ObservableProperty] string _path = null!;
-    [ObservableProperty] long _fileSize;
+    [ObservableProperty]
+    public partial int Id { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    ImageType _type;
+    public partial string LibraryName { get; set; } = string.Empty;
 
     [ObservableProperty]
-    [property: UserEditable]
-    ImageKind _kind;
+    public partial ObservableCollectionEx<TagViewModel> Tags { get; set; } = new();
+
+    [ObservableProperty]
+    public partial string Path { get; set; } = null!;
+
+    [ObservableProperty]
+    public partial long FileSize { get; set; }
+
+    [ObservableProperty]
+    [UserEditable]
+    public partial ImageType Type { get; set; }
+
+    [ObservableProperty]
+    [UserEditable]
+    public partial ImageKind Kind { get; set; }
 
     #region Camera
 
     [ObservableProperty]
-    [property: UserEditable]
-    string? _cameraName;
+    [UserEditable]
+    public partial string? CameraName { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    double? _exposure;
+    [UserEditable]
+    public partial double? Exposure { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    double? _cameraTemperatureSetPoint;
+    [UserEditable]
+    public partial double? CameraTemperatureSetPoint { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    double? _cameraTemperature;
+    [UserEditable]
+    public partial double? CameraTemperature { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    int? _cameraGain;
+    [UserEditable]
+    public partial int? CameraGain { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    int? _cameraOffset;
+    [UserEditable]
+    public partial int? CameraOffset { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    int? _binning;
+    [UserEditable]
+    public partial int? Binning { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    double? _pixelSize;
+    [UserEditable]
+    public partial double? PixelSize { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    string? _readoutMode;
+    [UserEditable]
+    public partial string? ReadoutMode { get; set; }
 
     #endregion
 
     #region Focuser
 
     [ObservableProperty]
-    [property: UserEditable]
-    string? _focuserName;
+    [UserEditable]
+    public partial string? FocuserName { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    int? _focuserPosition;
+    [UserEditable]
+    public partial int? FocuserPosition { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    double? _focuserTemperature;
+    [UserEditable]
+    public partial double? FocuserTemperature { get; set; }
 
     #endregion
 
     #region Rotator
 
     [ObservableProperty]
-    [property: UserEditable]
-    string? _rotatorName;
+    [UserEditable]
+    public partial string? RotatorName { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    double? _rotatorPosition;
+    [UserEditable]
+    public partial double? RotatorPosition { get; set; }
 
     #endregion
 
     #region Filter Wheel
 
     [ObservableProperty]
-    [property: UserEditable]
-    string? _filterWheelName;
+    [UserEditable]
+    public partial string? FilterWheelName { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    string? _filterName;
+    [UserEditable]
+    public partial string? FilterName { get; set; }
 
     #endregion
 
     #region Mount
 
     [ObservableProperty]
-    [property: UserEditable]
-    double? _rightAscension;
+    [UserEditable]
+    public partial double? RightAscension { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    double? _declination;
+    [UserEditable]
+    public partial double? Declination { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    double? _altitude;
+    [UserEditable]
+    public partial double? Altitude { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    double? _azimuth;
+    [UserEditable]
+    public partial double? Azimuth { get; set; }
 
     #endregion
 
     #region Telescope
 
     [ObservableProperty]
-    [property: UserEditable]
-    string? _telescopeName;
+    [UserEditable]
+    public partial string? TelescopeName { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    double? _focalLength;
+    [UserEditable]
+    public partial double? FocalLength { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    double? _airmass;
+    [UserEditable]
+    public partial double? Airmass { get; set; }
 
     #endregion
 
     #region Target
 
     [ObservableProperty]
-    [property: UserEditable]
-    DateTime? _observationTimestampUtc;
+    [UserEditable]
+    public partial DateTime? ObservationTimestampUtc { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    DateTime? _observationTimestampLocal;
+    [UserEditable]
+    public partial DateTime? ObservationTimestampLocal { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    string? _objectName;
+    [UserEditable]
+    public partial string? ObjectName { get; set; }
 
     #endregion
 
     #region Site
 
     [ObservableProperty]
-    [property: UserEditable]
-    double? _latitude;
+    [UserEditable]
+    public partial double? Latitude { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    double? _longitude;
+    [UserEditable]
+    public partial double? Longitude { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    double? _elevation;
+    [UserEditable]
+    public partial double? Elevation { get; set; }
 
     #endregion
 
     #region Weather
 
     [ObservableProperty]
-    [property: UserEditable]
-    double? _dewPoint;
+    [UserEditable]
+    public partial double? DewPoint { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    double? _humidity;
+    [UserEditable]
+    public partial double? Humidity { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    double? _pressure;
+    [UserEditable]
+    public partial double? Pressure { get; set; }
 
     [ObservableProperty]
-    [property: UserEditable]
-    double? _temperature;
+    [UserEditable]
+    public partial double? Temperature { get; set; }
 
     #endregion
 

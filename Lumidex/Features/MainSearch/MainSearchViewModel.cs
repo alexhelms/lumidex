@@ -20,7 +20,8 @@ public partial class MainSearchViewModel : ViewModelBase,
     public SearchQueryViewModel SearchQueryViewModel { get; }
     public SearchResultsViewModel SearchResultsViewModel { get; }
 
-    [ObservableProperty] ObservableCollectionEx<ImageFileViewModel> _searchResults = new();
+    [ObservableProperty]
+    public partial ObservableCollectionEx<ImageFileViewModel> SearchResults { get; set; } = new();
 
     public MainSearchViewModel(
         IDbContextFactory<LumidexDbContext> dbContextFactory,
