@@ -1,0 +1,30 @@
+<UserControl
+    x:Class="Lumidex.Features.Settings.PlotSettingsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:common="using:Lumidex.Common"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:exporter="using:Lumidex.Core.Exporters"
+    xmlns:i="https://github.com/projektanker/icons.avalonia"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:settings="using:Lumidex.Features.Settings"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="settings:PlotSettingsViewModel"
+    mc:Ignorable="d">
+    <Grid ColumnDefinitions="*,*">
+        <StackPanel>
+            <UniformGrid Columns="2">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    DockPanel.Dock="Left"
+                    Text="Use Calibrated Frames Instead of Raw" />
+                <ToggleSwitch
+                    HorizontalAlignment="Right"
+                    IsChecked="{Binding UseCalibratedFrames}"
+                    OffContent=""
+                    OnContent="" />
+            </UniformGrid>
+        </StackPanel>
+    </Grid>
+</UserControl>

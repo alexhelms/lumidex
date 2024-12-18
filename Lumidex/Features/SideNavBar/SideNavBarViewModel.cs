@@ -10,6 +10,7 @@ public partial class SideNavBarViewModel : ViewModelBase,
     public const string AliasTabName = "Alias";
     public const string TagsTabName = "Tags";
     public const string LibraryTabName = "Library";
+    public const string PlotTabName = "Plot";
 
     // Lower Tabs
     public const string SettingsTabName = "Settings";
@@ -19,8 +20,7 @@ public partial class SideNavBarViewModel : ViewModelBase,
 
     public SideNavBarViewModel()
     {
-        UpperTabs = new()
-        {
+        UpperTabs = [
             new()
             {
                 Name = SearchTabName,
@@ -45,17 +45,22 @@ public partial class SideNavBarViewModel : ViewModelBase,
                 ToolTipText = "Manage your library",
                 Icon = "mdi-bookshelf",
             },
-        };
+            new()
+            {
+                Name = PlotTabName,
+                ToolTipText = "Plot your data",
+                Icon = "mdi-chart-line",
+            },
+        ];
 
-        LowerTabs = new()
-        {
+        LowerTabs = [
             new()
             {
                 Name = SettingsTabName,
                 ToolTipText = "Lumidex Settings",
                 Icon = "mdi-cog",
             },
-        };
+        ];
     }
 
     protected override void OnInitialActivated()

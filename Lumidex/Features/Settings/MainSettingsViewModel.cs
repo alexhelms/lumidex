@@ -8,11 +8,13 @@ public partial class MainSettingsViewModel : ViewModelBase
 
     public MainSettingsViewModel(
         AstrobinSettingsViewModel astrobinSettings,
-        SearchSettingsViewModel searchSettings)
+        SearchSettingsViewModel searchSettings,
+        PlotSettingsViewModel plotSettings)
     {
         ViewModels = [
             astrobinSettings,
             searchSettings,
+            plotSettings,
         ];
 
         SelectedViewModel = astrobinSettings;
