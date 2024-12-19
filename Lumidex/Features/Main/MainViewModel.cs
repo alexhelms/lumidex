@@ -1,14 +1,15 @@
-﻿using Lumidex.Features.Tags;
-using Lumidex.Features.Library;
-using Lumidex.Features.MainSearch;
-using Lumidex.Features.SideNavBar;
-using Lumidex.Features.Aliases;
-using Avalonia.Controls.ApplicationLifetimes;
-using Lumidex.Services;
-using Lumidex.Features.Settings;
-using Lumidex.Core.IO;
-using Lumidex.Features.Main.Messages;
+﻿using Avalonia.Controls.ApplicationLifetimes;
 using Lumidex.Core;
+using Lumidex.Core.IO;
+using Lumidex.Features.Aliases;
+using Lumidex.Features.Library;
+using Lumidex.Features.Main.Messages;
+using Lumidex.Features.MainSearch;
+using Lumidex.Features.Plot;
+using Lumidex.Features.Settings;
+using Lumidex.Features.SideNavBar;
+using Lumidex.Features.Tags;
+using Lumidex.Services;
 
 namespace Lumidex.Features.Main;
 
@@ -22,6 +23,7 @@ public partial class MainViewModel : ViewModelBase,
     private readonly AliasManagerViewModel _aliasManagerViewModel;
     private readonly TagManagerViewModel _tagManagerViewModel;
     private readonly LibraryManagerViewModel _libraryManagerViewModel;
+    private readonly PlotManagerViewModel _plotManagerViewModel;
     private readonly MainSettingsViewModel _settingsViewModel;
 
     [ObservableProperty]
@@ -42,6 +44,7 @@ public partial class MainViewModel : ViewModelBase,
         AliasManagerViewModel aliasManagerViewModel,
         TagManagerViewModel tagManagerViewModel,
         LibraryManagerViewModel libraryManagerViewModel,
+        PlotManagerViewModel plotManagerViewModel,
         MainSettingsViewModel settingsViewModel)
     {
         _systemService = systemService;
@@ -52,6 +55,7 @@ public partial class MainViewModel : ViewModelBase,
         _aliasManagerViewModel = aliasManagerViewModel;
         _tagManagerViewModel = tagManagerViewModel;
         _libraryManagerViewModel = libraryManagerViewModel;
+        _plotManagerViewModel = plotManagerViewModel;
         _settingsViewModel = settingsViewModel;
 
         // 28px for MacOS so traffic light is vertically centered.
@@ -84,6 +88,7 @@ public partial class MainViewModel : ViewModelBase,
             SideNavBarViewModel.AliasTabName => _aliasManagerViewModel,
             SideNavBarViewModel.TagsTabName => _tagManagerViewModel,
             SideNavBarViewModel.LibraryTabName => _libraryManagerViewModel,
+            SideNavBarViewModel.PlotTabName => _plotManagerViewModel,
             // Lower Tabs
             SideNavBarViewModel.SettingsTabName => _settingsViewModel,
             _ => throw new NotImplementedException(),

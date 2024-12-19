@@ -26,6 +26,7 @@
     <PackageReference Include="Avalonia.Controls.ColorPicker" />
     <PackageReference Include="Avalonia.Controls.DataGrid" />
     <PackageReference Include="Avalonia.Fonts.Inter" />
+    <PackageReference Include="Avalonia.Skia" />
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="Avalonia.Xaml.Behaviors" />
     <PackageReference Include="Avalonia.Xaml.Interactivity" />
@@ -41,6 +42,7 @@
     <PackageReference Include="ObservableCollectionEx" />
     <PackageReference Include="Projektanker.Icons.Avalonia.MaterialDesign" />
     <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" />
+    <PackageReference Include="ScottPlot" />
     <PackageReference Include="Serilog" />
 
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
@@ -65,6 +67,12 @@
     </Compile>
     <Compile Update="Features\Aliases\ObjectNameView.axaml.cs">
       <DependentUpon>ObjectNameView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Features\Plot\IntegrationOverTimeView.axaml.cs">
+      <DependentUpon>IntegrationOverTimeView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Features\Settings\PlotSettingsView.axaml.cs">
+      <DependentUpon>PlotSettingsView.axaml</DependentUpon>
     </Compile>
     <Compile Update="Features\Tags\TagManagerView.axaml.cs">
       <DependentUpon>TagManagerView.axaml</DependentUpon>
