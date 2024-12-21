@@ -8,10 +8,13 @@ public partial class PlotManagerViewModel : ViewModelBase
     [ObservableProperty]
     public partial PlotViewModel? SelectedPlot { get; set; }
 
-    public PlotManagerViewModel(IntegrationOverTimeViewModel integrationOverTime)
+    public PlotManagerViewModel(
+        IntegrationOverTimeViewModel integrationOverTime,
+        IntegrationPiePlotViewModel integrationPie)
     {
         Plots = [
-            integrationOverTime
+            integrationOverTime,
+            integrationPie
         ];
 
         SelectedPlot = Plots.First();

@@ -28,7 +28,7 @@ public partial class ObjectNameFilter : FilterViewModelBase
 
                 aliases.UnionWith(dbContext.ObjectAliases
                     .Where(a => EF.Functions.Like(a.Alias, $"%{Name}%"))
-                .Select(a => a.ObjectName));
+                    .Select(a => a.ObjectName));
 
                 aliases.UnionWith(dbContext.ImageFiles
                     .Where(f => f.ObjectName != null)
