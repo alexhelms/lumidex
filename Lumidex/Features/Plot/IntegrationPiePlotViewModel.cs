@@ -23,7 +23,7 @@ public partial class IntegrationPiePlotViewModel : PlotViewModel
     public partial string? TelescopeName { get; set; }
 
     [ObservableProperty]
-    public partial int CutoffThreshold { get; set; } = 2;
+    public partial double CutoffThreshold { get; set; } = 2;
 
     public IntegrationPiePlotViewModel(IDbContextFactory<LumidexDbContext> dbContextFactory)
     {

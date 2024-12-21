@@ -92,20 +92,19 @@
                         Width="120"
                         VerticalAlignment="Center"
                         DockPanel.Dock="Left"
-                        Text="Slice Cuttoff %" />
+                        Text="Slice Cuttoff" />
                     <TextBlock
-                        Width="35"
+                        Width="44"
                         VerticalAlignment="Center"
                         DockPanel.Dock="Right"
-                        Text="{Binding CutoffThreshold, StringFormat={}{0}%}"
+                        Text="{Binding CutoffThreshold, StringFormat={}{0:F2}%}"
                         TextAlignment="Right" />
                     <Slider
                         Margin="8,0,0,0"
-                        IsSnapToTickEnabled="True"
-                        LargeChange="2"
-                        Maximum="10"
+                        LargeChange="0.5"
+                        Maximum="3"
                         Minimum="0"
-                        SmallChange="1"
+                        SmallChange="0.1"
                         TickFrequency="1"
                         TickPlacement="BottomRight"
                         Value="{Binding CutoffThreshold}" />
