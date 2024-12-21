@@ -1,12 +1,15 @@
-﻿using Lumidex.Core.Data;
+﻿using Avalonia.Threading;
+using Lumidex.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using ScottPlot;
+using System.Timers;
 
 namespace Lumidex.Features.Plot;
 
 public partial class IntegrationPiePlotViewModel : PlotViewModel
 {
     private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
+    private System.Timers.Timer? _timer;
 
     public override string DisplayName => "Integration Pie";
 
@@ -40,6 +43,34 @@ public partial class IntegrationPiePlotViewModel : PlotViewModel
         GeneratePlot();
     }
 
+    protected override void OnActivated()
+    {
+        base.OnActivated();
+        _timer = new System.Timers.Timer(TimeSpan.FromMilliseconds(50));
+        _timer.AutoReset = false;
+        _timer.Elapsed += (_, _) =>
+        {
+            if (IsActive)
+            {
+                Dispatcher.UIThread.InvokeAsync(GeneratePlot);
+            }
+        };
+    }
+
+    protected override void OnDeactivated()
+    {
+        base.OnDeactivated();
+        _timer?.Stop();
+        _timer?.Dispose();
+        _timer = null;
+    }
+
+    partial void OnCutoffThresholdChanged(double value)
+    {
+        _timer?.Stop();
+        _timer?.Start();
+    }
+
     [RelayCommand]
     private void ClearCameraName() => CameraName = null;
 
@@ -56,28 +87,44 @@ public partial class IntegrationPiePlotViewModel : PlotViewModel
     {
         Plot.Clear();
 
-        var data = GetPlotData();
+        Dictionary<string, double> data = GetPlotData();
         var slices = new List<PieSlice>(data.Count);
         var sum = data.Values.Sum();
         var threshold = CutoffThreshold / 100.0 * sum;
+        bool sliceRemoved = false;
+
+        do
+        {
+            sliceRemoved = false;
+            sum = data.Values.Sum();
+            threshold = CutoffThreshold / 100.0 * sum;
+            foreach (var (name, totalExposure) in data)
+            {
+                if (totalExposure <= threshold)
+                {
+                    data.Remove(name);
+                    sliceRemoved = true;
+                    break;
+                }
+            }
+        }
+        while (sliceRemoved);
+
         var colors = Rainbow(data.Count).ToArray();
-        int i = 0;
+        int colorIndex = 0;
 
         foreach (var (name, totalExposure) in data)
         {
-            if (totalExposure >= threshold)
+            slices.Add(new PieSlice
             {
-                slices.Add(new PieSlice
-                {
-                    Label = $"{name}{Environment.NewLine}{totalExposure:F1} hr",
-                    Value = totalExposure,
-                    LabelFontColor = Colors.White,
-                    LabelFontSize = 16,
-                    FillColor = colors[i],
-                });
-            }
+                Label = $"{name}{Environment.NewLine}{totalExposure:F1} hr",
+                Value = totalExposure,
+                LabelFontColor = Colors.White,
+                LabelFontSize = 16,
+                FillColor = colors[colorIndex],
+            });
 
-            i++;
+            colorIndex++;
         }
 
         var pie = Plot.Add.Pie(slices);
