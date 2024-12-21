@@ -101,12 +101,12 @@
                         TextAlignment="Right" />
                     <Slider
                         Margin="8,0,0,0"
+                        IsSnapToTickEnabled="True"
                         LargeChange="0.5"
                         Maximum="3"
                         Minimum="0"
                         SmallChange="0.1"
-                        TickFrequency="1"
-                        TickPlacement="BottomRight"
+                        TickFrequency="0.05"
                         Value="{Binding CutoffThreshold}" />
                 </DockPanel>
 
