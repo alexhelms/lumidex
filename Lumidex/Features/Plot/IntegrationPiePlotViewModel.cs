@@ -1,5 +1,4 @@
-﻿using Humanizer;
-using Lumidex.Core.Data;
+﻿using Lumidex.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using ScottPlot;
 
@@ -17,6 +16,15 @@ public partial class IntegrationPiePlotViewModel : PlotViewModel
     [ObservableProperty]
     public partial DateTime DateEndLocal { get; set; }
 
+    [ObservableProperty]
+    public partial string? CameraName { get; set; }
+
+    [ObservableProperty]
+    public partial string? TelescopeName { get; set; }
+
+    [ObservableProperty]
+    public partial int CutoffThreshold { get; set; } = 2;
+
     public IntegrationPiePlotViewModel(IDbContextFactory<LumidexDbContext> dbContextFactory)
     {
         _dbContextFactory = dbContextFactory;
@@ -33,6 +41,12 @@ public partial class IntegrationPiePlotViewModel : PlotViewModel
     }
 
     [RelayCommand]
+    private void ClearCameraName() => CameraName = null;
+
+    [RelayCommand]
+    private void ClearTelescopeName() => TelescopeName = null;
+
+    [RelayCommand]
     private void DrawPlot()
     {
         GeneratePlot();
@@ -45,7 +59,7 @@ public partial class IntegrationPiePlotViewModel : PlotViewModel
         var data = GetPlotData();
         var slices = new List<PieSlice>(data.Count);
         var sum = data.Values.Sum();
-        var threshold = 0.02 * sum;
+        var threshold = CutoffThreshold / 100.0 * sum;
         var colors = Rainbow(data.Count).ToArray();
         int i = 0;
 
@@ -72,6 +86,13 @@ public partial class IntegrationPiePlotViewModel : PlotViewModel
         pie.LineWidth = 2;
         pie.DonutFraction = 0.25;
 
+        var totalAnnotation = Plot.Add.Annotation($"{sum:F1} hours", Alignment.MiddleCenter);
+        totalAnnotation.LabelFontSize = 20;
+        totalAnnotation.LabelFontColor = Colors.White;
+        totalAnnotation.LabelBackgroundColor = Colors.Transparent;
+        totalAnnotation.LabelBorderColor = Colors.Transparent;
+        totalAnnotation.LabelShadowColor = Colors.Transparent;
+
         Plot.Title("Integration Pie");
         Plot.HideLegend();
         Plot.HideAxesAndGrid();
@@ -96,8 +117,7 @@ public partial class IntegrationPiePlotViewModel : PlotViewModel
             }
         }
 
-        // Naive query of total exposure grouped by object name, not considering object name aliases.
-        Dictionary<string, double> groups = dbContext.ImageFiles
+        var query = dbContext.ImageFiles
             .AsNoTracking()
             .Where(image => image.ObjectName != null)
             .Where(image => image.Exposure != null)
@@ -105,6 +125,15 @@ public partial class IntegrationPiePlotViewModel : PlotViewModel
             .Where(image => image.Kind == kind)
             .Where(image => image.ObservationTimestampLocal >= DateBeginLocal)
             .Where(image => image.ObservationTimestampLocal <= DateEndLocal)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(CameraName))
+            query = query.Where(f => EF.Functions.Like(f.CameraName, $"%{CameraName}%"));
+
+        if (!string.IsNullOrWhiteSpace(TelescopeName))
+            query = query.Where(f => EF.Functions.Like(f.TelescopeName, $"%{TelescopeName}%"));
+
+        Dictionary<string, double> groups = query
             .GroupBy(image => image.ObjectName!)
             .Select(group => new
             {

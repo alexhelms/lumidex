@@ -55,6 +55,62 @@
                         Watermark=" " />
                 </DockPanel>
 
+                <DockPanel Margin="0,8,0,0">
+                    <TextBlock
+                        Width="120"
+                        VerticalAlignment="Center"
+                        DockPanel.Dock="Left"
+                        Text="Camera Name" />
+                    <Button
+                        Margin="5,0,0,0"
+                        VerticalAlignment="Stretch"
+                        i:Attached.Icon="mdi-close"
+                        Command="{Binding ClearCameraNameCommand}"
+                        DockPanel.Dock="Right"
+                        ToolTip.Tip="Clear" />
+                    <TextBox Margin="8,0,0,0" Text="{Binding CameraName}" />
+                </DockPanel>
+
+                <DockPanel Margin="0,8,0,0">
+                    <TextBlock
+                        Width="120"
+                        VerticalAlignment="Center"
+                        DockPanel.Dock="Left"
+                        Text="Telescope Name" />
+                    <Button
+                        Margin="5,0,0,0"
+                        VerticalAlignment="Stretch"
+                        i:Attached.Icon="mdi-close"
+                        Command="{Binding ClearTelescopeNameCommand}"
+                        DockPanel.Dock="Right"
+                        ToolTip.Tip="Clear" />
+                    <TextBox Margin="8,0,0,0" Text="{Binding TelescopeName}" />
+                </DockPanel>
+
+                <DockPanel Margin="0,8,0,0">
+                    <TextBlock
+                        Width="120"
+                        VerticalAlignment="Center"
+                        DockPanel.Dock="Left"
+                        Text="Slice Cuttoff %" />
+                    <TextBlock
+                        Width="35"
+                        VerticalAlignment="Center"
+                        DockPanel.Dock="Right"
+                        Text="{Binding CutoffThreshold, StringFormat={}{0}%}"
+                        TextAlignment="Right" />
+                    <Slider
+                        Margin="8,0,0,0"
+                        IsSnapToTickEnabled="True"
+                        LargeChange="2"
+                        Maximum="10"
+                        Minimum="0"
+                        SmallChange="1"
+                        TickFrequency="1"
+                        TickPlacement="BottomRight"
+                        Value="{Binding CutoffThreshold}" />
+                </DockPanel>
+
                 <StackPanel
                     Margin="0,8,0,0"
                     HorizontalAlignment="Right"
@@ -68,8 +124,8 @@
                         <i:Icon FontSize="20" Value="mdi-information-outline" />
                         <ToolTip.Tip>
                             <TextBlock LineSpacing="5" TextWrapping="Wrap">
-                                This plot shows the total integration time in hours grouped by month.
-                                Only light and raw/calibrated images are considered.
+                                This plot shows the total integration time in hours between two dates.
+                                Small pie slices can be omitted by adjusting the slice cutoff percent.
                             </TextBlock>
                         </ToolTip.Tip>
                     </Border>
