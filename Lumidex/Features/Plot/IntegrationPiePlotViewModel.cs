@@ -73,8 +73,8 @@ public partial class IntegrationPiePlotViewModel : PlotViewModel
         pie.DonutFraction = 0.25;
 
         Plot.Title("Integration Pie");
-        Plot.HideGrid();
         Plot.HideLegend();
+        Plot.HideAxesAndGrid();
         Plot.Axes.Margins(0, 0);
         Plot.Axes.AutoScale();
 
