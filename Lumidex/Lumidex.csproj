@@ -60,31 +60,5 @@
   <ItemGroup>
     <Content Include="Assets\lumidex-icon.ico" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Features\Aliases\AliasManagerView.axaml.cs">
-      <DependentUpon>AliasManagerView.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Features\Aliases\ObjectNameView.axaml.cs">
-      <DependentUpon>ObjectNameView.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Features\Plot\IntegrationOverTimeView.axaml.cs">
-      <DependentUpon>IntegrationOverTimeView.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Features\Settings\PlotSettingsView.axaml.cs">
-      <DependentUpon>PlotSettingsView.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Features\Tags\TagManagerView.axaml.cs">
-      <DependentUpon>TagManagerView.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Features\Library\LibraryManagerView.axaml.cs">
-      <DependentUpon>LibraryManagerView.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Features\Library\LibraryView.axaml.cs">
-      <DependentUpon>LibraryView.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Features\MainSearch\SearchQueryView.axaml.cs">
-      <DependentUpon>SearchQueryView.axaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
+  
 </Project>

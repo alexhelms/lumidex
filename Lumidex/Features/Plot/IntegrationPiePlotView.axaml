@@ -1,0 +1,97 @@
+<UserControl
+    x:Class="Lumidex.Features.Plot.IntegrationPiePlotView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Lumidex.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="https://github.com/projektanker/icons.avalonia"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:plot="using:Lumidex.Features.Plot"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="plot:IntegrationPiePlotViewModel"
+    mc:Ignorable="d">
+    <DockPanel>
+
+        <DockPanel Margin="0,40,0,0" DockPanel.Dock="Left">
+
+
+
+            <StackPanel>
+
+                <DockPanel>
+                    <TextBlock
+                        Width="120"
+                        VerticalAlignment="Center"
+                        DockPanel.Dock="Left"
+                        Text="Date Begin Local" />
+                    <CalendarDatePicker
+                        Width="220"
+                        Margin="8,0,0,0"
+                        HorizontalAlignment="Stretch"
+                        CustomDateFormatString="yyyy/MM/dd"
+                        IsTodayHighlighted="True"
+                        SelectedDate="{Binding DateBeginLocal}"
+                        SelectedDateFormat="Custom"
+                        ToolTip.Tip="Begin date, UTC"
+                        Watermark=" " />
+                </DockPanel>
+
+                <DockPanel Margin="0,8,0,0">
+                    <TextBlock
+                        Width="120"
+                        VerticalAlignment="Center"
+                        DockPanel.Dock="Left"
+                        Text="Date End Local" />
+                    <CalendarDatePicker
+                        Width="220"
+                        Margin="8,0,0,0"
+                        HorizontalAlignment="Stretch"
+                        CustomDateFormatString="yyyy/MM/dd"
+                        IsTodayHighlighted="True"
+                        SelectedDate="{Binding DateEndLocal}"
+                        SelectedDateFormat="Custom"
+                        ToolTip.Tip="Begin date, UTC"
+                        Watermark=" " />
+                </DockPanel>
+
+                <StackPanel
+                    Margin="0,8,0,0"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal">
+
+                    <Border
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Background="Transparent"
+                        DockPanel.Dock="Bottom">
+                        <i:Icon FontSize="20" Value="mdi-information-outline" />
+                        <ToolTip.Tip>
+                            <TextBlock LineSpacing="5" TextWrapping="Wrap">
+                                This plot shows the total integration time in hours grouped by month.
+                                Only light and raw/calibrated images are considered.
+                            </TextBlock>
+                        </ToolTip.Tip>
+                    </Border>
+
+                    <Button
+                        Width="100"
+                        Margin="8,0,0,0"
+                        HorizontalContentAlignment="Center"
+                        Classes="accent"
+                        Command="{Binding DrawPlotCommand}"
+                        Content="Plot"
+                        IsDefault="True" />
+
+                </StackPanel>
+
+
+
+            </StackPanel>
+
+        </DockPanel>
+
+        <controls:AvaPlot Margin="8,0,0,0" Plot="{Binding Plot}" />
+
+    </DockPanel>
+</UserControl>
