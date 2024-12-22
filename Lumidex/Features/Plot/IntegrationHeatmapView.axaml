@@ -134,7 +134,7 @@
                             <ToolTip.Tip>
                                 <TextBlock LineSpacing="5" TextWrapping="Wrap">
                                     This plot shows the total integration time in hours between two dates.
-                                    Small pie slices can be omitted by adjusting the slice cutoff percent.
+                                    Each square is one day and the color is the total exposure taken on that day.
                                 </TextBlock>
                             </ToolTip.Tip>
                         </Border>
