@@ -113,21 +113,22 @@ public partial class IntegrationOverTimeViewModel : PlotViewModel
             FROM (
             	SELECT ObservationTimestampLocal, Exposure
             	FROM ImageFiles
-            	WHERE
-                    Type = {type} AND
-                    Kind = {kind} AND
-                    ObservationTimestampLocal IS NOT NULL AND
-                    ObservationTimestampLocal > {start} AND
-                    ObservationTimestampLocal < {end}
+            	WHERE 1 = 1
+                  AND Type = {type}
+                  AND Kind = {kind}
+                  AND ObservationTimestampLocal IS NOT NULL
+                  AND ObservationTimestampLocal > {start}
+                  AND ObservationTimestampLocal < {end}
             )
             GROUP BY Timestamp
+            ORDER BY Timestamp
             """;
 
         var items = dbContext.Database
-            .SqlQuery<ExposureGroupingSql>(sql)
+            .SqlQuery<ExposureGroup>(sql)
             .ToList();
 
-        double[] xValues = items.Select(item => DateTime.ParseExact(item.Timestamp, "yyyy-MM", null).ToOADate()).ToArray();
+        double[] xValues = items.Select(item => item.Timestamp.ToOADate()).ToArray();
         double[] yValues = items.Select(item => item.TotalExposure).ToArray();
 
         // If no data is available, create some fake data to plot so "no data" renders a reasonable plot.
@@ -150,7 +151,5 @@ public partial class IntegrationOverTimeViewModel : PlotViewModel
         return (xValues, yValues);
     }
 
-    private record ExposureGroupingSql(string Timestamp, double TotalExposure);
-
-    public record ExposureGroup(DateTime Timestamp, double ExposureHours);
+    public record ExposureGroup(DateTime Timestamp, double TotalExposure);
 }

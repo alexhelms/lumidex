@@ -1,5 +1,5 @@
 <UserControl
-    x:Class="Lumidex.Features.Plot.IntegrationPiePlotView"
+    x:Class="Lumidex.Features.Plot.IntegrationHeatmapView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:Lumidex.Controls"
@@ -9,7 +9,7 @@
     xmlns:plot="using:Lumidex.Features.Plot"
     d:DesignHeight="450"
     d:DesignWidth="800"
-    x:DataType="plot:IntegrationPiePlotViewModel"
+    x:DataType="plot:IntegrationHeatmapViewModel"
     mc:Ignorable="d">
     <DockPanel>
 
@@ -83,29 +83,6 @@
                         DockPanel.Dock="Right"
                         ToolTip.Tip="Clear" />
                     <TextBox Margin="8,0,0,0" Text="{Binding TelescopeName}" />
-                </DockPanel>
-
-                <DockPanel Margin="0,8,0,0">
-                    <TextBlock
-                        Width="120"
-                        VerticalAlignment="Center"
-                        DockPanel.Dock="Left"
-                        Text="Slice Cuttoff" />
-                    <TextBlock
-                        Width="44"
-                        VerticalAlignment="Center"
-                        DockPanel.Dock="Right"
-                        Text="{Binding CutoffThreshold, StringFormat={}{0:F2}%}"
-                        TextAlignment="Right" />
-                    <Slider
-                        Margin="8,0,0,0"
-                        IsSnapToTickEnabled="True"
-                        LargeChange="0.5"
-                        Maximum="3"
-                        Minimum="0"
-                        SmallChange="0.1"
-                        TickFrequency="0.05"
-                        Value="{Binding CutoffThreshold}" />
                 </DockPanel>
 
                 <StackPanel
