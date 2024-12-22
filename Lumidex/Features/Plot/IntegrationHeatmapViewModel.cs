@@ -1,4 +1,5 @@
-﻿using Lumidex.Core.Data;
+﻿using Avalonia.Threading;
+using Lumidex.Core.Data;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using ScottPlot;
@@ -25,9 +26,17 @@ public partial class IntegrationHeatmapViewModel : PlotViewModel
     [ObservableProperty]
     public partial string? TelescopeName { get; set; }
 
+    [ObservableProperty]
+    public partial bool ShowDetailedLabels { get; set; }
+
     public IntegrationHeatmapViewModel(IDbContextFactory<LumidexDbContext> dbContextFactory)
     {
         _dbContextFactory = dbContextFactory;
+    }
+
+    partial void OnShowDetailedLabelsChanged(bool value)
+    {
+        Dispatcher.UIThread.InvokeAsync(DrawPlot);
     }
 
     protected override void OnInitialActivated()
@@ -47,6 +56,27 @@ public partial class IntegrationHeatmapViewModel : PlotViewModel
     private void ClearTelescopeName() => TelescopeName = null;
 
     [RelayCommand]
+    private void SearchPrev6Months()
+    {
+        DateBeginLocal = DateTime.Now.AddMonths(-6);
+        DrawPlot();
+    }
+
+    [RelayCommand]
+    private void SearchPrev1Year()
+    {
+        DateBeginLocal = DateTime.Now.AddYears(-1);
+        DrawPlot();
+    }
+
+    [RelayCommand]
+    private void SearchPrev2Years()
+    {
+        DateBeginLocal = DateTime.Now.AddYears(-2);
+        DrawPlot();
+    }
+
+    [RelayCommand]
     private void DrawPlot()
     {
         GeneratePlot();
@@ -63,7 +93,6 @@ public partial class IntegrationHeatmapViewModel : PlotViewModel
         var data = GetPlotData();
 
         const int DaysInAWeek = 7;
-        const int DaysInAMonth = 30;
         DateTime end = DateEndLocal.Date;
         DateTime start = DateBeginLocal.Date;
         if (end < start)
@@ -76,7 +105,6 @@ public partial class IntegrationHeatmapViewModel : PlotViewModel
         int numDays = (int)(end - start).TotalDays;
         numDays = (int)Math.Round(Math.Ceiling(numDays / (double)DaysInAWeek)) * DaysInAWeek;
         int numWeeks = Math.Max(1, numDays / DaysInAWeek);
-        int numMonths = Math.Max(1, numDays / DaysInAMonth);
 
         double[,] exposureMap = new double[DaysInAWeek, numWeeks];
         for (int week = 0; week < numWeeks; week++)
@@ -90,8 +118,26 @@ public partial class IntegrationHeatmapViewModel : PlotViewModel
         }
 
         var heatmap = Plot.Add.Heatmap(exposureMap);
-        heatmap.CellAlignment = Alignment.MiddleLeft;
+        heatmap.CellAlignment = Alignment.MiddleCenter;
         heatmap.Colormap = new ScottPlot.Colormaps.Viridis();
+
+        if (ShowDetailedLabels)
+        {
+            for (int x = 0, i = 0; x < exposureMap.GetLength(1); x++)
+            {
+                for (int y = 0; y < exposureMap.GetLength(0); y++, i++)
+                {
+                    Coordinates coordinates = new(x, (DaysInAWeek - 1) - y);
+                    var value = exposureMap[y, x];
+                    if (value == 0) continue;
+                    var cellLabel = $"{value:F1}\n{start.AddDays(i):M-d}";
+                    var text = Plot.Add.Text(cellLabel, coordinates);
+                    text.Alignment = Alignment.MiddleCenter;
+                    text.LabelFontColor = Colors.White;
+                    text.LabelFontSize = 8;
+                }
+            }
+        }
 
         _colorBar = Plot.Add.ColorBar(heatmap, Edge.Bottom);
         _colorBar.Label = "Exposure (hr)";
@@ -102,10 +148,8 @@ public partial class IntegrationHeatmapViewModel : PlotViewModel
         _colorBar.Axis.MinorTickStyle.Color = Colors.Transparent;
 
         Plot.HideGrid();
-        Plot.Axes.SquareUnits();
-        Plot.Axes.Left.Min = 0;
-        Plot.Axes.Bottom.Min = 0;
-        Plot.Axes.Margins(0.06, 0);
+        Plot.Axes.SquareUnits((end - start).TotalDays > 90);
+        Plot.Axes.Margins();
         Plot.Axes.FrameColor(Colors.Transparent);
         Plot.Axes.Left.SetTicks([], []);
         Plot.Axes.Bottom.SetTicks([], []);
@@ -114,25 +158,44 @@ public partial class IntegrationHeatmapViewModel : PlotViewModel
         var sunday = DateTime.Now.AddDays(DayOfWeek.Sunday - DateTime.Now.DayOfWeek);
         for (int i = 0; i < DaysInAWeek; i++)
         {
-            var text = Plot.Add.Text(sunday.AddDays(DaysInAWeek - i - 1).ToString("ddd"), 0, i);
+            var text = Plot.Add.Text(sunday.AddDays(DaysInAWeek - i - 1).ToString("ddd"), -0.5, i);
             text.LabelFontColor = Colors.White;
             text.LabelAlignment = Alignment.MiddleRight;
             text.OffsetX = -5;
         }
 
         // Month labels
-        for (int i = 0; i <= numMonths; i++)
+        int monthCounter = 0;
+        for (int i = 0; i < numDays; i++)
         {
-            var label = start.AddMonths(i).ToString("MMM |yy").Replace('|', '\'');
-            var text = Plot.Add.Text(label, i * (numWeeks / numMonths), -1);
-            text.LabelFontColor = Colors.White;
-            text.LabelAlignment = Alignment.UpperCenter;
-            text.LabelOffsetX = 30;
-            text.LabelOffsetY = -5;
+            var today = start.AddDays(i);
+            
+            // Every week, with a special case for the first cell in the first column being the first of the month.
+            if (((i + 1) % DaysInAWeek == 0) || (i == 0 && today.Day == 1))
+            {
+                var week = start.AddDays(i == 0 ? i : i + 1);
+
+                // Every month
+                if (week.Month != week.AddDays(-DaysInAWeek).Month)
+                {
+                    // Limit the labels when there are multiple years
+                    if (monthCounter % Math.Max(1, end.Year - start.Year) == 0)
+                    {
+                        var label = week.ToString("MMM |yy").Replace('|', '\'');
+                        var text = Plot.Add.Text(label, i / DaysInAWeek, -1);
+                        text.LabelFontColor = Colors.White;
+                        text.LabelAlignment = Alignment.UpperCenter;
+                        text.LabelOffsetX = 8;
+                        text.LabelOffsetY = -5;
+                    }
+
+                    monthCounter++;
+                }
+            }
         }
 
         // Border
-        var heatmapBorder = Plot.Add.Rectangle(0, numWeeks, -0.5, DaysInAWeek - 0.5);
+        var heatmapBorder = Plot.Add.Rectangle(-0.5, numWeeks - 0.5, -0.5, DaysInAWeek - 0.5);
         heatmapBorder.LineColor = Colors.White;
         heatmapBorder.FillColor = Colors.Transparent;
 
@@ -143,10 +206,7 @@ public partial class IntegrationHeatmapViewModel : PlotViewModel
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 
-        // sqlite implicitly selects the first of the month (I think)
-        // so I need to add an additional month so the WHERE clause
-        // works as expected.
-        var end = DateEndLocal.AddDays(1).ToString("yyyy-MM-dd");
+        var end = DateEndLocal.ToString("yyyy-MM-dd");
         var start = DateBeginLocal.ToString("yyyy-MM-dd");
         var type = (int)ImageType.Light;
         var kind = (int)ImageKind.Raw;
@@ -181,17 +241,17 @@ public partial class IntegrationHeatmapViewModel : PlotViewModel
         var sql =
             $"""
             SELECT DISTINCT 
-                strftime('%Y-%m-%d', ObservationTimestampLocal, '-12:00') as Timestamp, 
+                Timestamp, 
                 SUM(Exposure)/3600 AS TotalExposure
             FROM (
-                SELECT ObservationTimestampLocal, Exposure
+                SELECT strftime('%Y-%m-%d', ObservationTimestampLocal, '-12:00') as Timestamp, Exposure
                 FROM ImageFiles
                 WHERE 1 = 1
                     AND Type = @type
                     AND Kind = @kind
                     AND ObservationTimestampLocal IS NOT NULL
-                    AND ObservationTimestampLocal > @start
-                    AND ObservationTimestampLocal < @end
+                    AND strftime('%Y-%m-%d', ObservationTimestampLocal, '-12:00') >= @start
+                    AND strftime('%Y-%m-%d', ObservationTimestampLocal, '-12:00') <= @end
                     {cameraNameFilter}
                     {telescopeNameFilter}
             )

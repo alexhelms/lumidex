@@ -85,35 +85,72 @@
                     <TextBox Margin="8,0,0,0" Text="{Binding TelescopeName}" />
                 </DockPanel>
 
-                <StackPanel
-                    Margin="0,8,0,0"
-                    HorizontalAlignment="Right"
-                    Orientation="Horizontal">
-
-                    <Border
-                        HorizontalAlignment="Left"
+                <DockPanel Margin="0,8,0,0">
+                    <TextBlock
                         VerticalAlignment="Center"
-                        Background="Transparent"
-                        DockPanel.Dock="Bottom">
-                        <i:Icon FontSize="20" Value="mdi-information-outline" />
-                        <ToolTip.Tip>
-                            <TextBlock LineSpacing="5" TextWrapping="Wrap">
-                                This plot shows the total integration time in hours between two dates.
-                                Small pie slices can be omitted by adjusting the slice cutoff percent.
-                            </TextBlock>
-                        </ToolTip.Tip>
-                    </Border>
+                        DockPanel.Dock="Left"
+                        Text="Show Detailed Labels" />
+                    <ToggleSwitch
+                        Margin="8,0,-12,0"
+                        HorizontalAlignment="Right"
+                        IsChecked="{Binding ShowDetailedLabels}"
+                        OffContent="{x:Null}"
+                        OnContent="{x:Null}" />
+                </DockPanel>
 
-                    <Button
-                        Width="100"
-                        Margin="8,0,0,0"
-                        HorizontalContentAlignment="Center"
-                        Classes="accent"
-                        Command="{Binding DrawPlotCommand}"
-                        Content="Plot"
-                        IsDefault="True" />
+                <DockPanel Margin="0,8,0,0">
 
-                </StackPanel>
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                        <Button
+                            Width="48"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding SearchPrev2YearsCommand}"
+                            Content="2yr"
+                            ToolTip.Tip="Show plot for the past two years." />
+                        <Button
+                            Width="48"
+                            Margin="5,0,0,0"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding SearchPrev1YearCommand}"
+                            Content="1yr"
+                            ToolTip.Tip="Show plot for the past one year." />
+                        <Button
+                            Width="48"
+                            Margin="5,0,0,0"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding SearchPrev6MonthsCommand}"
+                            Content="6mo"
+                            ToolTip.Tip="Show plot for the past six months." />
+                    </StackPanel>
+
+                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+
+                        <Border
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Background="Transparent"
+                            DockPanel.Dock="Bottom">
+                            <i:Icon FontSize="20" Value="mdi-information-outline" />
+                            <ToolTip.Tip>
+                                <TextBlock LineSpacing="5" TextWrapping="Wrap">
+                                    This plot shows the total integration time in hours between two dates.
+                                    Small pie slices can be omitted by adjusting the slice cutoff percent.
+                                </TextBlock>
+                            </ToolTip.Tip>
+                        </Border>
+
+                        <Button
+                            Width="100"
+                            Margin="8,0,0,0"
+                            HorizontalContentAlignment="Center"
+                            Classes="accent"
+                            Command="{Binding DrawPlotCommand}"
+                            Content="Plot"
+                            IsDefault="True" />
+
+                    </StackPanel>
+
+                </DockPanel>
 
             </StackPanel>
 
