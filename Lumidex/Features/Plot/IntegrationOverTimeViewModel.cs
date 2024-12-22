@@ -88,10 +88,7 @@ public partial class IntegrationOverTimeViewModel : PlotViewModel
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 
-        // sqlite implicitly selects the first of the month (I think)
-        // so I need to add an additional month so the WHERE clause
-        // works as expected.
-        var end = DateEndLocal.AddMonths(1).ToString("yyyy-MM");
+        var end = DateEndLocal.ToString("yyyy-MM");
         var start = DateBeginLocal.ToString("yyyy-MM");
         var type = (int)ImageType.Light;
         var kind = (int)ImageKind.Raw;
@@ -108,17 +105,17 @@ public partial class IntegrationOverTimeViewModel : PlotViewModel
         FormattableString sql =
             $"""
             SELECT DISTINCT 
-                strftime('%Y-%m', ObservationTimestampLocal, '-12:00') as Timestamp, 
+                Timestamp, 
                 SUM(Exposure)/3600 AS TotalExposure
             FROM (
-            	SELECT ObservationTimestampLocal, Exposure
+            	SELECT strftime('%Y-%m', ObservationTimestampLocal, '-12:00') as Timestamp, Exposure
             	FROM ImageFiles
             	WHERE 1 = 1
                   AND Type = {type}
                   AND Kind = {kind}
                   AND ObservationTimestampLocal IS NOT NULL
-                  AND ObservationTimestampLocal > {start}
-                  AND ObservationTimestampLocal < {end}
+                  AND strftime('%Y-%m', ObservationTimestampLocal, '-12:00') >= {start}
+                  AND strftime('%Y-%m', ObservationTimestampLocal, '-12:00') <= {end}
             )
             GROUP BY Timestamp
             ORDER BY Timestamp
