@@ -41,15 +41,15 @@ public partial class SideNavBarViewModel : ViewModelBase,
             },
             new()
             {
-                Name = LibraryTabName,
-                ToolTipText = "Manage your library",
-                Icon = "mdi-bookshelf",
-            },
-            new()
-            {
                 Name = PlotTabName,
                 ToolTipText = "Plot your data",
                 Icon = "mdi-chart-line",
+            },
+            new()
+            {
+                Name = LibraryTabName,
+                ToolTipText = "Manage your library",
+                Icon = "mdi-bookshelf",
             },
         ];
 
