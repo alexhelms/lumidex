@@ -1,4 +1,5 @@
 ﻿using Lumidex.Core.Data;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using ScottPlot;
 
@@ -101,7 +102,6 @@ public partial class IntegrationHeatmapViewModel : PlotViewModel
         _colorBar.Axis.MinorTickStyle.Color = Colors.Transparent;
 
         Plot.HideGrid();
-        //Plot.Layout.Frameless();
         Plot.Axes.SquareUnits();
         Plot.Axes.Left.Min = 0;
         Plot.Axes.Bottom.Min = 0;
@@ -162,19 +162,23 @@ public partial class IntegrationHeatmapViewModel : PlotViewModel
             }
         }
 
-        FormattableString cameraNameFilter = $"1 = 1";
+        var parameters = new List<SqliteParameter>();
+
+        FormattableString cameraNameFilter = $"AND 1 = 1";
         if (!string.IsNullOrWhiteSpace(CameraName))
         {
-            cameraNameFilter = $"CameraName LIKE '%{CameraName}%'";
+            cameraNameFilter = $"AND CameraName LIKE @cameraName";
+            parameters.Add(new SqliteParameter("@cameraName", $"%{CameraName}%"));
         }
 
-        FormattableString telescopeNameFilter = $"1 = 1";
+        FormattableString telescopeNameFilter = $"AND 1 = 1";
         if (!string.IsNullOrWhiteSpace(TelescopeName))
         {
-            telescopeNameFilter = $"TelescopeName LIKE '%{TelescopeName}%'";
+            cameraNameFilter = $"AND TelescopeName LIKE @telescopeName";
+            parameters.Add(new SqliteParameter("@telescopeName", $"%{TelescopeName}%"));
         }
 
-        FormattableString sql =
+        var sql =
             $"""
             SELECT DISTINCT 
                 strftime('%Y-%m-%d', ObservationTimestampLocal, '-12:00') as Timestamp, 
@@ -183,20 +187,27 @@ public partial class IntegrationHeatmapViewModel : PlotViewModel
                 SELECT ObservationTimestampLocal, Exposure
                 FROM ImageFiles
                 WHERE 1 = 1
-                    AND Type = {type}
-                    AND Kind = {kind}
+                    AND Type = @type
+                    AND Kind = @kind
                     AND ObservationTimestampLocal IS NOT NULL
-                    AND ObservationTimestampLocal > {start}
-                    AND ObservationTimestampLocal < {end}
-                    AND {cameraNameFilter.ToString()}
-                    AND {telescopeNameFilter.ToString()}
+                    AND ObservationTimestampLocal > @start
+                    AND ObservationTimestampLocal < @end
+                    {cameraNameFilter}
+                    {telescopeNameFilter}
             )
             GROUP BY Timestamp
             ORDER BY Timestamp
             """;
-        
+
+        parameters.AddRange([
+            new SqliteParameter("@type", type),
+            new SqliteParameter("@kind", kind),
+            new SqliteParameter("@start", start),
+            new SqliteParameter("@end", end),
+        ]);
+
         var items = dbContext.Database
-            .SqlQuery<ExposureGrouping>(sql)
+            .SqlQueryRaw<ExposureGrouping>(sql, parameters.ToArray())
             .ToDictionary(group => group.Timestamp, group => group.TotalExposure);
 
         return items;
