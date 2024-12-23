@@ -18,15 +18,15 @@
             <StackPanel DockPanel.Dock="Top">
 
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock VerticalAlignment="Center" Text="Astrobin Filter Name" />
+                    <TextBlock VerticalAlignment="Center" Text="AstroBin Filter Name" />
                     <Border Margin="8,0,0,0" Background="Transparent">
                         <i:Icon FontSize="20" Value="mdi-information-outline" />
                         <ToolTip.Tip>
                             <TextBlock LineSpacing="5" TextWrapping="Wrap">
-                                Astrobin requires filters added to acquisition details must come from their database.
-                                Use the textbox below to search Astrobin for a filter by name and select Add. Once
-                                added to Your Filters you can assign Astrobin filters to you data when exporting a
-                                CSV for Astrobin acquisition details.
+                                AstroBin requires filters added to acquisition details must come from their database.
+                                Use the textbox below to search AstroBin for a filter by name and select Add. Once
+                                added to Your Filters you can assign AstroBin filters to you data when exporting a
+                                CSV for AstroBin acquisition details.
                             </TextBlock>
                         </ToolTip.Tip>
                     </Border>

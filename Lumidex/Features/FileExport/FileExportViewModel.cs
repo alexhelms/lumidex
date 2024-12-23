@@ -8,6 +8,7 @@ namespace Lumidex.Features.FileExport;
 public partial class FileExportViewModel : ViewModelBase
 {
     private readonly DialogService _dialogService;
+    private readonly CancellationTokenSource _cts = new();
 
     [ObservableProperty]
     public partial string DestinationDirectory { get; set; } = string.Empty;
@@ -45,6 +46,14 @@ public partial class FileExportViewModel : ViewModelBase
         ExportFilesCommand.ExecuteAsync(null);
     }
 
+    protected override void OnDeactivated()
+    {
+        base.OnDeactivated();
+
+        // Cancel the export operation if the user closes the dialog.
+        _cts.Cancel();
+    }
+
     [RelayCommand(IncludeCancelCommand = true)]
     public async Task ExportFiles(CancellationToken token)
     {
@@ -70,12 +79,14 @@ public partial class FileExportViewModel : ViewModelBase
             });
         });
 
+        var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(token, _cts.Token);
+
         try
         {
             int filesCopied = await exporter.CopyAsync(filenames, DestinationDirectory,
                 progress: progress,
-                token: token);
-            if (filesCopied != filenames.Count && !token.IsCancellationRequested)
+                token: linkedCts.Token);
+            if (filesCopied != filenames.Count && !linkedCts.Token.IsCancellationRequested)
             {
                 int filesNotCopied = filenames.Count - filesCopied;
                 await _dialogService.ShowMessageDialog(
