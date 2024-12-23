@@ -17,14 +17,15 @@
         <TextBlock
             Margin="0,4"
             VerticalAlignment="Center"
-            Text="Map image filters to Astrobin filters."
+            Text="Map image filters to AstroBin filters."
             TextAlignment="Center"
             TextWrapping="Wrap" />
         <TextBlock
-            Margin="0,4"
+            Margin="0,8,0,0"
             VerticalAlignment="Center"
+            Foreground="Yellow"
             IsVisible="{Binding !AstrobinFilters.Count}"
-            Text="Configure Astrobin filters in Lumidex settings."
+            Text="You have not configured any AstroBin filters. Visit Settings > AstroBin to add filters."
             TextAlignment="Center"
             TextWrapping="Wrap" />
         <DockPanel Margin="0,8,0,0">
@@ -40,7 +41,8 @@
                         i:Attached.Icon="fa-regular fa-copy"
                         Background="Transparent"
                         Command="{Binding CopyCsvContentCommand}"
-                        ToolTip.Tip="Copy" />
+                        Flyout="{StaticResource CopiedToClipboardFlyout}"
+                        ToolTip.Tip="Copy To Clipboard" />
                 </TextBox.InnerRightContent>
             </TextBox>
             <ScrollViewer>

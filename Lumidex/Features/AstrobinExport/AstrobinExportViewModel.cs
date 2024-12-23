@@ -11,16 +11,16 @@ public partial class AstrobinExportViewModel : ViewModelBase,
 
     private readonly SystemService _systemService;
     
-    private Dictionary<string, List<ImageFileViewModel>> _imageGrouping = new();
+    private Dictionary<string, List<ImageFileViewModel>> _imageGrouping = [];
 
     [ObservableProperty]
-    public partial ObservableCollectionEx<ImageFileViewModel> SelectedItems { get; set; } = new();
+    public partial ObservableCollectionEx<ImageFileViewModel> SelectedItems { get; set; } = [];
 
     [ObservableProperty]
-    public partial ObservableCollectionEx<AstrobinFilterViewModel> AstrobinFilters { get; set; } = new();
+    public partial ObservableCollectionEx<AstrobinFilterViewModel> AstrobinFilters { get; set; } = [];
 
     [ObservableProperty]
-    public partial ObservableCollectionEx<FilterMappingViewModel> FilterMappings { get; set; } = new();
+    public partial ObservableCollectionEx<FilterMappingViewModel> FilterMappings { get; set; } = [];
 
     [ObservableProperty]
     public partial string? CsvContent { get; set; }
@@ -71,7 +71,7 @@ public partial class AstrobinExportViewModel : ViewModelBase,
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Error rendering Astrobin CSV");
+            Log.Error(ex, "Error rendering AstroBin CSV");
             CsvContent = null;
         }
     }

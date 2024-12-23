@@ -31,7 +31,7 @@ public partial class AstrobinSettingsViewModel : ViewModelBase, ISettingsViewMod
     [NotifyCanExecuteChangedFor(nameof(AddFilterCommand))]
     public partial object? SelectedFilter { get; set; }
 
-    public string DisplayName => "Astrobin";
+    public string DisplayName => "AstroBin";
     public Func<string?, CancellationToken, Task<IEnumerable<object>>>? AsyncPopulator { get; private set; }
 
     public AstrobinSettingsViewModel(
@@ -64,7 +64,7 @@ public partial class AstrobinSettingsViewModel : ViewModelBase, ISettingsViewMod
         }
         catch (FlurlHttpException)
         {
-            AstrobinUnavailableMessage = "Astrobin is unavailable, check your connection";
+            AstrobinUnavailableMessage = "AstroBin is unavailable, check your connection";
             return [];
         }
         finally
