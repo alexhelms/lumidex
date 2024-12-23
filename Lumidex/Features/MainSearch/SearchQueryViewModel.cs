@@ -62,7 +62,8 @@ public partial class SearchQueryViewModel : ViewModelBase,
         DewPointFilter dewPointFilter,
         HumidityFilter humidityFilter,
         PressureFilter pressureFilter,
-        TemperatureFilter temperatureFilter)
+        TemperatureFilter temperatureFilter,
+        CoordinateFilter coordinateFilter)
     {
         _dbContextFactory = dbContextFactory;
 
@@ -110,6 +111,7 @@ public partial class SearchQueryViewModel : ViewModelBase,
             humidityFilter,
             pressureFilter,
             temperatureFilter,
+            coordinateFilter,
         ];
 
         AvailableFilters.AddRange(allFilters.OrderBy(f => f.DisplayName));
