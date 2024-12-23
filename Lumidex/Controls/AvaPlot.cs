@@ -96,6 +96,10 @@ public class AvaPlot : Avalonia.Controls.Control, IPlotControl
             {
                 _plot.Render(lease.SkCanvas, rect);
             }
+            catch (NullReferenceException)
+            {
+                // Sometimes this throws, maybe a bug in ScottPlot?
+            }
             catch (KeyNotFoundException)
             {
                 // Sometimes this throws, maybe a bug in ScottPlot?

@@ -1,5 +1,5 @@
 <UserControl
-    x:Class="Lumidex.Features.Plot.IntegrationPiePlotView"
+    x:Class="Lumidex.Features.Plot.IntegrationHeatmapView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:Lumidex.Controls"
@@ -9,7 +9,7 @@
     xmlns:plot="using:Lumidex.Features.Plot"
     d:DesignHeight="450"
     d:DesignWidth="800"
-    x:DataType="plot:IntegrationPiePlotViewModel"
+    x:DataType="plot:IntegrationHeatmapViewModel"
     mc:Ignorable="d">
     <DockPanel>
 
@@ -87,56 +87,70 @@
 
                 <DockPanel Margin="0,8,0,0">
                     <TextBlock
-                        Width="120"
                         VerticalAlignment="Center"
                         DockPanel.Dock="Left"
-                        Text="Slice Cuttoff" />
-                    <TextBlock
-                        Width="44"
-                        VerticalAlignment="Center"
-                        DockPanel.Dock="Right"
-                        Text="{Binding CutoffThreshold, StringFormat={}{0:F2}%}"
-                        TextAlignment="Right" />
-                    <Slider
-                        Margin="8,0,0,0"
-                        IsSnapToTickEnabled="True"
-                        LargeChange="0.5"
-                        Maximum="3"
-                        Minimum="0"
-                        SmallChange="0.1"
-                        TickFrequency="0.05"
-                        Value="{Binding CutoffThreshold}" />
+                        Text="Show Detailed Labels" />
+                    <ToggleSwitch
+                        Margin="8,0,-12,0"
+                        HorizontalAlignment="Right"
+                        IsChecked="{Binding ShowDetailedLabels}"
+                        OffContent="{x:Null}"
+                        OnContent="{x:Null}" />
                 </DockPanel>
 
-                <StackPanel
-                    Margin="0,8,0,0"
-                    HorizontalAlignment="Right"
-                    Orientation="Horizontal">
+                <DockPanel Margin="0,8,0,0">
 
-                    <Border
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Center"
-                        Background="Transparent"
-                        DockPanel.Dock="Bottom">
-                        <i:Icon FontSize="20" Value="mdi-information-outline" />
-                        <ToolTip.Tip>
-                            <TextBlock LineSpacing="5" TextWrapping="Wrap">
-                                This plot shows the total integration time in hours between two dates.
-                                Small pie slices can be omitted by adjusting the slice cutoff percent.
-                            </TextBlock>
-                        </ToolTip.Tip>
-                    </Border>
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                        <Button
+                            Width="48"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding SearchPrev2YearsCommand}"
+                            Content="2yr"
+                            ToolTip.Tip="Show plot for the past two years." />
+                        <Button
+                            Width="48"
+                            Margin="5,0,0,0"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding SearchPrev1YearCommand}"
+                            Content="1yr"
+                            ToolTip.Tip="Show plot for the past one year." />
+                        <Button
+                            Width="48"
+                            Margin="5,0,0,0"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding SearchPrev6MonthsCommand}"
+                            Content="6mo"
+                            ToolTip.Tip="Show plot for the past six months." />
+                    </StackPanel>
 
-                    <Button
-                        Width="100"
-                        Margin="8,0,0,0"
-                        HorizontalContentAlignment="Center"
-                        Classes="accent"
-                        Command="{Binding DrawPlotCommand}"
-                        Content="Plot"
-                        IsDefault="True" />
+                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
 
-                </StackPanel>
+                        <Border
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Background="Transparent"
+                            DockPanel.Dock="Bottom">
+                            <i:Icon FontSize="20" Value="mdi-information-outline" />
+                            <ToolTip.Tip>
+                                <TextBlock LineSpacing="5" TextWrapping="Wrap">
+                                    This plot shows the total integration time in hours between two dates.
+                                    Each square is one day and the color is the total exposure taken on that day.
+                                </TextBlock>
+                            </ToolTip.Tip>
+                        </Border>
+
+                        <Button
+                            Width="100"
+                            Margin="8,0,0,0"
+                            HorizontalContentAlignment="Center"
+                            Classes="accent"
+                            Command="{Binding DrawPlotCommand}"
+                            Content="Plot"
+                            IsDefault="True" />
+
+                    </StackPanel>
+
+                </DockPanel>
 
             </StackPanel>
 

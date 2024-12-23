@@ -35,13 +35,16 @@ public static class DependencyInjection
                 connectionString = $"Data Source={dbPath}";
             }
 
+            bool enableSensitiveLogging = false;
+
 #if DEBUG
             //ILoggerFactory factory = new LoggerFactory().AddSerilog();
             //options.UseLoggerFactory(factory);
+            //enableSensitiveLogging = true;
 #endif
             options.UseSqlite(connectionString, config => config
                 .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                .EnableSensitiveDataLogging(false);
+                .EnableSensitiveDataLogging(enableSensitiveLogging);
         });
     }
 

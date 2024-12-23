@@ -2,14 +2,14 @@
 using Lumidex.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using ScottPlot;
-using System.Timers;
+using Timer = System.Timers.Timer;
 
 namespace Lumidex.Features.Plot;
 
 public partial class IntegrationPiePlotViewModel : PlotViewModel
 {
     private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
-    private System.Timers.Timer? _timer;
+    private Timer? _timer;
 
     public override string DisplayName => "Integration Pie";
 

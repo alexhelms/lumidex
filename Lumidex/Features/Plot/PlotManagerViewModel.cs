@@ -10,11 +10,13 @@ public partial class PlotManagerViewModel : ViewModelBase
 
     public PlotManagerViewModel(
         IntegrationOverTimeViewModel integrationOverTime,
-        IntegrationPiePlotViewModel integrationPie)
+        IntegrationPiePlotViewModel integrationPie,
+        IntegrationHeatmapViewModel integrationHeatmap)
     {
         Plots = [
             integrationOverTime,
-            integrationPie
+            integrationPie,
+            integrationHeatmap,
         ];
 
         SelectedPlot = Plots.First();
