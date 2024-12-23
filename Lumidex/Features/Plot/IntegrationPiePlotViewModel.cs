@@ -174,6 +174,9 @@ public partial class IntegrationPiePlotViewModel : PlotViewModel
             .Where(image => image.ObservationTimestampLocal <= DateEndLocal)
             .AsQueryable();
 
+        if (Library is not null)
+            query = query.Where(f => f.LibraryId == Library.Id);
+
         if (!string.IsNullOrWhiteSpace(CameraName))
             query = query.Where(f => EF.Functions.Like(f.CameraName, $"%{CameraName}%"));
 
