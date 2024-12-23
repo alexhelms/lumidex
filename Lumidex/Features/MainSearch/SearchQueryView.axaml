@@ -1607,6 +1607,108 @@
                         </Grid>
                     </DataTemplate>
 
+                    <DataTemplate DataType="filter:CoordinateFilter">
+                        <StackPanel>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*" SharedSizeGroup="CoordinateGroup" />
+                                    <ColumnDefinition Width="2*" />
+                                </Grid.ColumnDefinitions>
+                                <DockPanel Grid.Column="0">
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        DockPanel.Dock="Left"
+                                        Text="Coordinate" />
+                                    <TextBlock
+                                        Margin="0,0,5,0"
+                                        VerticalAlignment="Center"
+                                        Text="RA (hr)"
+                                        TextAlignment="Right" />
+                                </DockPanel>
+
+                                <DockPanel Grid.Column="1">
+                                    <Button
+                                        Margin="5,0,0,0"
+                                        VerticalAlignment="Stretch"
+                                        i:Attached.Icon="mdi-filter-remove"
+                                        Background="#ffcc2222"
+                                        Command="{Binding #FilterItemsControl.((search:SearchQueryViewModel)DataContext).RemoveAdvancedFilterCommand}"
+                                        CommandParameter="{Binding}"
+                                        DockPanel.Dock="Right"
+                                        ToolTip.Tip="Remove filter" />
+                                    <Button
+                                        Margin="5,0,0,0"
+                                        VerticalAlignment="Stretch"
+                                        i:Attached.Icon="mdi-close"
+                                        Command="{Binding ClearRightAscensionCommand}"
+                                        DockPanel.Dock="Right"
+                                        ToolTip.Tip="Clear" />
+                                    <NumericUpDown
+                                        Maximum="24"
+                                        Minimum="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding RightAscension}" />
+                                </DockPanel>
+                            </Grid>
+
+                            <Grid Margin="0,8,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*" SharedSizeGroup="CoordinateGroup" />
+                                    <ColumnDefinition Width="2*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Grid.Column="0"
+                                    Margin="0,0,5,0"
+                                    VerticalAlignment="Center"
+                                    Text="DEC (&#186;)"
+                                    TextAlignment="Right" />
+                                <DockPanel Grid.Column="1">
+                                    <Button
+                                        Margin="5,0,37,0"
+                                        VerticalAlignment="Stretch"
+                                        i:Attached.Icon="mdi-close"
+                                        Command="{Binding ClearDeclinationCommand}"
+                                        DockPanel.Dock="Right"
+                                        ToolTip.Tip="Clear" />
+                                    <NumericUpDown
+                                        Maximum="90"
+                                        Minimum="-90"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding Declination}" />
+                                </DockPanel>
+                            </Grid>
+
+                            <Grid Margin="0,8,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*" SharedSizeGroup="CoordinateGroup" />
+                                    <ColumnDefinition Width="2*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Grid.Column="0"
+                                    Margin="0,0,5,0"
+                                    VerticalAlignment="Center"
+                                    Text="Radius (&#186;)"
+                                    TextAlignment="Right" />
+                                <DockPanel Grid.Column="1">
+                                    <Button
+                                        Margin="5,0,37,0"
+                                        VerticalAlignment="Stretch"
+                                        i:Attached.Icon="mdi-close"
+                                        Command="{Binding ClearRadiusCommand}"
+                                        DockPanel.Dock="Right"
+                                        ToolTip.Tip="Clear" />
+                                    <NumericUpDown
+                                        Maximum="45"
+                                        Minimum="0"
+                                        ShowButtonSpinner="False"
+                                        Value="{Binding Radius}" />
+                                </DockPanel>
+                            </Grid>
+
+                        </StackPanel>
+                    </DataTemplate>
+
                 </ItemsControl.DataTemplates>
             </ItemsControl>
         </ScrollViewer>
