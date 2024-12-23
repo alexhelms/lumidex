@@ -110,9 +110,9 @@ public partial class IntegrationOverTimeViewModel : PlotViewModel
         var settings = dbContext.AppSettings.FirstOrDefault();
         if (settings is not null)
         {
-            if (settings.UseCalibratedFrames)
+            if (settings.UseIntermediateFramesForPlots)
             {
-                kind = (int)ImageKind.Calibration;
+                kind = (int)ImageKind.Intermediate;
             }
         }
 
