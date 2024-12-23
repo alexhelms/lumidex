@@ -58,6 +58,27 @@
                         Width="120"
                         VerticalAlignment="Center"
                         DockPanel.Dock="Left"
+                        Text="Library" />
+                    <Button
+                        Margin="5,0,0,0"
+                        VerticalAlignment="Stretch"
+                        i:Attached.Icon="mdi-close"
+                        Command="{Binding ClearLibraryCommand}"
+                        DockPanel.Dock="Right"
+                        ToolTip.Tip="Clear" />
+                    <ComboBox
+                        Margin="8,0,0,0"
+                        HorizontalAlignment="Stretch"
+                        DisplayMemberBinding="{Binding Name}"
+                        ItemsSource="{Binding Libraries}"
+                        SelectedItem="{Binding Library, Mode=TwoWay}" />
+                </DockPanel>
+
+                <DockPanel Margin="0,8,0,0">
+                    <TextBlock
+                        Width="120"
+                        VerticalAlignment="Center"
+                        DockPanel.Dock="Left"
                         Text="Camera Name" />
                     <Button
                         Margin="5,0,0,0"

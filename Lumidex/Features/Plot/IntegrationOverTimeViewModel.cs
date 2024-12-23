@@ -1,7 +1,9 @@
 ﻿using Lumidex.Core.Data;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using ScottPlot;
 using ScottPlot.TickGenerators;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Lumidex.Features.Plot;
 
@@ -17,6 +19,12 @@ public partial class IntegrationOverTimeViewModel : PlotViewModel
     [ObservableProperty]
     public partial DateTime DateEndLocal { get; set; }
 
+    [ObservableProperty]
+    public partial string? CameraName { get; set; }
+
+    [ObservableProperty]
+    public partial string? TelescopeName { get; set; }
+
     public IntegrationOverTimeViewModel(IDbContextFactory<LumidexDbContext> dbContextFactory)
     {
         _dbContextFactory = dbContextFactory;
@@ -31,6 +39,12 @@ public partial class IntegrationOverTimeViewModel : PlotViewModel
 
         GeneratePlot();
     }
+
+    [RelayCommand]
+    private void ClearCameraName() => CameraName = null;
+
+    [RelayCommand]
+    private void ClearTelescopeName() => TelescopeName = null;
 
     [RelayCommand]
     private void DrawPlot()
@@ -102,7 +116,30 @@ public partial class IntegrationOverTimeViewModel : PlotViewModel
             }
         }
 
-        FormattableString sql =
+        var parameters = new List<SqliteParameter>();
+
+        var libraryFilter = "AND 1 = 1";
+        if (Library is not null)
+        {
+            libraryFilter = "AND LibraryId = @libraryId";
+            parameters.Add(new SqliteParameter("@libraryId", Library.Id));
+        }
+
+        var cameraNameFilter = "AND 1 = 1";
+        if (!string.IsNullOrWhiteSpace(CameraName))
+        {
+            cameraNameFilter = "AND CameraName LIKE @cameraName";
+            parameters.Add(new SqliteParameter("@cameraName", $"%{CameraName}%"));
+        }
+
+        var telescopeNameFilter = "AND 1 = 1";
+        if (!string.IsNullOrWhiteSpace(TelescopeName))
+        {
+            cameraNameFilter = "AND TelescopeName LIKE @telescopeName";
+            parameters.Add(new SqliteParameter("@telescopeName", $"%{TelescopeName}%"));
+        }
+
+        var sql =
             $"""
             SELECT DISTINCT 
                 Timestamp, 
@@ -111,18 +148,28 @@ public partial class IntegrationOverTimeViewModel : PlotViewModel
             	SELECT strftime('%Y-%m', ObservationTimestampLocal, '-12:00') as Timestamp, Exposure
             	FROM ImageFiles
             	WHERE 1 = 1
-                  AND Type = {type}
-                  AND Kind = {kind}
-                  AND ObservationTimestampLocal IS NOT NULL
-                  AND strftime('%Y-%m', ObservationTimestampLocal, '-12:00') >= {start}
-                  AND strftime('%Y-%m', ObservationTimestampLocal, '-12:00') <= {end}
+                    AND Type = @type
+                    AND Kind = @kind
+                    AND ObservationTimestampLocal IS NOT NULL
+                    AND strftime('%Y-%m-%d', ObservationTimestampLocal, '-12:00') >= @start
+                    AND strftime('%Y-%m-%d', ObservationTimestampLocal, '-12:00') <= @end
+                    {libraryFilter}
+                    {cameraNameFilter}
+                    {telescopeNameFilter}
             )
             GROUP BY Timestamp
             ORDER BY Timestamp
             """;
 
+        parameters.AddRange([
+            new SqliteParameter("@type", type),
+            new SqliteParameter("@kind", kind),
+            new SqliteParameter("@start", start),
+            new SqliteParameter("@end", end),
+        ]);
+
         var items = dbContext.Database
-            .SqlQuery<ExposureGroup>(sql)
+            .SqlQueryRaw<ExposureGroup>(sql, parameters.ToArray())
             .ToList();
 
         double[] xValues = items.Select(item => item.Timestamp.ToOADate()).ToArray();

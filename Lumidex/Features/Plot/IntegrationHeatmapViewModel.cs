@@ -224,17 +224,24 @@ public partial class IntegrationHeatmapViewModel : PlotViewModel
 
         var parameters = new List<SqliteParameter>();
 
-        FormattableString cameraNameFilter = $"AND 1 = 1";
+        var libraryFilter = "AND 1 = 1";
+        if (Library is not null)
+        {
+            libraryFilter = "AND LibraryId = @libraryId";
+            parameters.Add(new SqliteParameter("@libraryId", Library.Id));
+        }
+
+        var cameraNameFilter = "AND 1 = 1";
         if (!string.IsNullOrWhiteSpace(CameraName))
         {
-            cameraNameFilter = $"AND CameraName LIKE @cameraName";
+            cameraNameFilter = "AND CameraName LIKE @cameraName";
             parameters.Add(new SqliteParameter("@cameraName", $"%{CameraName}%"));
         }
 
-        FormattableString telescopeNameFilter = $"AND 1 = 1";
+        var telescopeNameFilter = "AND 1 = 1";
         if (!string.IsNullOrWhiteSpace(TelescopeName))
         {
-            cameraNameFilter = $"AND TelescopeName LIKE @telescopeName";
+            cameraNameFilter = "AND TelescopeName LIKE @telescopeName";
             parameters.Add(new SqliteParameter("@telescopeName", $"%{TelescopeName}%"));
         }
 
@@ -252,6 +259,7 @@ public partial class IntegrationHeatmapViewModel : PlotViewModel
                     AND ObservationTimestampLocal IS NOT NULL
                     AND strftime('%Y-%m-%d', ObservationTimestampLocal, '-12:00') >= @start
                     AND strftime('%Y-%m-%d', ObservationTimestampLocal, '-12:00') <= @end
+                    {libraryFilter}
                     {cameraNameFilter}
                     {telescopeNameFilter}
             )
@@ -267,11 +275,11 @@ public partial class IntegrationHeatmapViewModel : PlotViewModel
         ]);
 
         var items = dbContext.Database
-            .SqlQueryRaw<ExposureGrouping>(sql, parameters.ToArray())
+            .SqlQueryRaw<ExposureGroup>(sql, parameters.ToArray())
             .ToDictionary(group => group.Timestamp, group => group.TotalExposure);
 
         return items;
     }
 
-    private record ExposureGrouping(DateTime Timestamp, double TotalExposure);
+    private record ExposureGroup(DateTime Timestamp, double TotalExposure);
 }
