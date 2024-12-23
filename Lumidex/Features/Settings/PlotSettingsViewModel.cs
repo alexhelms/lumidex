@@ -10,7 +10,7 @@ public partial class PlotSettingsViewModel : ViewModelBase, ISettingsViewModel
     public string DisplayName => "Plot";
 
     [ObservableProperty]
-    public partial bool UseCalibratedFrames { get; set; }
+    public partial bool UseIntermediateFrames { get; set; }
 
     public PlotSettingsViewModel(IDbContextFactory<LumidexDbContext> dbContextFactory)
     {
@@ -20,11 +20,11 @@ public partial class PlotSettingsViewModel : ViewModelBase, ISettingsViewModel
         var settings = dbContext.AppSettings.FirstOrDefault();
         if (settings is not null)
         {
-            UseCalibratedFrames = settings.UseCalibratedFrames;
+            UseIntermediateFrames = settings.UseIntermediateFramesForPlots;
         }
     }
 
-    partial void OnUseCalibratedFramesChanged(bool oldValue, bool newValue)
+    partial void OnUseIntermediateFramesChanged(bool oldValue, bool newValue)
     {
         if (oldValue != newValue)
         {
@@ -32,7 +32,7 @@ public partial class PlotSettingsViewModel : ViewModelBase, ISettingsViewModel
             var settings = dbContext.AppSettings.FirstOrDefault();
             if (settings is not null)
             {
-                settings.UseCalibratedFrames = newValue;
+                settings.UseIntermediateFramesForPlots = newValue;
                 dbContext.SaveChanges();
             }
         }

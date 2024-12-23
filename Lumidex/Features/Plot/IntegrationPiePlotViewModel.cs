@@ -158,9 +158,9 @@ public partial class IntegrationPiePlotViewModel : PlotViewModel
         var settings = dbContext.AppSettings.FirstOrDefault();
         if (settings is not null)
         {
-            if (settings.UseCalibratedFrames)
+            if (settings.UseIntermediateFramesForPlots)
             {
-                kind = ImageKind.Calibration;
+                kind = ImageKind.Intermediate;
             }
         }
 

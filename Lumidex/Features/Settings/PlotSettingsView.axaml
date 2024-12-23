@@ -18,10 +18,10 @@
                 <TextBlock
                     VerticalAlignment="Center"
                     DockPanel.Dock="Left"
-                    Text="Use Calibrated Frames Instead of Raw" />
+                    Text="Use Intermediate Frames Instead of Raw" />
                 <ToggleSwitch
                     HorizontalAlignment="Right"
-                    IsChecked="{Binding UseCalibratedFrames}"
+                    IsChecked="{Binding UseIntermediateFrames}"
                     OffContent=""
                     OnContent="" />
             </UniformGrid>

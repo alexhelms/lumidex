@@ -6,7 +6,7 @@ public class AppSettings
 
     public bool PersistFiltersOnExit { get; set; } = true;
 
-    public bool UseCalibratedFrames { get; set; }
+    public bool UseIntermediateFramesForPlots { get; set; }
 
     public ICollection<AstrobinFilter> AstrobinFilters { get; set; } = [];
 
