@@ -92,6 +92,11 @@ public partial class IntegrationOverTimeViewModel : PlotViewModel
         Plot.Title($"Integration Over Time");
         Plot.Axes.Left.Label.Text = "Hours";
         Plot.Axes.Left.Min = 0;
+
+        // By subtracting a month but adding one day, we prevent the first X axis label from rendering.
+        Plot.Axes.Bottom.Min = DateBeginLocal.AddMonths(-1).AddDays(1).ToOADate();
+        Plot.Axes.Bottom.Max = DateEndLocal.ToOADate();
+
         Plot.Axes.SetLimitsY(0, Math.Max(Math.Max(yValues.Max(), 1) * 1.1, 10));
 
         ApplyPlotStyle();
@@ -102,8 +107,8 @@ public partial class IntegrationOverTimeViewModel : PlotViewModel
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 
-        var end = DateEndLocal.ToString("yyyy-MM");
         var start = DateBeginLocal.ToString("yyyy-MM");
+        var end = DateEndLocal.ToString("yyyy-MM");
         var type = (int)ImageType.Light;
         var kind = (int)ImageKind.Raw;
 
@@ -151,8 +156,8 @@ public partial class IntegrationOverTimeViewModel : PlotViewModel
                     AND Type = @type
                     AND Kind = @kind
                     AND ObservationTimestampLocal IS NOT NULL
-                    AND strftime('%Y-%m-%d', ObservationTimestampLocal, '-12:00') >= @start
-                    AND strftime('%Y-%m-%d', ObservationTimestampLocal, '-12:00') <= @end
+                    AND strftime('%Y-%m', ObservationTimestampLocal, '-12:00') >= @start
+                    AND strftime('%Y-%m', ObservationTimestampLocal, '-12:00') <= @end
                     {libraryFilter}
                     {cameraNameFilter}
                     {telescopeNameFilter}
