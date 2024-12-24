@@ -516,10 +516,7 @@
                         </SplitButton.Content>
                         <SplitButton.Flyout>
                             <MenuFlyout Placement="Bottom">
-                                <MenuItem
-                                    Click="CopyToClipboard_Click"
-                                    Command="{Binding CopyIntegrationSummaryAsMarkdownCommand}"
-                                    Header="Copy as Markdown" />
+                                <MenuItem Click="CopyAsMarkdown_Click" Header="Copy as Markdown" />
                             </MenuFlyout>
                         </SplitButton.Flyout>
                     </SplitButton>

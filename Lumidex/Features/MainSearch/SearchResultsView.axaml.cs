@@ -92,4 +92,15 @@ public partial class SearchResultsView : UserControl
     {
         FlyoutBase.ShowAttachedFlyout(CopyGrid);
     }
+
+    private void CopyAsMarkdown_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        // Click and Command on the MenuItem ends up not calling both, only the Command.
+        // Workaround: Only have the Click handler so I can open the flyout, then call the Command.
+        if (DataContext is SearchResultsViewModel viewmodel)
+        {
+            FlyoutBase.ShowAttachedFlyout(CopyGrid);
+            viewmodel.CopyIntegrationSummaryAsMarkdownCommand.Execute(null);
+        }
+    }
 }
