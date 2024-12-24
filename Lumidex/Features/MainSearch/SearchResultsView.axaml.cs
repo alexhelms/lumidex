@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.LogicalTree;
 using Lumidex.Features.MainSearch.Messages;
 
@@ -84,6 +85,22 @@ public partial class SearchResultsView : UserControl
                 // Note: Right clicking the menu item selects the single row.
                 vm.RemoveTagCommand.Execute(tagVm);
             }
+        }
+    }
+
+    private void CopyToClipboard_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        FlyoutBase.ShowAttachedFlyout(CopyGrid);
+    }
+
+    private void CopyAsMarkdown_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        // Click and Command on the MenuItem ends up not calling both, only the Command.
+        // Workaround: Only have the Click handler so I can open the flyout, then call the Command.
+        if (DataContext is SearchResultsViewModel viewmodel)
+        {
+            FlyoutBase.ShowAttachedFlyout(CopyGrid);
+            viewmodel.CopyIntegrationSummaryAsMarkdownCommand.Execute(null);
         }
     }
 }
