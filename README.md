@@ -20,6 +20,8 @@ You original data is never altered.
 - AstroBin Export -> Export acquisition details in AstroBin CSV format
 - Duplicate Detection -> See a list of duplicate images so you can track them down
 - Edit Data -> Edit the database contents for images so you have consistent data (does not alter files)
+- Plots -> Visualize your integration over time
+- Coordinate Search -> Search for images near an RA/DEC coordinate
 
 ## Get Lumidex
 
@@ -44,6 +46,15 @@ Check out the [releases](https://github.com/alexhelms/lumidex/releases) to downl
 
 ### File Export
 ![File Export](/assets/lumidex_file_export.png?raw=true "File Export")
+
+### Plot - Integration Over Time
+![File Export](/assets/lumidex_plot_integration_over_time.png?raw=true "Integration Over Time")
+
+### Plot - Integration Pie
+![File Export](/assets/lumidex_plot_integration_pie.png?raw=true "Integration Pie")
+
+### Plot - Integration Heatmap
+![File Export](/assets/lumidex_plot_integration_heatmap.png?raw=true "Integration Heatmap")
 
 ## High CPU Usage During Scan in Windows
 
