@@ -487,19 +487,43 @@
                         TextAlignment="Right" />
                 </Grid>
 
-                <Button
+                <Grid
+                    x:Name="CopyGrid"
                     Margin="0,5,0,0"
                     HorizontalAlignment="Right"
-                    Command="{Binding CopyIntegrationSummaryCommand}"
-                    DockPanel.Dock="Top"
-                    ToolTip.Placement="LeftEdgeAlignedTop"
-                    ToolTip.Tip="Copy Integration Summary"
-                    ToolTip.VerticalOffset="0">
-                    <i:Icon
-                        FontSize="16"
-                        Foreground="White"
-                        Value="mdi-content-copy" />
-                </Button>
+                    DockPanel.Dock="Top">
+                    <FlyoutBase.AttachedFlyout>
+                        <Flyout Placement="Left" ShowMode="TransientWithDismissOnPointerMoveAway">
+                            <Border Background="#333538">
+                                <TextBlock
+                                    Foreground="White"
+                                    Text="Copied!"
+                                    TextAlignment="Center" />
+                            </Border>
+                        </Flyout>
+                    </FlyoutBase.AttachedFlyout>
+                    <SplitButton
+                        Click="CopyToClipboard_Click"
+                        Command="{Binding CopyIntegrationSummaryCommand}"
+                        ToolTip.Placement="LeftEdgeAlignedTop"
+                        ToolTip.Tip="Copy Integration Summary"
+                        ToolTip.VerticalOffset="0">
+                        <SplitButton.Content>
+                            <i:Icon
+                                FontSize="16"
+                                Foreground="White"
+                                Value="mdi-content-copy" />
+                        </SplitButton.Content>
+                        <SplitButton.Flyout>
+                            <MenuFlyout Placement="Bottom">
+                                <MenuItem
+                                    Click="CopyToClipboard_Click"
+                                    Command="{Binding CopyIntegrationSummaryAsMarkdownCommand}"
+                                    Header="Copy as Markdown" />
+                            </MenuFlyout>
+                        </SplitButton.Flyout>
+                    </SplitButton>
+                </Grid>
 
                 <DataGrid
                     Margin="0,8,0,0"

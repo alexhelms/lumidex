@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.LogicalTree;
 using Lumidex.Features.MainSearch.Messages;
 
@@ -85,5 +86,10 @@ public partial class SearchResultsView : UserControl
                 vm.RemoveTagCommand.Execute(tagVm);
             }
         }
+    }
+
+    private void CopyToClipboard_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        FlyoutBase.ShowAttachedFlyout(CopyGrid);
     }
 }

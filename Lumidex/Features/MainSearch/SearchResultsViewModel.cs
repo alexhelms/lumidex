@@ -403,6 +403,64 @@ public partial class SearchResultsViewModel : ViewModelBase,
             await _systemService.SetClipboard(summary);
         }
     }
+
+    [RelayCommand]
+    private async Task CopyIntegrationSummaryAsMarkdown()
+    {
+        if (StatsView is null) return;
+
+        const string FilterTitle = "Filter";
+        const string ExposureTitle = "Exposures";
+        const string IntegrationTitle = "Integration";
+        const string IntegrationUnit = " hr";
+
+        int filterSize = FilterTitle.Length;
+        int integrationSize = IntegrationTitle.Length;
+        int exposureSize = ExposureTitle.Length;
+
+        double totalIntegration = 0;
+        foreach (var item in StatsView.OfType<IntegrationStatistic>()) {
+            filterSize = Math.Max(item.Filter?.Length ?? 0, filterSize);
+            exposureSize = Math.Max(item.Count.ToString().Length, exposureSize);
+            integrationSize = Math.Max(item.TotalIntegrationDisplay.Length, integrationSize);
+            totalIntegration += item.TotalIntegration.TotalHours;
+        }
+
+        var totalIntegrationString = totalIntegration.ToString("F1") + IntegrationUnit;
+        integrationSize = Math.Max(totalIntegrationString.Length, integrationSize);
+
+        var sb = new StringBuilder(512);
+        string formatString = $"| {{0,{-1 * filterSize}}} | {{1,{exposureSize}}} | {{2,{integrationSize}}} |";
+        const int SpaceWidth = 2;
+
+        sb.Append(string.Format(formatString, FilterTitle, ExposureTitle, IntegrationTitle));
+        sb.AppendLine();
+            
+        sb.Append("|");
+        sb.Append('-', filterSize + SpaceWidth);
+        sb.Append("|");
+        sb.Append('-', exposureSize + SpaceWidth - 1);
+        sb.Append(":|");
+        sb.Append('-', integrationSize + SpaceWidth - 1);
+        sb.Append(":|");
+        sb.AppendLine();
+
+
+        foreach (var item in StatsView.OfType<IntegrationStatistic>())
+        {
+            sb.Append(string.Format(formatString, item.Filter, item.Count, item.TotalIntegrationDisplay + IntegrationUnit));
+            sb.AppendLine();
+        }
+
+        sb.Append(string.Format(formatString, "Total", "", totalIntegrationString));
+
+
+        var summary = sb.ToString().TrimEnd();
+        if (summary.Length > 0)
+        {
+            await _systemService.SetClipboard(summary);
+        }
+    }
 }
 
 public class IntegrationStatistic
