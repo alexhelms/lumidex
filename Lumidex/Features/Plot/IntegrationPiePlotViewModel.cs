@@ -77,6 +77,31 @@ public partial class IntegrationPiePlotViewModel : PlotViewModel
     [RelayCommand]
     private void ClearTelescopeName() => TelescopeName = null;
 
+
+    [RelayCommand]
+    private void SearchPrev6Months()
+    {
+        DateBeginLocal = DateTime.Now.AddMonths(-6);
+        DateEndLocal = DateTime.Now;
+        DrawPlot();
+    }
+
+    [RelayCommand]
+    private void SearchPrev1Year()
+    {
+        DateBeginLocal = DateTime.Now.AddYears(-1);
+        DateEndLocal = DateTime.Now;
+        DrawPlot();
+    }
+
+    [RelayCommand]
+    private void SearchPrev2Years()
+    {
+        DateBeginLocal = DateTime.Now.AddYears(-2);
+        DateEndLocal = DateTime.Now;
+        DrawPlot();
+    }
+
     [RelayCommand]
     private void DrawPlot()
     {
