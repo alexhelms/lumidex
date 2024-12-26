@@ -59,6 +59,7 @@ public partial class IntegrationHeatmapViewModel : PlotViewModel
     private void SearchPrev6Months()
     {
         DateBeginLocal = DateTime.Now.AddMonths(-6);
+        DateEndLocal = DateTime.Now;
         DrawPlot();
     }
 
@@ -66,6 +67,7 @@ public partial class IntegrationHeatmapViewModel : PlotViewModel
     private void SearchPrev1Year()
     {
         DateBeginLocal = DateTime.Now.AddYears(-1);
+        DateEndLocal = DateTime.Now;
         DrawPlot();
     }
 
@@ -73,6 +75,7 @@ public partial class IntegrationHeatmapViewModel : PlotViewModel
     private void SearchPrev2Years()
     {
         DateBeginLocal = DateTime.Now.AddYears(-2);
+        DateEndLocal = DateTime.Now;
         DrawPlot();
     }
 
