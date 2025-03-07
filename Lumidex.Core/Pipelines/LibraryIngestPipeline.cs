@@ -100,14 +100,14 @@ public class LibraryIngestPipeline
 
         var (pipeline, completion) = CreatePipeline(internalProgress, token);
 
-        Log.Information("Starting library ingest pipeline...");
+        Log.Information("Starting library ingest pipeline for {Path}", library.Path);
         var start = Stopwatch.GetTimestamp();
 
         // Walk the directories on a background thread
         await Task.Run(() =>
         {
             DateTime? startDate = forceFullScan ? null : library.LastScan;
-            foreach (var fileInfo in DirectoryWalker.Walk(_fileSystem, library.Path, startDate))
+            foreach (var fileInfo in DirectoryWalker.Walk(_fileSystem, library.Path, startDate, DirectoryFilter))
             {
                 pipeline.Post(new FileMessage(fileInfo, library.Id));
             }
@@ -148,6 +148,15 @@ public class LibraryIngestPipeline
         }
     }
 
+    bool DirectoryFilter(IDirectoryInfo dirInfo)
+    {
+        // Skip python site-packages
+        if (dirInfo.Name == "site-packages")
+            return false;
+
+        return true;
+    }
+
     private (ITargetBlock<FileMessage>, Task) CreatePipeline(
         IProgress<IngestProgress>? progress = null,
         CancellationToken token = default)
@@ -165,6 +174,8 @@ public class LibraryIngestPipeline
         var errorProgressBlock = new ActionBlock<List<IngestStatus>>(
             status => progress?.Report(new() { Errors = status })
         );
+
+        int degreesOfParallelism = Environment.ProcessorCount;
 
         // *******************************
         // STEP 1: Compute the header hash
@@ -187,7 +198,7 @@ public class LibraryIngestPipeline
         },
         new ExecutionDataflowBlockOptions
         {
-            MaxDegreeOfParallelism = Environment.ProcessorCount,
+            MaxDegreeOfParallelism = degreesOfParallelism,
             CancellationToken = token,
         });
 
@@ -249,7 +260,7 @@ public class LibraryIngestPipeline
         },
         new ExecutionDataflowBlockOptions
         {
-            MaxDegreeOfParallelism = Environment.ProcessorCount,
+            MaxDegreeOfParallelism = degreesOfParallelism,
             CancellationToken = token,
         });
 
@@ -277,7 +288,7 @@ public class LibraryIngestPipeline
         },
         new ExecutionDataflowBlockOptions
         {
-            MaxDegreeOfParallelism = Environment.ProcessorCount,
+            MaxDegreeOfParallelism = degreesOfParallelism,
             CancellationToken = token,
         });
 

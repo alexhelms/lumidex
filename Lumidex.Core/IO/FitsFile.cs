@@ -95,6 +95,7 @@ public partial class FitsFile : IDisposable
         'L' => typeof(bool),    // logical
         'I' => typeof(int),     // integer
         'F' => typeof(double),  // floating point
+        'X' => throw new ArgumentOutOfRangeException($"Complex FITS header data not supported"),
         _ => throw new ArgumentOutOfRangeException($"Unsupported FITS header data type {dtype}"),
     };
 

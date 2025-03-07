@@ -7,16 +7,19 @@ public static class DirectoryWalker
 {
     public static readonly string[] SupportedExtensions = ["fit", "fits", "xisf"];
 
-    public static IEnumerable<IFileInfo> Walk(string rootDir, DateTime? startDateUtc = null)
-        => Walk(new FileSystem(), rootDir, SupportedExtensions, startDateUtc);
+    public static IEnumerable<IFileInfo> Walk(
+        IFileSystem fs, 
+        string rootDir, 
+        DateTime? startDateUtc = null,
+        Predicate<IDirectoryInfo>? directoryFilter = null) 
+        => Walk(fs, rootDir, SupportedExtensions, startDateUtc, directoryFilter);
 
-    public static IEnumerable<IFileInfo> Walk(string rootDir, string[] extensions, DateTime? startDateUtc = null)
-        => Walk(new FileSystem(), rootDir, extensions, startDateUtc);
-
-    public static IEnumerable<IFileInfo> Walk(IFileSystem fs, string rootDir, DateTime? startDateUtc = null)
-        => Walk(fs, rootDir, SupportedExtensions, startDateUtc);
-
-    public static IEnumerable<IFileInfo> Walk(IFileSystem fs, string rootDir, string[] extensions, DateTime? startDateUtc = null)
+    public static IEnumerable<IFileInfo> Walk(
+        IFileSystem fs, 
+        string rootDir,
+        string[] extensions,
+        DateTime? startDateUtc = null,
+        Predicate<IDirectoryInfo>? directoryFilter = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(rootDir);
         ArgumentNullException.ThrowIfNull(extensions);
@@ -36,13 +39,21 @@ public static class DirectoryWalker
 
         var patternString = string.Join('|', extensions.Select(ext => $@"\.{ext}"));
         var pattern = new Regex(patternString, RegexOptions.IgnoreCase);
-        var stack = new Stack<IDirectoryInfo>();
+        var dirStack = new Stack<IDirectoryInfo>();
 
-        stack.Push(dirInfo);
+        dirStack.Push(dirInfo);
 
-        while (stack.Count > 0)
+        while (dirStack.Count > 0)
         {
-            var currentDir = stack.Pop();
+            IDirectoryInfo currentDir = dirStack.Pop();
+
+            if (directoryFilter is not null)
+            {
+                // Apply directory filter
+                if (!directoryFilter.Invoke(currentDir))
+                    continue;
+            }
+
             IEnumerable<IFileInfo>? files = [];
 
             try
@@ -87,7 +98,7 @@ public static class DirectoryWalker
                 if (dir.Name.StartsWith('$'))
                     continue;
 
-                stack.Push(dir);
+                dirStack.Push(dir);
             }
         }
     }
