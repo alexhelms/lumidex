@@ -1,8 +1,6 @@
 ﻿using Avalonia.Controls;
-using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using ScottPlot;
-using ScottPlot.Control;
 
 using MenuItem = Avalonia.Controls.MenuItem;
 
@@ -51,7 +49,7 @@ public class AvaPlotMenu : IPlotMenu
             else
             {
                 var menuItem = new MenuItem { Header = curr.Label };
-                menuItem.Click += (s, e) => curr.OnInvoke(_avaPlot);
+                menuItem.Click += (s, e) => curr.OnInvoke(_avaPlot.Plot);
                 menuFlyout.Items.Add(menuItem);
             }
         }
@@ -59,7 +57,7 @@ public class AvaPlotMenu : IPlotMenu
         return menuFlyout;
     }
 
-    public async void OpenSaveImageDialog(IPlotControl plotControl)
+    public async void OpenSaveImageDialog(Plot plot)
     {
         var topLevel = TopLevel.GetTopLevel(_avaPlot) ?? throw new NullReferenceException("Could not find a top level");
         var destinationFile = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions()
@@ -71,8 +69,8 @@ public class AvaPlotMenu : IPlotMenu
         string? path = destinationFile?.TryGetLocalPath();
         if (path is not null && !string.IsNullOrWhiteSpace(path))
         {
-            var lastRenderSize = plotControl.Plot.RenderManager.LastRender.FigureRect.Size;
-            plotControl.Plot.Save(path, (int)lastRenderSize.Width, (int)lastRenderSize.Height, ImageFormats.FromFilename(path));
+            var lastRenderSize = plot.RenderManager.LastRender.FigureRect.Size;
+            plot.Save(path, (int)lastRenderSize.Width, (int)lastRenderSize.Height, ImageFormats.FromFilename(path));
         }
     }
 
@@ -85,7 +83,7 @@ public class AvaPlotMenu : IPlotMenu
         new("All Files") { Patterns = ["*"] },
     ];
 
-    public void Add(string Label, Action<IPlotControl> action)
+    public void Add(string Label, Action<Plot> action)
     {
         ContextMenuItems.Add(new ContextMenuItem() { Label = Label, OnInvoke = action });
     }
