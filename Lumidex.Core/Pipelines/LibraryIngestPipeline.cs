@@ -100,7 +100,7 @@ public class LibraryIngestPipeline
 
         var (pipeline, completion) = CreatePipeline(internalProgress, token);
 
-        Log.Information("Starting library ingest pipeline...");
+        Log.Information("Starting library ingest pipeline for {Path}", library.Path);
         var start = Stopwatch.GetTimestamp();
 
         // Walk the directories on a background thread
