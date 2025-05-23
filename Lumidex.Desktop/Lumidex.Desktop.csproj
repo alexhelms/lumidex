@@ -15,7 +15,9 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="HotAvalonia" PrivateAssets="All" Publish="True" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="MonoMod.RuntimeDetour" PrivateAssets="All" />
     <PackageReference Include="Projektanker.Icons.Avalonia.MaterialDesign" />
     <PackageReference Include="Serilog" />
   </ItemGroup>
