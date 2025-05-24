@@ -31,7 +31,7 @@
                         IsTodayHighlighted="True"
                         SelectedDate="{Binding DateBeginLocal}"
                         SelectedDateFormat="Custom"
-                        ToolTip.Tip="Begin date, UTC"
+                        ToolTip.Tip="Begin date, Local"
                         Watermark=" " />
                 </DockPanel>
 
@@ -49,7 +49,7 @@
                         IsTodayHighlighted="True"
                         SelectedDate="{Binding DateEndLocal}"
                         SelectedDateFormat="Custom"
-                        ToolTip.Tip="Begin date, UTC"
+                        ToolTip.Tip="Begin date, Local"
                         Watermark=" " />
                 </DockPanel>
 

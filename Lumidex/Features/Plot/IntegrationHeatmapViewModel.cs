@@ -254,14 +254,16 @@ public partial class IntegrationHeatmapViewModel : PlotViewModel
                 Timestamp, 
                 SUM(Exposure)/3600 AS TotalExposure
             FROM (
-                SELECT strftime('%Y-%m-%d', ObservationTimestampLocal, '-12:00') as Timestamp, Exposure
+                SELECT
+                    strftime('%Y-%m-%d', coalesce(ObservationTimestampLocal, ObservationTimestampUtc), '-12:00') as Timestamp,
+                    Exposure
                 FROM ImageFiles
                 WHERE 1 = 1
                     AND Type = @type
                     AND Kind = @kind
-                    AND ObservationTimestampLocal IS NOT NULL
-                    AND strftime('%Y-%m-%d', ObservationTimestampLocal, '-12:00') >= @start
-                    AND strftime('%Y-%m-%d', ObservationTimestampLocal, '-12:00') <= @end
+                    AND Timestamp IS NOT NULL
+                    AND Timestamp >= @start
+                    AND Timestamp <= @end
                     {libraryFilter}
                     {cameraNameFilter}
                     {telescopeNameFilter}
