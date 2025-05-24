@@ -17,18 +17,18 @@ public class HeaderReader
         }
 
         var header = GetHeader(fileInfo);
-        var imageFile = Process(header);
+        var imageFile = Process(fileInfo.Name, header);
         imageFile.Path = fileInfo.FullName;
 
         return imageFile;
     }
 
-    public ImageFile Process(ImageHeader header)
+    public ImageFile Process(string filename, ImageHeader header)
     {
         ImageFile imageFile = new();
 
         imageFile.Type = DetermineImageType(header);
-        imageFile.Kind = DetermineImageKind(header, imageFile.Type, header.FileExtension);
+        imageFile.Kind = DetermineImageKind(header, imageFile.Type, filename);
 
         ExtractCameraKeywords(header, imageFile);
         ExtractFocuserKeywords(header, imageFile);
@@ -98,45 +98,60 @@ public class HeaderReader
         return ImageType.Unknown;
     }
 
-    private ImageKind DetermineImageKind(ImageHeader header, ImageType imageType, string extension)
+    private ImageKind DetermineImageKind(ImageHeader header, ImageType imageType, string filename)
     {
         // TODO: Siril support.
+
+        string extension = Path.GetExtension(filename);
 
         if (header.Items.Count == 0) return ImageKind.Processed;
 
         if (header.GetEntry<string>("IMAGETYP") is { Value: { } } imageTypeEntry)
         {
-            var imageTypeLower= imageTypeEntry.Value.ToLowerInvariant();
-            if (imageTypeLower.Contains("master")) return ImageKind.Master;
+            if (imageTypeEntry.Value.AsSpan().Contains("master", StringComparison.OrdinalIgnoreCase))
+                return ImageKind.Master;
         }
 
         var historyAndCommentItems = header.Items
                 .Where(item => item.Keyword == "HISTORY" || item.Keyword == "COMMENT")
                 .ToList();
 
-        var hasBeenCalibrated = historyAndCommentItems
-                .Any(item => item.Comment.StartsWith("Calibration with PixInsight"));
-
-        var hasBeenCosmetized = historyAndCommentItems
-                .Any(item => item.Comment.StartsWith("CosmeticCorrection with PixInsight"));
-
-        var hasBeenRegistered = historyAndCommentItems
-                .Any(item => item.Comment.StartsWith("Registration with PixInsight"));
+        bool isIntermediate = historyAndCommentItems
+            .Any(item =>
+            {
+                return item.Comment.AsSpan().StartsWith("Calibration with PixInsight")
+                     || item.Comment.AsSpan().StartsWith("CosmeticCorrection with PixInsight")
+                     || item.Comment.AsSpan().StartsWith("Registration with PixInsight")
+                     || item.Comment.AsSpan().StartsWith("Debayer with PixInsight")
+                     || item.Comment.AsSpan().StartsWith("LocalNormalization with PixInsight");
+            });
 
         var hasBeenIntegrated = historyAndCommentItems
-                .Any(item => item.Comment.StartsWith("Integration with PixInsight"));
+                .Any(item => item.Comment.AsSpan().StartsWith("Integration with PixInsight"));
 
         // Pix intermediate files are only xisf
         if (extension == ".xisf")
         {
-            if (hasBeenCalibrated) return ImageKind.Intermediate;
-            if (hasBeenCosmetized) return ImageKind.Intermediate;
-            if (hasBeenRegistered) return ImageKind.Intermediate;
+            if (isIntermediate) return ImageKind.Intermediate;
+
+            // PixInsight 1.9.x no longer adds FITS HISTORY headers.
+            // Instead it uses the XISFProperty element that are distinct from the FITSKeyword element in the XISF spec.
+            // Look at each XISFProperty for the processes that make this header an "intermediate" image kind.
+            
+            var xisfPropertyIds = header.Items
+                .Where(item => item.Keyword.AsSpan().StartsWith("PCL:Signature"))
+                .Select(item => item.Keyword)
+                .ToHashSet();
+
+            if (xisfPropertyIds.Contains("PCL:Signature:Calibration")
+                || xisfPropertyIds.Contains("PCL:Signature:CosmeticCorrection")
+                || xisfPropertyIds.Contains("PCL:Signature:Registration")
+                || xisfPropertyIds.Contains("PCL:Signature:Debayer")
+                || xisfPropertyIds.Contains("PCL:Signature:LocalNormalization"))
+                return ImageKind.Intermediate;
         }
 
-        if (hasBeenCalibrated == false &&
-            hasBeenCosmetized == false &&
-            hasBeenRegistered == false &&
+        if (isIntermediate == false &&
             hasBeenIntegrated == false)
         {
             switch (imageType)
