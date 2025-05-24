@@ -174,19 +174,19 @@
                     <DataGrid.Columns>
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding LibraryName}"
+                            Binding="{Binding LibraryName, Mode=OneWay}"
                             Header="Library" />
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding ObjectName}"
+                            Binding="{Binding ObjectName, Mode=OneWay}"
                             Header="Name" />
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding Type}"
+                            Binding="{Binding Type, Mode=OneWay}"
                             Header="Type" />
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding Kind}"
+                            Binding="{Binding Kind, Mode=OneWay}"
                             Header="Kind" />
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
@@ -194,7 +194,7 @@
                             Header="Exposure (s)" />
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding FilterName}"
+                            Binding="{Binding FilterName, Mode=OneWay}"
                             Header="Filter" />
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
@@ -209,15 +209,15 @@
                                 <DataTemplate DataType="common:ImageFileViewModel">
                                     <TextBlock
                                         VerticalAlignment="Center"
-                                        Text="{Binding Path, Converter={StaticResource Filename}}"
-                                        ToolTip.Tip="{Binding Path}" />
+                                        Text="{Binding Path, Converter={StaticResource Filename}, Mode=OneWay}"
+                                        ToolTip.Tip="{Binding Path, Mode=OneWay}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
                         <DataGridTemplateColumn x:DataType="common:ImageFileViewModel" Header="Tags">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate DataType="common:ImageFileViewModel">
-                                    <ItemsControl ItemsSource="{Binding Tags}">
+                                    <ItemsControl ItemsSource="{Binding Tags, Mode=OneWay}">
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <WrapPanel VerticalAlignment="Center" />
@@ -230,10 +230,10 @@
                                                     Padding="4,2"
                                                     HorizontalAlignment="Left"
                                                     VerticalAlignment="Center"
-                                                    Background="{Binding Brush}"
-                                                    Text="{Binding Name}">
+                                                    Background="{Binding Brush, Mode=OneWay}"
+                                                    Text="{Binding Name, Mode=OneWay}">
                                                     <TextBlock.ContextMenu>
-                                                        <ContextMenu Tag="{Binding $parent[DataGridRow].DataContext}">
+                                                        <ContextMenu Tag="{Binding $parent[DataGridRow].DataContext, Mode=OneWay}">
                                                             <MenuItem Click="RemoveTagMenuItem_Click" Header="Remove Tag" />
                                                         </ContextMenu>
                                                     </TextBlock.ContextMenu>
@@ -250,171 +250,171 @@
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding Airmass}"
+                            Binding="{Binding Airmass, Mode=OneWay}"
                             Header="Airmass"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:AirmassFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:AirmassFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding Altitude}"
+                            Binding="{Binding Altitude, Mode=OneWay}"
                             Header="Altitude (&#186;)"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:AltitudeFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:AltitudeFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding Azimuth}"
+                            Binding="{Binding Azimuth, Mode=OneWay}"
                             Header="Azimuth (&#186;)"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:AzimuthFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:AzimuthFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding Binning}"
+                            Binding="{Binding Binning, Mode=OneWay}"
                             Header="Binning"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:CameraBinningFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:CameraBinningFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding CameraGain}"
+                            Binding="{Binding CameraGain, Mode=OneWay}"
                             Header="Gain"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:CameraGainFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:CameraGainFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding CameraName}"
+                            Binding="{Binding CameraName, Mode=OneWay}"
                             Header="Camera Name"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:CameraNameFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:CameraNameFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding CameraOffset}"
+                            Binding="{Binding CameraOffset, Mode=OneWay}"
                             Header="Offset"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:CameraOffsetFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:CameraOffsetFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding CameraTemperature}"
+                            Binding="{Binding CameraTemperature, Mode=OneWay}"
                             Header="Camera Temperature (&#186;C)"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:CameraTemperatureFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:CameraTemperatureFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding CameraTemperatureSetPoint}"
+                            Binding="{Binding CameraTemperatureSetPoint, Mode=OneWay}"
                             Header="Camera Temperature Set Point (&#186;C)"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:CameraTemperatureSetPointFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:CameraTemperatureSetPointFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding Declination}"
+                            Binding="{Binding Declination, Mode=OneWay}"
                             Header="Declination (&#186;)"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:DeclinationFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:DeclinationFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding DewPoint}"
+                            Binding="{Binding DewPoint, Mode=OneWay}"
                             Header="Dew Point (&#186;C)"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:DewPointFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:DewPointFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding Elevation}"
+                            Binding="{Binding Elevation, Mode=OneWay}"
                             Header="Elevation (m)"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:ElevationFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:ElevationFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding FilterWheelName}"
+                            Binding="{Binding FilterWheelName, Mode=OneWay}"
                             Header="Filter Wheel Name"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:FilterWheelNameFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:FilterWheelNameFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding FocalLength}"
+                            Binding="{Binding FocalLength, Mode=OneWay}"
                             Header="Focal Length (mm)"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:FocalLengthFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:FocalLengthFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding FocuserName}"
+                            Binding="{Binding FocuserName, Mode=OneWay}"
                             Header="Focuser Name"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:FocuserNameFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:FocuserNameFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding FocuserPosition}"
+                            Binding="{Binding FocuserPosition, Mode=OneWay}"
                             Header="Focuser Position"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:FocuserPositionFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:FocuserPositionFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding FocuserTemperature}"
+                            Binding="{Binding FocuserTemperature, Mode=OneWay}"
                             Header="Focuser Temperature (&#186;C)"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:FocuserTemperatureFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:FocuserTemperatureFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding Humidity}"
+                            Binding="{Binding Humidity, Mode=OneWay}"
                             Header="Humidity (%)"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:HumidityFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:HumidityFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding Latitude}"
+                            Binding="{Binding Latitude, Mode=OneWay}"
                             Header="Latitude (&#186;)"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:LatitudeFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:LatitudeFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding Longitude}"
+                            Binding="{Binding Longitude, Mode=OneWay}"
                             Header="Longitude (&#186;)"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:LongitudeFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:LongitudeFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding PixelSize}"
+                            Binding="{Binding PixelSize, Mode=OneWay}"
                             Header="Pixel Size (µm)"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:PixelSizeFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:PixelSizeFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding Pressure}"
+                            Binding="{Binding Pressure, Mode=OneWay}"
                             Header="Pressure (mbar)"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:PressureFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:PressureFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding ReadoutMode}"
+                            Binding="{Binding ReadoutMode, Mode=OneWay}"
                             Header="Readout Mode"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:ReadoutModeFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:ReadoutModeFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding RightAscension, Converter={x:Static converter:FuncConverters.DegreesToHours}}"
+                            Binding="{Binding RightAscension, Converter={x:Static converter:FuncConverters.DegreesToHours}, Mode=OneWay}"
                             Header="Right Ascension (hr)"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:ReadoutModeFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:ReadoutModeFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding RotatorName}"
+                            Binding="{Binding RotatorName, Mode=OneWay}"
                             Header="Rotator Name"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:RotatorNameFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:RotatorNameFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding RotatorPosition}"
+                            Binding="{Binding RotatorPosition, Mode=OneWay}"
                             Header="Rotator Position"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:RotatorPositionFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:RotatorPositionFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding TelescopeName}"
+                            Binding="{Binding TelescopeName, Mode=OneWay}"
                             Header="Telescope Name"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:TelescopeNameFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:TelescopeNameFilter}, Mode=OneWay}" />
 
                         <DataGridTextColumn
                             x:DataType="common:ImageFileViewModel"
-                            Binding="{Binding Temperature}"
+                            Binding="{Binding Temperature, Mode=OneWay}"
                             Header="Temperature (&#186;C)"
-                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:TemperatureFilter}}" />
+                            IsVisible="{Binding #SearchResultsDataGrid.((search:SearchResultsViewModel)DataContext).ActiveFilters, Converter={x:Static converter:FuncConverters.ContainsFilter}, ConverterParameter={x:Type filter:TemperatureFilter}, Mode=OneWay}" />
 
                     </DataGrid.Columns>
                 </DataGrid>
