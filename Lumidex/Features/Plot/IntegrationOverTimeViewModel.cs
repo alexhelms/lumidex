@@ -186,14 +186,16 @@ public partial class IntegrationOverTimeViewModel : PlotViewModel
                 Timestamp, 
                 SUM(Exposure)/3600 AS TotalExposure
             FROM (
-            	SELECT strftime('%Y-%m', ObservationTimestampLocal, '-12:00') as Timestamp, Exposure
+            	SELECT
+                    strftime('%Y-%m', coalesce(ObservationTimestampLocal, ObservationTimestampUtc), '-12:00') as Timestamp,
+                    Exposure
             	FROM ImageFiles
             	WHERE 1 = 1
                     AND Type = @type
                     AND Kind = @kind
-                    AND ObservationTimestampLocal IS NOT NULL
-                    AND strftime('%Y-%m', ObservationTimestampLocal, '-12:00') >= @start
-                    AND strftime('%Y-%m', ObservationTimestampLocal, '-12:00') <= @end
+                    AND Timestamp IS NOT NULL
+                    AND Timestamp >= @start
+                    AND Timestamp <= @end
                     {libraryFilter}
                     {cameraNameFilter}
                     {telescopeNameFilter}
@@ -229,7 +231,7 @@ public partial class IntegrationOverTimeViewModel : PlotViewModel
             for (int i = 0; i < length; i++)
             {
                 xValues[i] = now.AddMonths(i + 1).ToOADate();
-                yValues[i] = 0;
+                yValues[i] = -1;  // -1 otherwise the text label is displayed on the plot
             }
         }
 

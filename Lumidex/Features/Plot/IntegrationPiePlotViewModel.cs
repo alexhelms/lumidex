@@ -195,8 +195,8 @@ public partial class IntegrationPiePlotViewModel : PlotViewModel
             .Where(image => image.Exposure != null)
             .Where(image => image.Type == ImageType.Light)
             .Where(image => image.Kind == kind)
-            .Where(image => image.ObservationTimestampLocal >= DateBeginLocal)
-            .Where(image => image.ObservationTimestampLocal <= DateEndLocal)
+            .Where(image => (image.ObservationTimestampLocal ?? image.ObservationTimestampUtc) >= DateBeginLocal)
+            .Where(image => (image.ObservationTimestampLocal ?? image.ObservationTimestampUtc) <= DateEndLocal)
             .AsQueryable();
 
         if (Library is not null)
