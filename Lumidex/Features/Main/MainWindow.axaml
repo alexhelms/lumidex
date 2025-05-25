@@ -7,7 +7,6 @@
     xmlns:dialogs="using:AvaloniaDialogs.Views"
     xmlns:main="clr-namespace:Lumidex.Features.Main"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="using:Lumidex.ViewModels"
     Title="Lumidex"
     Width="1920"
     Height="1080"

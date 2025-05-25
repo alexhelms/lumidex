@@ -16,7 +16,7 @@
                 Height="48"
                 HorizontalAlignment="Stretch"
                 Background="Transparent"
-                Command="{Binding $parent[ItemsControl].((sidenavbar:SideNavBarViewModel)DataContext).ChangeTabCommand}}"
+                Command="{Binding $parent[ItemsControl].((sidenavbar:SideNavBarViewModel)DataContext).ChangeTabCommand}"
                 CommandParameter="{Binding Name}"
                 IsChecked="{Binding IsSelected}"
                 ToolTip.Tip="{Binding ToolTipText}">
