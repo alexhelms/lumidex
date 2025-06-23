@@ -151,6 +151,46 @@ public class HeaderReader
                 return ImageKind.Intermediate;
         }
 
+        if (header.GetEntry<string>("PROGRAM") is { Value: { } } programEntry)
+        {
+            //Siril always adds the PROGRAM header with the value "Siril <version number>"
+            if (programEntry.Value.AsSpan().Contains("Siril", StringComparison.OrdinalIgnoreCase))
+            {
+
+                if (header.GetEntry<int>("STACKCNT") is { Value: { } } stackCountEntry)
+                {
+                    //Siril always adds this header for stacked images,
+                    //So must be either a Master or Intermediate image.
+                    //Siril does not add headers that identify whether the image is Flat, Dark, or Bias
+                    //This info must come from capture software.
+
+                    switch (imageType)
+                    {
+                        case ImageType.Flat:
+                        case ImageType.Dark:
+                        case ImageType.Bias:
+                            return ImageKind.Master;
+                        case ImageType.Light:
+                        case ImageType.Unknown:
+                            return ImageKind.Intermediate;
+                    }
+                }
+
+                //Not stacked so either a Calibration or Intermediate image.
+                switch (imageType)
+                {
+                    case ImageType.Flat:
+                    case ImageType.Dark:
+                    case ImageType.Bias:
+                        return ImageKind.Calibration;
+                    case ImageType.Light:
+                    case ImageType.Unknown:
+                        return ImageKind.Intermediate;
+                }
+
+            }
+        }
+
         if (isIntermediate == false &&
             hasBeenIntegrated == false)
         {
