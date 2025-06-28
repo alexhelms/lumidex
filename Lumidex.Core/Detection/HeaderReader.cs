@@ -292,7 +292,13 @@ public class HeaderReader
             "EXPOSURE", "EXPTIME");
         ExtractKeyword<double, double?>(header, imageFile, x => x.CameraTemperatureSetPoint,
             "SET-TEMP", "CCD-TSET");
+        ExtractKeyword<int, double?>(header, imageFile, x => x.CameraTemperatureSetPoint,
+            x => (double)x,
+            "SET-TEMP", "CCD-TSET");
         ExtractKeyword<double, double?>(header, imageFile, x => x.CameraTemperature,
+            "CCD-TEMP");
+        ExtractKeyword<int, double?>(header, imageFile, x => x.CameraTemperature,
+            x => (double)x,
             "CCD-TEMP");
         ExtractKeyword<int, int?>(header, imageFile, x => x.CameraGain,
             "GAIN", "CCD-GAIN", "EGAIN");
@@ -350,9 +356,9 @@ public class HeaderReader
         ExtractKeyword<double, double?>(header, imageFile, x => x.Declination,
             "DEC");
         ExtractKeyword<double, double?>(header, imageFile, x => x.Altitude,
-            "CENTALT");
+            "CENTALT", "OBJCTALT");
         ExtractKeyword<double, double?>(header, imageFile, x => x.Azimuth,
-            "CENTAZ");
+            "CENTAZ", "OBJCTAZ");
     }
 
     private void ExtractTelescopeKeywords(ImageHeader header, ImageFile imageFile)
@@ -395,9 +401,9 @@ public class HeaderReader
     private void ExtractSiteKeywords(ImageHeader header, ImageFile imageFile)
     {
         ExtractKeyword<double, double?>(header, imageFile, x => x.Latitude,
-            "SITELAT");
+            "SITELAT", "OBSLAT");
         ExtractKeyword<double, double?>(header, imageFile, x => x.Longitude,
-            "SITELONG", "SITELON");
+            "SITELONG", "SITELON", "OBSLONG");
         ExtractKeyword<double, double?>(header, imageFile, x => x.Elevation,
             "SITEELEV", "SITEELV");
     }
