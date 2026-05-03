@@ -230,8 +230,20 @@ public class LibraryIngestPipeline
                 var updateStatuses = new List<IngestStatus>(messages.Length);
                 var skipStatuses = new List<IngestStatus>(messages.Length);
                 var hashes = fileInfoLookup.Keys.ToHashSet();
+
+                // Scope dedup to the library currently being scanned. A hash
+                // match in another library is not a duplicate from this
+                // library's perspective — libraries are logically independent,
+                // and the same physical file may legitimately exist in more
+                // than one. All messages in a single pipeline invocation come
+                // from the same library today; Distinct().Single() locks
+                // that invariant so any future refactor that mixed libraries
+                // into one batch would fault loudly into ProcessAsync's
+                // top-level catch rather than silently mis-scoping and
+                // reintroducing #66.
+                var libraryId = messages.Select(m => m.Value.LibraryId).Distinct().Single();
                 var imageFiles = dbContext.ImageFiles
-                    .Where(f => hashes.Contains(f.HeaderHash))
+                    .Where(f => f.LibraryId == libraryId && hashes.Contains(f.HeaderHash))
                     .ToList();
 
                 foreach (var imageFile in imageFiles)
