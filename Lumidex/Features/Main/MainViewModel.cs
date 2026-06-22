@@ -9,6 +9,7 @@ using Lumidex.Features.Plot;
 using Lumidex.Features.Settings;
 using Lumidex.Features.SideNavBar;
 using Lumidex.Features.Tags;
+using Lumidex.Features.TargetSummary;
 using Lumidex.Services;
 
 namespace Lumidex.Features.Main;
@@ -24,6 +25,7 @@ public partial class MainViewModel : ViewModelBase,
     private readonly TagManagerViewModel _tagManagerViewModel;
     private readonly LibraryManagerViewModel _libraryManagerViewModel;
     private readonly PlotManagerViewModel _plotManagerViewModel;
+    private readonly TargetSummaryViewModel _targetSummaryViewModel;
     private readonly MainSettingsViewModel _settingsViewModel;
 
     [ObservableProperty]
@@ -45,6 +47,7 @@ public partial class MainViewModel : ViewModelBase,
         TagManagerViewModel tagManagerViewModel,
         LibraryManagerViewModel libraryManagerViewModel,
         PlotManagerViewModel plotManagerViewModel,
+        TargetSummaryViewModel targetSummaryViewModel,
         MainSettingsViewModel settingsViewModel)
     {
         _systemService = systemService;
@@ -56,6 +59,7 @@ public partial class MainViewModel : ViewModelBase,
         _tagManagerViewModel = tagManagerViewModel;
         _libraryManagerViewModel = libraryManagerViewModel;
         _plotManagerViewModel = plotManagerViewModel;
+        _targetSummaryViewModel = targetSummaryViewModel;
         _settingsViewModel = settingsViewModel;
 
         // 28px for MacOS so traffic light is vertically centered.
@@ -89,6 +93,7 @@ public partial class MainViewModel : ViewModelBase,
             SideNavBarViewModel.TagsTabName => _tagManagerViewModel,
             SideNavBarViewModel.LibraryTabName => _libraryManagerViewModel,
             SideNavBarViewModel.PlotTabName => _plotManagerViewModel,
+            SideNavBarViewModel.TargetsTabName => _targetSummaryViewModel,
             // Lower Tabs
             SideNavBarViewModel.SettingsTabName => _settingsViewModel,
             _ => throw new NotImplementedException(),

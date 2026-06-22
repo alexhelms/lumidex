@@ -1,0 +1,220 @@
+<UserControl
+    x:Class="Lumidex.Features.TargetSummary.TargetSummaryView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converter="using:Lumidex.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="https://github.com/projektanker/icons.avalonia"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ts="using:Lumidex.Features.TargetSummary"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="ts:TargetSummaryViewModel"
+    mc:Ignorable="d">
+
+    <!-- Implicit template (in DataTemplates, not Resources, so it applies by type) for the filter
+         leaf row. Every binding reads off the row's own DataContext — never an ancestor/#element
+         binding, which crashes Avalonia's binding-error logger in these deferred expander lists.
+         The bar is drawn at raw hours and scaled to fit by a Viewbox, so no width binding is needed. -->
+    <UserControl.DataTemplates>
+        <DataTemplate DataType="ts:FilterRowViewModel">
+            <Grid Margin="0,1" ColumnDefinitions="240,64,*">
+                <TextBlock
+                    Grid.Column="0"
+                    Margin="48,0,0,0"
+                    VerticalAlignment="Center"
+                    Opacity="0.8"
+                    Text="{Binding Filter}" />
+                <TextBlock
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    Opacity="0.8"
+                    TextAlignment="Right"
+                    Text="{Binding Hours, StringFormat='{}{0:0.0}h'}" />
+                <Border
+                    Grid.Column="2"
+                    Height="14"
+                    MinWidth="80"
+                    Margin="8,0"
+                    VerticalAlignment="Center"
+                    Background="#22FFFFFF"
+                    ClipToBounds="True"
+                    CornerRadius="4">
+                    <Viewbox HorizontalAlignment="Stretch" Stretch="Fill" StretchDirection="Both">
+                        <StackPanel Orientation="Horizontal">
+                            <ItemsControl ItemsSource="{Binding Segments}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="ts:BarSegment">
+                                        <Rectangle
+                                            Height="12"
+                                            Width="{Binding Hours}"
+                                            Fill="{Binding Filter, Converter={x:Static converter:FilterColorConverter.Instance}}"
+                                            ToolTip.Tip="{Binding Filter}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <Rectangle Height="12" Width="{Binding Remainder}" Fill="Transparent" />
+                        </StackPanel>
+                    </Viewbox>
+                </Border>
+            </Grid>
+        </DataTemplate>
+    </UserControl.DataTemplates>
+
+    <DockPanel Margin="8">
+        <StackPanel
+            Margin="0,0,0,8"
+            DockPanel.Dock="Top"
+            Orientation="Horizontal"
+            Spacing="8">
+            <Button Command="{Binding RefreshCommand}" Content="Refresh" />
+        </StackPanel>
+
+        <ScrollViewer>
+            <ItemsControl ItemsSource="{Binding Targets}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="ts:TargetRowViewModel">
+                        <StackPanel>
+                            <!-- Target row: same column geometry as the scope/filter rows so the bars line up. -->
+                            <Grid Margin="0,3" ColumnDefinitions="240,64,*">
+                                <DockPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <ToggleButton
+                                        DockPanel.Dock="Left"
+                                        Margin="0,0,4,0"
+                                        Padding="2,0"
+                                        VerticalAlignment="Center"
+                                        Background="Transparent"
+                                        IsChecked="{Binding IsExpanded}"
+                                        IsVisible="{Binding CanExpand}"
+                                        ToolTip.Tip="Show the per-telescope breakdown">
+                                        <i:Icon FontSize="14" Value="mdi-chevron-right" />
+                                    </ToggleButton>
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontWeight="SemiBold"
+                                        Text="{Binding CanonicalName}"
+                                        TextTrimming="CharacterEllipsis"
+                                        ToolTip.Tip="{Binding CanonicalName}" />
+                                </DockPanel>
+                                <TextBlock
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    TextAlignment="Right"
+                                    Text="{Binding Hours, StringFormat='{}{0:0.0}h'}" />
+                                <Border
+                                    Grid.Column="2"
+                                    Height="16"
+                                    MinWidth="80"
+                                    Margin="8,0"
+                                    VerticalAlignment="Center"
+                                    Background="#22FFFFFF"
+                                    ClipToBounds="True"
+                                    CornerRadius="4">
+                                    <Viewbox HorizontalAlignment="Stretch" Stretch="Fill" StretchDirection="Both">
+                                        <StackPanel Orientation="Horizontal">
+                                            <ItemsControl ItemsSource="{Binding Segments}">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <StackPanel Orientation="Horizontal" />
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate DataType="ts:BarSegment">
+                                                        <Rectangle
+                                                            Height="14"
+                                                            Width="{Binding Hours}"
+                                                            Fill="{Binding Filter, Converter={x:Static converter:FilterColorConverter.Instance}}"
+                                                            ToolTip.Tip="{Binding Filter}" />
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                            <Rectangle Height="14" Width="{Binding Remainder}" Fill="Transparent" />
+                                        </StackPanel>
+                                    </Viewbox>
+                                </Border>
+                            </Grid>
+
+                            <!-- Expanded breakdown: scope rows (multi-scope) each followed by its filters,
+                                 OR the filters directly (single-scope). -->
+                            <StackPanel Margin="0,0,0,4" IsVisible="{Binding IsExpanded}">
+                                <ItemsControl IsVisible="{Binding CanExpand}" ItemsSource="{Binding Scopes}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="ts:ScopeRowViewModel">
+                                            <StackPanel>
+                                                <Grid Margin="0,4,0,1" ColumnDefinitions="240,64,*">
+                                                    <DockPanel Grid.Column="0" Margin="20,0,0,0" VerticalAlignment="Center">
+                                                        <ToggleButton
+                                                            DockPanel.Dock="Left"
+                                                            Margin="0,0,4,0"
+                                                            Padding="2,0"
+                                                            VerticalAlignment="Center"
+                                                            Background="Transparent"
+                                                            IsChecked="{Binding IsExpanded}"
+                                                            ToolTip.Tip="Show filters">
+                                                            <i:Icon FontSize="12" Value="mdi-chevron-right" />
+                                                        </ToggleButton>
+                                                        <TextBlock
+                                                            VerticalAlignment="Center"
+                                                            FontWeight="SemiBold"
+                                                            Opacity="0.9"
+                                                            Text="{Binding Scope}" />
+                                                    </DockPanel>
+                                                    <TextBlock
+                                                        Grid.Column="1"
+                                                        VerticalAlignment="Center"
+                                                        Opacity="0.9"
+                                                        TextAlignment="Right"
+                                                        Text="{Binding Hours, StringFormat='{}{0:0.0}h'}" />
+                                                    <Border
+                                                        Grid.Column="2"
+                                                        Height="14"
+                                                        MinWidth="80"
+                                                        Margin="8,0"
+                                                        VerticalAlignment="Center"
+                                                        Background="#22FFFFFF"
+                                                        ClipToBounds="True"
+                                                        CornerRadius="4">
+                                                        <Viewbox HorizontalAlignment="Stretch" Stretch="Fill" StretchDirection="Both">
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <ItemsControl ItemsSource="{Binding Segments}">
+                                                                    <ItemsControl.ItemsPanel>
+                                                                        <ItemsPanelTemplate>
+                                                                            <StackPanel Orientation="Horizontal" />
+                                                                        </ItemsPanelTemplate>
+                                                                    </ItemsControl.ItemsPanel>
+                                                                    <ItemsControl.ItemTemplate>
+                                                                        <DataTemplate DataType="ts:BarSegment">
+                                                                            <Rectangle
+                                                                                Height="12"
+                                                                                Width="{Binding Hours}"
+                                                                                Fill="{Binding Filter, Converter={x:Static converter:FilterColorConverter.Instance}}"
+                                                                                ToolTip.Tip="{Binding Filter}" />
+                                                                        </DataTemplate>
+                                                                    </ItemsControl.ItemTemplate>
+                                                                </ItemsControl>
+                                                                <Rectangle Height="12" Width="{Binding Remainder}" Fill="Transparent" />
+                                                            </StackPanel>
+                                                        </Viewbox>
+                                                    </Border>
+                                                </Grid>
+                                                <!-- The scope's filters (implicit template), shown when the scope is expanded. -->
+                                                <ItemsControl IsVisible="{Binding IsExpanded}" ItemsSource="{Binding Filters}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <!-- Single-scope target: its filters directly under it. -->
+                                <ItemsControl IsVisible="{Binding !CanExpand}" ItemsSource="{Binding Filters}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>
