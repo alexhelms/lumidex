@@ -19,6 +19,7 @@ public static class DependencyInjection
             => () => provider.GetRequiredService<LibraryIngestPipeline>());
 
         services.AddTransient<Targets.TargetResolutionService>();
+        services.AddTransient<Targets.TargetSummaryQuery>();
         
         services.AddDbContextFactory<LumidexDbContext>(options =>
         {

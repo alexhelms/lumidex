@@ -41,6 +41,12 @@ public class LumidexDbContext : DbContext
             .Property(x => x.CreatedOn)
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
+        // The target summary filters Type==Light then joins/aggregates on ObjectName; without this
+        // index the largest table is full-scanned several times per reload. ObjectName is TEXT
+        // COLLATE NOCASE, so the index inherits NOCASE and serves the case-insensitive join.
+        modelBuilder.Entity<ImageFile>()
+            .HasIndex(x => new { x.Type, x.ObjectName });
+
         modelBuilder.Entity<Library>()
             .Property(x => x.CreatedOn)
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
