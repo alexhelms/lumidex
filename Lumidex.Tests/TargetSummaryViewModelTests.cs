@@ -50,4 +50,27 @@ public class TargetSummaryViewModelTests : IClassFixture<DatabaseFixture>, IDisp
         m31.ReferenceMax.Should().BeApproximately(1.0, 1e-6);   // its own 1h, not the unnamed 2h
         m31.Remainder.Should().BeApproximately(0, 1e-6);        // it is the largest real target
     }
+
+    // Changing the sort re-orders the loaded rows in memory (no DB reload). Hours are set inverse to
+    // the alphabetical order so the two sort modes produce different orders.
+    [Fact]
+    public async Task Sort_ReordersLoadedRows()
+    {
+        using (var db = new LumidexDbContext(_fx.Options))
+        {
+            db.Libraries.Add(new Library { Id = 1, Name = "Lib", Path = "/lib" });
+            db.ImageFiles.AddRange(
+                new ImageFile { HeaderHash="a", Path="/a", ObjectName="M 104", Type=ImageType.Light, TelescopeName="T20", FilterName="L", Exposure=3600,   LibraryId=1 }, // 1h
+                new ImageFile { HeaderHash="b", Path="/b", ObjectName="M 31",  Type=ImageType.Light, TelescopeName="T20", FilterName="L", Exposure=2*3600, LibraryId=1 }); // 2h
+            db.SaveChanges();
+        }
+
+        var vm = BuildViewModel();
+        await vm.Reload();
+        vm.Targets.Select(t => t.CanonicalName).Should().ContainInOrder("M 31", "M 104");   // default: most data first
+
+        vm.SortBy = TargetSummarySort.Alphabetical;
+        vm.SortAscending = true;
+        vm.Targets.Select(t => t.CanonicalName).Should().ContainInOrder("M 104", "M 31");    // alphabetical ascending
+    }
 }

@@ -3,6 +3,9 @@ using Lumidex.Services;
 
 namespace Lumidex.Features.TargetSummary;
 
+// The sort key for the target list.
+public enum TargetSummarySort { Alphabetical, DataAcquired, FirstAcquired, LastAcquired }
+
 public partial class TargetSummaryViewModel : ViewModelBase
 {
     private readonly TargetResolutionService _resolution;
@@ -15,6 +18,13 @@ public partial class TargetSummaryViewModel : ViewModelBase
     // Reassigned wholesale on each load; a fresh collection + one rebind avoids the ItemsControl
     // range-notification crash the codebase hits when mutating in place.
     [ObservableProperty] public partial ObservableCollectionEx<TargetRowViewModel> Targets { get; set; } = new();
+
+    // The sort control. Default is most-integrated first; changing either re-orders the loaded rows
+    // in memory (no DB hit).
+    [ObservableProperty] public partial TargetSummarySort SortBy { get; set; } = TargetSummarySort.DataAcquired;
+    [ObservableProperty] public partial bool SortAscending { get; set; } = false;
+
+    public IReadOnlyList<TargetSummarySort> SortOptions { get; } = Enum.GetValues<TargetSummarySort>();
 
     public TargetSummaryViewModel(TargetResolutionService resolution, TargetSummaryQuery query, DialogService dialogService)
     {
@@ -65,7 +75,7 @@ public partial class TargetSummaryViewModel : ViewModelBase
                 foreach (var s in r.Scopes)
                     s.IsExpanded = expandedScopes.Contains((r.TargetId, s.Scope));
             }
-            Targets = new(rows.OrderByDescending(r => r.Hours));
+            Targets = new(Order(rows));
         }
         catch (Exception ex)
         {
@@ -89,7 +99,7 @@ public partial class TargetSummaryViewModel : ViewModelBase
             })
             .OrderBy(s => s.Scope, StringComparer.OrdinalIgnoreCase)
             .ToList();
-        return new TargetRowViewModel { TargetId = t.TargetId, CanonicalName = t.CanonicalName, Scopes = scopes };
+        return new TargetRowViewModel { TargetId = t.TargetId, CanonicalName = t.CanonicalName, First = t.First, Last = t.Last, Scopes = scopes };
     }
 
     protected override void OnInitialActivated()
@@ -100,4 +110,33 @@ public partial class TargetSummaryViewModel : ViewModelBase
 
     [RelayCommand]
     private Task Refresh() => Reload();
+
+    partial void OnSortByChanged(TargetSummarySort value) => ApplySort();
+    partial void OnSortAscendingChanged(bool value) => ApplySort();
+
+    // Re-order the already-loaded rows without touching the DB. The same row instances are re-wrapped
+    // in a new collection, so expand state is preserved.
+    private void ApplySort()
+    {
+        if (Targets.Count > 0)
+            Targets = new(Order(Targets));
+    }
+
+    // Date keys push undated rows last (ascending) via MaxValue; the others compare their numeric or
+    // date key. Alphabetical compares case-insensitively.
+    private List<TargetRowViewModel> Order(IEnumerable<TargetRowViewModel> rows)
+    {
+        Func<TargetRowViewModel, IComparable> key = SortBy switch
+        {
+            TargetSummarySort.DataAcquired => r => r.Hours,
+            TargetSummarySort.FirstAcquired => r => r.First ?? DateTime.MaxValue,
+            TargetSummarySort.LastAcquired => r => r.Last ?? DateTime.MaxValue,
+            _ => r => r.CanonicalName,
+        };
+        var ordered = SortBy == TargetSummarySort.Alphabetical
+            ? rows.OrderBy(r => r.CanonicalName, StringComparer.OrdinalIgnoreCase)
+            : rows.OrderBy(key);
+        return (SortAscending ? ordered : ordered.Reverse()).ToList();
+    }
 }
+

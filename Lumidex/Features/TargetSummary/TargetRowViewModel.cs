@@ -35,6 +35,8 @@ public partial class TargetRowViewModel : ObservableObject
     public required int TargetId { get; init; }
     public required string CanonicalName { get; init; }
     public required IReadOnlyList<ScopeRowViewModel> Scopes { get; init; }
+    public DateTime? First { get; init; }
+    public DateTime? Last { get; init; }
     public double ReferenceMax { get; set; }
 
     [ObservableProperty] public partial bool IsExpanded { get; set; }
