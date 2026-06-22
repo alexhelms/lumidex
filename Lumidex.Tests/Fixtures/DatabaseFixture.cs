@@ -9,6 +9,9 @@ public class DatabaseFixture : IDisposable
 
     public string DatabaseFilename { get; }
 
+    // Exposed so tests can build their own fresh contexts against the same DB.
+    public DbContextOptions<LumidexDbContext> Options { get; }
+
     public DatabaseFixture()
     {
         var tempFilename = $"lumidex-{Path.GetFileName(Path.GetTempFileName())}.db";
@@ -20,7 +23,8 @@ public class DatabaseFixture : IDisposable
             .EnableSensitiveDataLogging(false);
 
         Directory.CreateDirectory(Path.GetDirectoryName(DatabaseFilename)!);
-        DbContext = new LumidexDbContext(builder.Options);
+        Options = builder.Options;
+        DbContext = new LumidexDbContext(Options);
         DbContext.Database.EnsureCreated();
     }
 

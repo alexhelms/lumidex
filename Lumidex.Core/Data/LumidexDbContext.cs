@@ -27,6 +27,8 @@ public class LumidexDbContext : DbContext
     public DbSet<ObjectAlias> ObjectAliases { get; set; }
     public DbSet<AstrobinFilter> AstrobinFilters { get; set; }
     public DbSet<PersistedFilter> PersistedFilters { get; set; }
+    public DbSet<Target> Targets { get; set; }
+    public DbSet<TargetNameMap> TargetNameMaps { get; set; }
 
     public LumidexDbContext(DbContextOptions<LumidexDbContext> options)
         : base(options)
