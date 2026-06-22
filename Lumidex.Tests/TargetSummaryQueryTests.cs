@@ -85,4 +85,27 @@ public class TargetSummaryQueryTests : IClassFixture<DatabaseFixture>, IDisposab
         unnamed.CanonicalName.Should().Be("(Unnamed)");
         unnamed.Hours.Should().BeApproximately(1, 1e-6);
     }
+
+    // Filter synonyms canonicalize before the roll-up, so "H" and "Ha" merge into one filter row
+    // with their hours summed.
+    [Fact]
+    public void GetTargetSummary_CanonicalizesFilterSynonyms()
+    {
+        using (var db = new LumidexDbContext(_fx.Options))
+        {
+            db.Libraries.Add(new Library { Id = 1, Name = "Lib", Path = "/lib" });
+            var t = new Target { CanonicalName = "M 31" };
+            db.Targets.Add(t);
+            db.TargetNameMaps.Add(new TargetNameMap { RawObjectName = "M 31", Target = t });
+            db.ImageFiles.AddRange(
+                new ImageFile { HeaderHash="a", Path="/a", ObjectName="M 31", Type=ImageType.Light, TelescopeName="T20", FilterName="H",  Exposure=3600, LibraryId=1 },
+                new ImageFile { HeaderHash="b", Path="/b", ObjectName="M 31", Type=ImageType.Light, TelescopeName="T20", FilterName="Ha", Exposure=3600, LibraryId=1 });
+            db.SaveChanges();
+        }
+
+        var scope = Query().GetTargetSummary().Single().Scopes.Single();
+        scope.Filters.Should().ContainSingle();                         // H + Ha fold to one canonical filter
+        scope.Filters.Single().Filter.Should().Be("Ha");
+        scope.Filters.Single().Hours.Should().BeApproximately(2, 1e-6); // 1h + 1h
+    }
 }

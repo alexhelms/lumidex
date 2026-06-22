@@ -26,6 +26,8 @@ public class TargetSummaryQuery
     private const string NoFilter = "(No filter)";
     private const string Unnamed = "(Unnamed)";
 
+    private static readonly HashSet<string> EmptyScopeFilters = new(StringComparer.OrdinalIgnoreCase);
+
     private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
     public TargetSummaryQuery(IDbContextFactory<LumidexDbContext> dbContextFactory)
         => _dbContextFactory = dbContextFactory;
@@ -83,7 +85,18 @@ public class TargetSummaryQuery
                                                 x.TelescopeName, x.FilterName, x.Seconds, x.First, x.Last)))
             .ToList();
 
-        return RollUp(cells);
+        // Canonicalize each cell's filter using the scope's whole filter set as context (the
+        // bare-B/R rule), so true synonyms merge before the roll-up groups by filter.
+        var scopeFilters = cells
+            .GroupBy(c => c.Scope)
+            .ToDictionary(g => g.Key, g => g.Select(c => c.Filter).ToHashSet(StringComparer.OrdinalIgnoreCase));
+        var canonical = cells.Select(c => c with
+        {
+            Filter = FilterCanonicalizer.Canonicalize(c.Filter,
+                scopeFilters.TryGetValue(c.Scope, out var sf) ? sf : EmptyScopeFilters),
+        });
+
+        return RollUp(canonical);
     }
 
     private static Cell ToCell(int id, string name, string? telescopeName, string? filterName, double seconds, DateTime? first, DateTime? last)
