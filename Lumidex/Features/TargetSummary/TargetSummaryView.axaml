@@ -1,0 +1,378 @@
+<UserControl
+    x:Class="Lumidex.Features.TargetSummary.TargetSummaryView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converter="using:Lumidex.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="https://github.com/projektanker/icons.avalonia"
+    xmlns:ie="using:Avalonia.Xaml.Interactions.Custom"
+    xmlns:interactivity="using:Avalonia.Xaml.Interactivity"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ts="using:Lumidex.Features.TargetSummary"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="ts:TargetSummaryViewModel"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <converter:NullableDecimalToDoubleConverter x:Key="DecimalToDouble" />
+    </UserControl.Resources>
+
+    <!-- Implicit data template (in DataTemplates, not Resources, so it applies by type) for the
+         filter row — the ONLY level with an editable goal. Both the per-scope and single-scope
+         filter lists below pick it up. Every binding reads off the row's own DataContext (the
+         SetGoalCommand, the bar's Segments/Remainder) — never an ancestor/#element binding, which
+         crashes Avalonia's binding-error logger in these deferred expander templates. -->
+    <UserControl.DataTemplates>
+        <DataTemplate DataType="ts:FilterGoalRowViewModel">
+            <Grid Margin="0,1" ColumnDefinitions="32,210,160,*,46">
+                <TextBlock
+                    Grid.Column="1"
+                    Margin="28,0,0,0"
+                    VerticalAlignment="Center"
+                    Opacity="0.8"
+                    Text="{Binding Filter}" />
+                <StackPanel
+                    Grid.Column="2"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="4">
+                    <TextBlock
+                        Width="52"
+                        VerticalAlignment="Center"
+                        Opacity="0.8"
+                        TextAlignment="Right"
+                        Text="{Binding Hours, StringFormat='{}{0:0.0}h'}" />
+                    <NumericUpDown
+                        Width="84"
+                        VerticalAlignment="Center"
+                        Increment="1"
+                        Minimum="0"
+                        ShowButtonSpinner="False"
+                        Value="{Binding ExplicitGoal, Converter={StaticResource DecimalToDouble}}"
+                        Watermark="goal">
+                        <interactivity:Interaction.Behaviors>
+                            <ie:ExecuteCommandOnLostFocusBehavior Command="{Binding SetGoalCommand}" />
+                        </interactivity:Interaction.Behaviors>
+                    </NumericUpDown>
+                </StackPanel>
+                <Border
+                    Grid.Column="3"
+                    Height="14"
+                    MinWidth="80"
+                    Margin="8,0"
+                    VerticalAlignment="Center"
+                    Background="#22FFFFFF"
+                    ClipToBounds="True"
+                    CornerRadius="4">
+                    <Viewbox HorizontalAlignment="Stretch" Stretch="Fill" StretchDirection="Both">
+                        <StackPanel Orientation="Horizontal">
+                            <ItemsControl ItemsSource="{Binding Segments}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="ts:BarSegment">
+                                        <Rectangle
+                                            Height="12"
+                                            Width="{Binding Hours}"
+                                            Fill="{Binding Filter, Converter={x:Static converter:FilterColorConverter.Instance}}"
+                                            ToolTip.Tip="{Binding Filter}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <Rectangle Height="12" Width="{Binding Remainder}" Fill="Transparent" />
+                        </StackPanel>
+                    </Viewbox>
+                </Border>
+                <TextBlock
+                    Grid.Column="4"
+                    VerticalAlignment="Center"
+                    Opacity="0.8"
+                    TextAlignment="Right"
+                    Text="{Binding PercentComplete, StringFormat='{}{0:0}%', TargetNullValue='—', FallbackValue='—'}" />
+            </Grid>
+        </DataTemplate>
+    </UserControl.DataTemplates>
+
+    <DockPanel Margin="8">
+        <!-- Toolbar: merge, refresh, and the per-layer sort control (filters stay static). -->
+        <StackPanel
+            Margin="0,0,0,8"
+            DockPanel.Dock="Top"
+            Orientation="Horizontal"
+            Spacing="8">
+            <Button
+                Classes="accent"
+                Command="{Binding MergeSelectedCommand}"
+                Content="Merge Targets"
+                ToolTip.Tip="Combine the selected target rows into one. Non-destructive — undo any time from Manage merges." />
+            <Button
+                Command="{Binding MergeScopesCommand}"
+                Content="Merge Scopes"
+                ToolTip.Tip="Combine selected scope rows (telescope-name variants, e.g. &quot;iTelescope 75&quot; and &quot;iTelescope T75&quot;) into one. Expand a target and check two scope rows. Non-destructive — undo from Manage merges." />
+            <Button Content="Manage merges…">
+                <Button.Flyout>
+                    <Flyout Placement="Bottom">
+                        <Border Width="380" Padding="4">
+                            <StackPanel Spacing="6">
+                                <TextBlock FontWeight="SemiBold" Text="Merges" />
+                                <TextBlock
+                                    IsVisible="{Binding HasNoMerges}"
+                                    Opacity="0.7"
+                                    Text="No merges yet." />
+                                <ItemsControl ItemsSource="{Binding MergeOperations}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="ts:MergeOperationRowViewModel">
+                                            <Grid Margin="0,2" ColumnDefinitions="58,*,Auto">
+                                                <Border
+                                                    Grid.Column="0"
+                                                    Margin="0,0,6,0"
+                                                    Padding="4,1"
+                                                    VerticalAlignment="Center"
+                                                    Background="#22FFFFFF"
+                                                    CornerRadius="3">
+                                                    <TextBlock
+                                                        FontSize="11"
+                                                        HorizontalAlignment="Center"
+                                                        Opacity="0.8"
+                                                        Text="{Binding KindLabel}" />
+                                                </Border>
+                                                <TextBlock
+                                                    Grid.Column="1"
+                                                    VerticalAlignment="Center"
+                                                    Text="{Binding Label}"
+                                                    TextTrimming="CharacterEllipsis"
+                                                    ToolTip.Tip="{Binding Label}" />
+                                                <Button
+                                                    Grid.Column="2"
+                                                    Margin="6,0,0,0"
+                                                    Command="{Binding UndoCommand}"
+                                                    Content="Undo" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+            <Button Command="{Binding RefreshCommand}" Content="Refresh" />
+            <TextBlock VerticalAlignment="Center" Text="Sort:" />
+            <ComboBox
+                MinWidth="160"
+                VerticalAlignment="Center"
+                ItemsSource="{Binding SortOptions}"
+                SelectedItem="{Binding SortBy}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Converter={x:Static converter:TargetSummarySortLabelConverter.Instance}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <ToggleButton
+                VerticalAlignment="Center"
+                IsChecked="{Binding SortAscending}"
+                ToolTip.Tip="Ascending / descending">
+                <Panel>
+                    <i:Icon FontSize="16" IsVisible="{Binding SortAscending}" Value="mdi-sort-ascending" />
+                    <i:Icon FontSize="16" IsVisible="{Binding !SortAscending}" Value="mdi-sort-descending" />
+                </Panel>
+            </ToggleButton>
+        </StackPanel>
+
+        <ScrollViewer>
+            <ItemsControl x:Name="TargetsList" ItemsSource="{Binding Targets}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="ts:TargetGoalRowViewModel">
+                        <StackPanel>
+                            <!-- Target row. Same lane geometry as the scope/filter rows so the
+                                 bars line up. Goal here is the derived rolled-up goal (no field). -->
+                            <Grid Margin="0,3" ColumnDefinitions="32,210,160,*,46">
+                                <CheckBox
+                                    Grid.Column="0"
+                                    VerticalAlignment="Center"
+                                    IsChecked="{Binding IsSelected}"
+                                    ToolTip.Tip="Select for merge" />
+                                <DockPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <ToggleButton
+                                        DockPanel.Dock="Left"
+                                        Margin="0,0,4,0"
+                                        Padding="2,0"
+                                        VerticalAlignment="Center"
+                                        Background="Transparent"
+                                        IsChecked="{Binding IsExpanded}"
+                                        ToolTip.Tip="Show the per-filter breakdown">
+                                        <i:Icon FontSize="14" Value="mdi-chevron-right" />
+                                    </ToggleButton>
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontWeight="SemiBold"
+                                        Text="{Binding CanonicalName}"
+                                        TextTrimming="CharacterEllipsis"
+                                        ToolTip.Tip="{Binding CanonicalName}" />
+                                </DockPanel>
+                                <StackPanel
+                                    Grid.Column="2"
+                                    VerticalAlignment="Center"
+                                    Orientation="Horizontal"
+                                    Spacing="4">
+                                    <TextBlock
+                                        Width="52"
+                                        VerticalAlignment="Center"
+                                        TextAlignment="Right"
+                                        Text="{Binding Hours, StringFormat='{}{0:0.0}h'}" />
+                                    <TextBlock IsVisible="{Binding HasGoal}" VerticalAlignment="Center" Text="/" />
+                                    <TextBlock
+                                        Width="52"
+                                        VerticalAlignment="Center"
+                                        IsVisible="{Binding HasGoal}"
+                                        TextAlignment="Right"
+                                        Text="{Binding Goal, StringFormat='{}{0:0.0}h'}" />
+                                </StackPanel>
+                                <Border
+                                    Grid.Column="3"
+                                    Height="16"
+                                    MinWidth="80"
+                                    Margin="8,0"
+                                    VerticalAlignment="Center"
+                                    Background="#22FFFFFF"
+                                    ClipToBounds="True"
+                                    CornerRadius="4">
+                                    <Viewbox HorizontalAlignment="Stretch" Stretch="Fill" StretchDirection="Both">
+                                        <StackPanel Orientation="Horizontal">
+                                            <ItemsControl ItemsSource="{Binding Segments}">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <StackPanel Orientation="Horizontal" />
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate DataType="ts:BarSegment">
+                                                        <Rectangle
+                                                            Height="14"
+                                                            Width="{Binding Hours}"
+                                                            Fill="{Binding Filter, Converter={x:Static converter:FilterColorConverter.Instance}}"
+                                                            ToolTip.Tip="{Binding Filter}" />
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                            <Rectangle Height="14" Width="{Binding Remainder}" Fill="Transparent" />
+                                        </StackPanel>
+                                    </Viewbox>
+                                </Border>
+                                <TextBlock
+                                    Grid.Column="4"
+                                    VerticalAlignment="Center"
+                                    TextAlignment="Right"
+                                    Text="{Binding PercentComplete, StringFormat='{}{0:0}%', TargetNullValue='—', FallbackValue='—'}" />
+                            </Grid>
+
+                            <!-- Expanded breakdown: scope rows (multi-scope) each followed by its
+                                 filters, OR the filters directly (single-scope). -->
+                            <StackPanel Margin="0,0,0,4" IsVisible="{Binding IsExpanded}">
+                                <ItemsControl IsVisible="{Binding CanExpand}" ItemsSource="{Binding Scopes}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="ts:ScopeGoalRowViewModel">
+                                            <StackPanel>
+                                                <!-- Scope header (derived goal, no field). -->
+                                                <Grid Margin="0,4,0,1" ColumnDefinitions="32,210,160,*,46">
+                                                    <CheckBox
+                                                        Grid.Column="0"
+                                                        Margin="6,0,0,0"
+                                                        VerticalAlignment="Center"
+                                                        IsChecked="{Binding IsSelected}"
+                                                        ToolTip.Tip="Select for scope merge" />
+                                                    <DockPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center">
+                                                        <ToggleButton
+                                                            DockPanel.Dock="Left"
+                                                            Margin="0,0,4,0"
+                                                            Padding="2,0"
+                                                            VerticalAlignment="Center"
+                                                            Background="Transparent"
+                                                            IsChecked="{Binding IsExpanded}"
+                                                            ToolTip.Tip="Show filters">
+                                                            <i:Icon FontSize="12" Value="mdi-chevron-right" />
+                                                        </ToggleButton>
+                                                        <TextBlock
+                                                            VerticalAlignment="Center"
+                                                            FontWeight="SemiBold"
+                                                            Opacity="0.9"
+                                                            Text="{Binding Scope}" />
+                                                    </DockPanel>
+                                                    <StackPanel
+                                                        Grid.Column="2"
+                                                        VerticalAlignment="Center"
+                                                        Orientation="Horizontal"
+                                                        Spacing="4">
+                                                        <TextBlock
+                                                            Width="52"
+                                                            VerticalAlignment="Center"
+                                                            Opacity="0.9"
+                                                            TextAlignment="Right"
+                                                            Text="{Binding Hours, StringFormat='{}{0:0.0}h'}" />
+                                                        <TextBlock IsVisible="{Binding HasGoal}" VerticalAlignment="Center" Opacity="0.9" Text="/" />
+                                                        <TextBlock
+                                                            Width="52"
+                                                            VerticalAlignment="Center"
+                                                            IsVisible="{Binding HasGoal}"
+                                                            Opacity="0.9"
+                                                            TextAlignment="Right"
+                                                            Text="{Binding Goal, StringFormat='{}{0:0.0}h'}" />
+                                                    </StackPanel>
+                                                    <Border
+                                                        Grid.Column="3"
+                                                        Height="14"
+                                                        MinWidth="80"
+                                                        Margin="8,0"
+                                                        VerticalAlignment="Center"
+                                                        Background="#22FFFFFF"
+                                                        ClipToBounds="True"
+                                                        CornerRadius="4">
+                                                        <Viewbox HorizontalAlignment="Stretch" Stretch="Fill" StretchDirection="Both">
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <ItemsControl ItemsSource="{Binding Segments}">
+                                                                    <ItemsControl.ItemsPanel>
+                                                                        <ItemsPanelTemplate>
+                                                                            <StackPanel Orientation="Horizontal" />
+                                                                        </ItemsPanelTemplate>
+                                                                    </ItemsControl.ItemsPanel>
+                                                                    <ItemsControl.ItemTemplate>
+                                                                        <DataTemplate DataType="ts:BarSegment">
+                                                                            <Rectangle
+                                                                                Height="12"
+                                                                                Width="{Binding Hours}"
+                                                                                Fill="{Binding Filter, Converter={x:Static converter:FilterColorConverter.Instance}}"
+                                                                                ToolTip.Tip="{Binding Filter}" />
+                                                                        </DataTemplate>
+                                                                    </ItemsControl.ItemTemplate>
+                                                                </ItemsControl>
+                                                                <Rectangle Height="12" Width="{Binding Remainder}" Fill="Transparent" />
+                                                            </StackPanel>
+                                                        </Viewbox>
+                                                    </Border>
+                                                    <TextBlock
+                                                        Grid.Column="4"
+                                                        VerticalAlignment="Center"
+                                                        Opacity="0.9"
+                                                        TextAlignment="Right"
+                                                        Text="{Binding PercentComplete, StringFormat='{}{0:0}%', TargetNullValue='—', FallbackValue='—'}" />
+                                                </Grid>
+                                                <!-- The scope's filters (implicit template), shown when the scope is expanded. -->
+                                                <ItemsControl IsVisible="{Binding IsExpanded}" ItemsSource="{Binding Filters}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <!-- Single-scope target: its filters directly under it. -->
+                                <ItemsControl IsVisible="{Binding !CanExpand}" ItemsSource="{Binding Filters}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

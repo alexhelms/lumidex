@@ -27,6 +27,11 @@ public class LumidexDbContext : DbContext
     public DbSet<ObjectAlias> ObjectAliases { get; set; }
     public DbSet<AstrobinFilter> AstrobinFilters { get; set; }
     public DbSet<PersistedFilter> PersistedFilters { get; set; }
+    public DbSet<Target> Targets { get; set; }
+    public DbSet<TargetNameMap> TargetNameMaps { get; set; }
+    public DbSet<TargetFilterGoal> TargetFilterGoals { get; set; }
+    public DbSet<ScopeMerge> ScopeMerges { get; set; }
+    public DbSet<TargetMerge> TargetMerges { get; set; }
 
     public LumidexDbContext(DbContextOptions<LumidexDbContext> options)
         : base(options)
@@ -38,6 +43,12 @@ public class LumidexDbContext : DbContext
         modelBuilder.Entity<ImageFile>()
             .Property(x => x.CreatedOn)
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        // Target summary queries filter Type==Light then join/DISTINCT on ObjectName;
+        // without this the largest table is full-scanned thrice per reload. ObjectName is
+        // TEXT COLLATE NOCASE so the index inherits NOCASE and serves the case-insensitive join.
+        modelBuilder.Entity<ImageFile>()
+            .HasIndex(x => new { x.Type, x.ObjectName });
 
         modelBuilder.Entity<Library>()
             .Property(x => x.CreatedOn)

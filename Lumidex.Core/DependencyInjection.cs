@@ -15,6 +15,10 @@ public static class DependencyInjection
     {
         services.AddTransient<IFileSystem, FileSystem>();
         services.AddTransient<LibraryIngestPipeline>();
+        // Not an IViewModelBase, so the UI auto-registration won't pick it up;
+        // register explicitly for injection into TargetSummaryViewModel.
+        services.AddTransient<Lumidex.Core.Targets.TargetResolutionService>();
+        services.AddTransient<Lumidex.Core.Targets.TargetGoalQuery>();
         services.AddTransient<Func<LibraryIngestPipeline>>(provider
             => () => provider.GetRequiredService<LibraryIngestPipeline>());
         

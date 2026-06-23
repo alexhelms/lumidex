@@ -11,6 +11,7 @@ public partial class SideNavBarViewModel : ViewModelBase,
     public const string TagsTabName = "Tags";
     public const string LibraryTabName = "Library";
     public const string PlotTabName = "Plot";
+    public const string TargetsTabName = "Targets";
 
     // Lower Tabs
     public const string SettingsTabName = "Settings";
@@ -44,6 +45,12 @@ public partial class SideNavBarViewModel : ViewModelBase,
                 Name = PlotTabName,
                 ToolTipText = "Plot your data",
                 Icon = "mdi-chart-line",
+            },
+            new()
+            {
+                Name = TargetsTabName,
+                ToolTipText = "Track integration toward goals",
+                Icon = "mdi-target",
             },
             new()
             {
