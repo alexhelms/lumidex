@@ -98,6 +98,13 @@ public static class DirectoryWalker
                 if (dir.Name.StartsWith('$'))
                     continue;
 
+                // . are POSIX hidden directories (.git, .cache, .Trash-*, ...).
+                // They hold no library images and can be large, so skip them.
+                // Only descendants are skipped — an explicitly-chosen root that
+                // starts with '.' is still walked (it is pushed before this loop).
+                if (dir.Name.StartsWith('.'))
+                    continue;
+
                 dirStack.Push(dir);
             }
         }
