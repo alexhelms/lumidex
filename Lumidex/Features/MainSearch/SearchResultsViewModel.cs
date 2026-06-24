@@ -370,6 +370,14 @@ public partial class SearchResultsViewModel : ViewModelBase,
             {
                 pixPath = @"/Applications/PixInsight/PixInsight.app/Contents/MacOS/PixInsight";
             }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                // Launch via the .sh wrapper, not the bare binary: it exports
+                // LD_LIBRARY_PATH for PixInsight's bundled libs (and is what the
+                // installed .desktop file uses). The bare binary can't find them
+                // and exits before opening a window.
+                pixPath = "/opt/PixInsight/bin/PixInsight.sh";
+            }
 
             await _systemService.StartProcess(pixPath, $"\"{fileInfo.FullName}\"");
         }
