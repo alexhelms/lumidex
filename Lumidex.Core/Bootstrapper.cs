@@ -55,6 +55,20 @@ public static class Bootstrapper
 
     private static IntPtr DllImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
     {
+        var path = GetNativeLibraryPath(libraryName);
+        if (path is null)
+            return IntPtr.Zero;
+
+        NativeLibrary.TryLoad(path, assembly, searchPath, out IntPtr handle);
+        return handle;
+    }
+
+    // Builds the absolute path to a bundled native library:
+    //   <app base>/runtimes/<portable-rid>/native/<prefix><name><ext>
+    // Returns null for platforms with no bundled library, leaving resolution to
+    // the runtime's default search (which then fails loudly, as before).
+    private static string? GetNativeLibraryPath(string libraryName)
+    {
         var prefix = string.Empty;
         var extension = ".dll";
 
@@ -69,8 +83,37 @@ public static class Bootstrapper
             extension = ".dylib";
         }
 
-        IntPtr handle = IntPtr.Zero;
-        NativeLibrary.TryLoad($"./runtimes/{RuntimeInformation.RuntimeIdentifier}/native/{prefix}{libraryName}{extension}", assembly, searchPath, out handle);
-        return handle;
+        // Resolve the portable RID whose runtimes/<rid>/native/ folder we ship.
+        // RuntimeInformation.RuntimeIdentifier is unusable here: on Linux it is
+        // the distro-specific RID (e.g. "fedora.44-x64"), which has no matching
+        // runtimes/ folder, so the load silently misses. It only happens to line
+        // up on Windows ("win-x64") — which is why this bug is Linux-only.
+        var rid = GetNativeRuntimeIdentifier();
+        if (rid is null)
+            return null;
+
+        // Anchor at the app's base directory, not "./". A relative path resolves
+        // against the current working directory, which equals the app folder
+        // only when launched from it (e.g. `dotnet run`). An installed build
+        // started from a .desktop entry or any other CWD would miss the lib.
+        return Path.Combine(AppContext.BaseDirectory, "runtimes", rid, "native", $"{prefix}{libraryName}{extension}");
+    }
+
+    // Maps OS + process architecture to the portable RID we bundle a native
+    // cfitsio for. Returns null for platforms with no bundled library, leaving
+    // resolution to the runtime's default search (which then fails loudly with
+    // DllNotFoundException, as before).
+    private static string? GetNativeRuntimeIdentifier()
+    {
+        var arch = RuntimeInformation.ProcessArchitecture;
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && arch is Architecture.X64)
+            return "win-x64";
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && arch is Architecture.X64)
+            return "linux-x64";
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            return arch is Architecture.Arm64 ? "osx-arm64" : "osx-x64";
+
+        return null;
     }
 }
