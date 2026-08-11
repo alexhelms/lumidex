@@ -81,24 +81,7 @@ public class LibraryIngestPipeline
         Skipped = new();
         Errors = new();
 
-        var internalProgress = new Progress<IngestProgress>(p =>
-        {
-            foreach (var item in p.Added)
-                Added.Add(item);
-
-            foreach (var item in p.Updated)
-                Updated.Add(item);
-
-            foreach (var item in p.Skipped)
-                Skipped.Add(item);
-
-            foreach (var item in p.Errors)
-                Errors.Add(item);
-
-            progress?.Report(p);
-        });
-
-        var (pipeline, completion) = CreatePipeline(internalProgress, token);
+        var (pipeline, completion) = CreatePipeline(progress, token);
 
         Log.Information("Starting library ingest pipeline for {Path}", library.Path);
         var start = Stopwatch.GetTimestamp();
@@ -192,7 +175,9 @@ public class LibraryIngestPipeline
             catch (Exception ex)
             {
                 Log.Error(ex, "Error hashing {Filename}", message.FileInfo.FullName);
-                errorProgressBlock.Post([new(message.FileInfo, "Hash Error")]);
+                var status = new IngestStatus(message.FileInfo, "Hash Error");
+                Errors.Add(status);
+                errorProgressBlock.Post([status]);
                 return Result.Fail(new PipelineError(message.FileInfo, "Error hashing file"));
             }
         },
@@ -260,6 +245,10 @@ public class LibraryIngestPipeline
                 }
 
                 int count = dbContext.SaveChanges();
+                foreach (var status in updateStatuses)
+                    Updated.Add(status);
+                foreach (var status in skipStatuses)
+                    Skipped.Add(status);
                 updatedProgressBlock.Post(updateStatuses);
                 skippedProgressBlock.Post(skipStatuses);
                 existingHashes = imageFiles
@@ -293,7 +282,9 @@ public class LibraryIngestPipeline
             }
             catch (Exception ex)
             {
-                errorProgressBlock.Post([new(fileInfo, "Header Error")]);
+                var status = new IngestStatus(fileInfo, "Header Error");
+                Errors.Add(status);
+                errorProgressBlock.Post([status]);
                 Log.Error(ex, "Error processing image header in {Filename}", fileInfo.FullName);
                 return Result.Fail(new PipelineError(fileInfo, "Error processing image header"));
             }
@@ -326,16 +317,22 @@ public class LibraryIngestPipeline
                 using var dbContext = _dbContextFactory.CreateDbContext();
                 dbContext.ImageFiles.AddRange(imageFiles);
                 dbContext.SaveChanges();
-                addedProgressBlock.Post(fileInfos
+                var statuses = fileInfos
                     .Select(fileInfo => new IngestStatus(fileInfo, "Added"))
-                    .ToList());
+                    .ToList();
+                foreach (var status in statuses)
+                    Added.Add(status);
+                addedProgressBlock.Post(statuses);
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "Error adding images to the database");
-                errorProgressBlock.Post(fileInfos
+                var statuses = fileInfos
                     .Select(fileInfo => new IngestStatus(fileInfo, "Error adding to database"))
-                    .ToList());
+                    .ToList();
+                foreach (var status in statuses)
+                    Errors.Add(status);
+                errorProgressBlock.Post(statuses);
             }
         },
         new ExecutionDataflowBlockOptions
