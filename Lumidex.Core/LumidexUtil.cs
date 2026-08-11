@@ -19,9 +19,11 @@ public static class LumidexUtil
             static string GetFieldValue(IEnumerable<FieldInfo> fields, string fieldName)
                 => (string)fields.First(f => f.Name == fieldName).GetValue(null)!;
         }
+        
+        PortableRuntimeIdentifier = GetPortableRid();
     }
 
-    public static string Copyright { get; } = "© 2024 Alex Helms and Contributors";
+    public static string Copyright => $"© 2024-{DateTime.Now.Year} Alex Helms and Contributors";
 
     public static string Version { get; } = string.Empty;
 
@@ -34,6 +36,23 @@ public static class LumidexUtil
     public static string OSArchitecture { get; } = RuntimeInformation.OSArchitecture.ToString().ToLowerInvariant();
 
     public static string OSDescription { get; } = RuntimeInformation.OSDescription;
+    
+    public static OSPlatform OSPlatform
+    {
+        get
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                return OSPlatform.OSX;
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                return OSPlatform.Linux;
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return OSPlatform.Windows;
+
+            return OSPlatform.Create("Unknown");
+        }
+    }
 
     public static string UserAgent { get; } = $"Lumidex/{Version} ({OSDescription}) ({OSArchitecture})";
 
@@ -42,4 +61,22 @@ public static class LumidexUtil
     public static bool IsMacOS => RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 
     public static bool IsLinux => RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+    
+    public static string PortableRuntimeIdentifier { get; }
+    
+    private static string GetPortableRid()
+    {
+        var arch = RuntimeInformation.ProcessArchitecture switch
+        {
+            Architecture.X64 => "x64",
+            Architecture.Arm64 => "arm64",
+            Architecture.X86 => "x86",
+            var other => throw new PlatformNotSupportedException($"Unsupported architecture: {other}")
+        };
+
+        return RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? $"win-{arch}"
+            : RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? $"linux-{arch}"
+            : RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? $"osx-{arch}"
+            : throw new PlatformNotSupportedException();
+    }
 }

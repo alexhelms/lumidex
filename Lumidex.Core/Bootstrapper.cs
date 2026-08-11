@@ -41,9 +41,10 @@ public static class Bootstrapper
         var launchTimeUtc = DateTime.UtcNow;
 
         Log.Information("Welcome to Lumidex {Version} {Architecture}", LumidexUtil.InformationalVersion, LumidexUtil.ProcessArchitecture);
-        Log.Information("Launched at {TimestampUtc:s} UTC ({TimestampLocal:s} Local)", launchTimeUtc, launchTimeUtc.ToLocalTime());
+        Log.Information("Launched at {TimestampUtc:s} ({TimestampLocal:s})", launchTimeUtc, launchTimeUtc.ToLocalTime());
         Log.Information("{OS} {Architecture}", LumidexUtil.OSDescription, LumidexUtil.OSArchitecture);
-        Log.Information("{Dotnet} {RuntimeIdentifier}", RuntimeInformation.FrameworkDescription, RuntimeInformation.RuntimeIdentifier);
+        Log.Information("{Dotnet} {RuntimeIdentifier}", RuntimeInformation.FrameworkDescription, LumidexUtil.PortableRuntimeIdentifier);
+
         Log.Information("Logs located at {Path}", LogPath);
     }
 
