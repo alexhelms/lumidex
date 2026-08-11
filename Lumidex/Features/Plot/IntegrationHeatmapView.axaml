@@ -1,120 +1,120 @@
 <UserControl
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d"
     x:Class="Lumidex.Features.Plot.IntegrationHeatmapView"
+    x:DataType="plot:IntegrationHeatmapViewModel"
     xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:Lumidex.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="https://github.com/projektanker/icons.avalonia"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:plot="using:Lumidex.Features.Plot"
-    d:DesignHeight="450"
-    d:DesignWidth="800"
-    x:DataType="plot:IntegrationHeatmapViewModel"
-    mc:Ignorable="d">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <DockPanel>
 
-        <DockPanel Margin="0,40,0,0" DockPanel.Dock="Left">
+        <DockPanel DockPanel.Dock="Left" Margin="0,40,0,0">
 
             <StackPanel>
 
                 <DockPanel>
                     <TextBlock
-                        Width="120"
-                        VerticalAlignment="Center"
                         DockPanel.Dock="Left"
-                        Text="Date Begin Local" />
+                        Text="Date Begin Local"
+                        VerticalAlignment="Center"
+                        Width="120" />
                     <CalendarDatePicker
-                        Width="220"
-                        Margin="8,0,0,0"
-                        HorizontalAlignment="Stretch"
                         CustomDateFormatString="yyyy/MM/dd"
+                        HorizontalAlignment="Stretch"
                         IsTodayHighlighted="True"
+                        Margin="8,0,0,0"
+                        PlaceholderText=" "
                         SelectedDate="{Binding DateBeginLocal}"
                         SelectedDateFormat="Custom"
                         ToolTip.Tip="Begin date, Local"
-                        Watermark=" " />
+                        Width="220" />
                 </DockPanel>
 
                 <DockPanel Margin="0,8,0,0">
                     <TextBlock
-                        Width="120"
-                        VerticalAlignment="Center"
                         DockPanel.Dock="Left"
-                        Text="Date End Local" />
+                        Text="Date End Local"
+                        VerticalAlignment="Center"
+                        Width="120" />
                     <CalendarDatePicker
-                        Width="220"
-                        Margin="8,0,0,0"
-                        HorizontalAlignment="Stretch"
                         CustomDateFormatString="yyyy/MM/dd"
+                        HorizontalAlignment="Stretch"
                         IsTodayHighlighted="True"
+                        Margin="8,0,0,0"
+                        PlaceholderText=" "
                         SelectedDate="{Binding DateEndLocal}"
                         SelectedDateFormat="Custom"
                         ToolTip.Tip="Begin date, Local"
-                        Watermark=" " />
+                        Width="220" />
                 </DockPanel>
 
                 <DockPanel Margin="0,8,0,0">
                     <TextBlock
-                        Width="120"
-                        VerticalAlignment="Center"
                         DockPanel.Dock="Left"
-                        Text="Library" />
+                        Text="Library"
+                        VerticalAlignment="Center"
+                        Width="120" />
                     <Button
-                        Margin="5,0,0,0"
-                        VerticalAlignment="Stretch"
-                        i:Attached.Icon="mdi-close"
                         Command="{Binding ClearLibraryCommand}"
                         DockPanel.Dock="Right"
-                        ToolTip.Tip="Clear" />
+                        Margin="5,0,0,0"
+                        ToolTip.Tip="Clear"
+                        VerticalAlignment="Stretch"
+                        i:Attached.Icon="mdi-close" />
                     <ComboBox
-                        Margin="8,0,0,0"
-                        HorizontalAlignment="Stretch"
                         DisplayMemberBinding="{Binding Name}"
+                        HorizontalAlignment="Stretch"
                         ItemsSource="{Binding Libraries}"
+                        Margin="8,0,0,0"
                         SelectedItem="{Binding Library, Mode=TwoWay}" />
                 </DockPanel>
 
                 <DockPanel Margin="0,8,0,0">
                     <TextBlock
-                        Width="120"
-                        VerticalAlignment="Center"
                         DockPanel.Dock="Left"
-                        Text="Camera Name" />
+                        Text="Camera Name"
+                        VerticalAlignment="Center"
+                        Width="120" />
                     <Button
-                        Margin="5,0,0,0"
-                        VerticalAlignment="Stretch"
-                        i:Attached.Icon="mdi-close"
                         Command="{Binding ClearCameraNameCommand}"
                         DockPanel.Dock="Right"
-                        ToolTip.Tip="Clear" />
+                        Margin="5,0,0,0"
+                        ToolTip.Tip="Clear"
+                        VerticalAlignment="Stretch"
+                        i:Attached.Icon="mdi-close" />
                     <TextBox Margin="8,0,0,0" Text="{Binding CameraName}" />
                 </DockPanel>
 
                 <DockPanel Margin="0,8,0,0">
                     <TextBlock
-                        Width="120"
-                        VerticalAlignment="Center"
                         DockPanel.Dock="Left"
-                        Text="Telescope Name" />
+                        Text="Telescope Name"
+                        VerticalAlignment="Center"
+                        Width="120" />
                     <Button
-                        Margin="5,0,0,0"
-                        VerticalAlignment="Stretch"
-                        i:Attached.Icon="mdi-close"
                         Command="{Binding ClearTelescopeNameCommand}"
                         DockPanel.Dock="Right"
-                        ToolTip.Tip="Clear" />
+                        Margin="5,0,0,0"
+                        ToolTip.Tip="Clear"
+                        VerticalAlignment="Stretch"
+                        i:Attached.Icon="mdi-close" />
                     <TextBox Margin="8,0,0,0" Text="{Binding TelescopeName}" />
                 </DockPanel>
 
                 <DockPanel Margin="0,8,0,0">
                     <TextBlock
-                        VerticalAlignment="Center"
                         DockPanel.Dock="Left"
-                        Text="Show Detailed Labels" />
+                        Text="Show Detailed Labels"
+                        VerticalAlignment="Center" />
                     <ToggleSwitch
-                        Margin="8,0,-12,0"
                         HorizontalAlignment="Right"
                         IsChecked="{Binding ShowDetailedLabels}"
+                        Margin="8,0,-12,0"
                         OffContent="{x:Null}"
                         OnContent="{x:Null}" />
                 </DockPanel>
@@ -123,34 +123,34 @@
 
                     <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
                         <Button
-                            Width="48"
-                            HorizontalContentAlignment="Center"
                             Command="{Binding SearchPrev2YearsCommand}"
                             Content="2yr"
-                            ToolTip.Tip="Show plot for the past two years." />
-                        <Button
-                            Width="48"
-                            Margin="5,0,0,0"
                             HorizontalContentAlignment="Center"
+                            ToolTip.Tip="Show plot for the past two years."
+                            Width="48" />
+                        <Button
                             Command="{Binding SearchPrev1YearCommand}"
                             Content="1yr"
-                            ToolTip.Tip="Show plot for the past one year." />
-                        <Button
-                            Width="48"
-                            Margin="5,0,0,0"
                             HorizontalContentAlignment="Center"
+                            Margin="5,0,0,0"
+                            ToolTip.Tip="Show plot for the past one year."
+                            Width="48" />
+                        <Button
                             Command="{Binding SearchPrev6MonthsCommand}"
                             Content="6mo"
-                            ToolTip.Tip="Show plot for the past six months." />
+                            HorizontalContentAlignment="Center"
+                            Margin="5,0,0,0"
+                            ToolTip.Tip="Show plot for the past six months."
+                            Width="48" />
                     </StackPanel>
 
                     <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
 
                         <Border
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
                             Background="Transparent"
-                            DockPanel.Dock="Bottom">
+                            DockPanel.Dock="Bottom"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center">
                             <i:Icon FontSize="20" Value="mdi-information-outline" />
                             <ToolTip.Tip>
                                 <TextBlock LineSpacing="5" TextWrapping="Wrap">
@@ -161,13 +161,13 @@
                         </Border>
 
                         <Button
-                            Width="100"
-                            Margin="8,0,0,0"
-                            HorizontalContentAlignment="Center"
                             Classes="accent"
                             Command="{Binding DrawPlotCommand}"
                             Content="Plot"
-                            IsDefault="True" />
+                            HorizontalContentAlignment="Center"
+                            IsDefault="True"
+                            Margin="8,0,0,0"
+                            Width="100" />
 
                     </StackPanel>
 

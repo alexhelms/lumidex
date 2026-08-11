@@ -1,23 +1,28 @@
 <UserControl
-    x:Class="Lumidex.Features.Main.MainView"
-    xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="clr-namespace:Lumidex.Features.Main"
-    xmlns:avalonia="using:Avalonia"
     d:DesignHeight="450"
     d:DesignWidth="800"
+    mc:Ignorable="d"
+    x:Class="Lumidex.Features.Main.MainView"
     x:DataType="vm:MainViewModel"
-    mc:Ignorable="d">
+    xmlns="https://github.com/avaloniaui"
+    xmlns:avalonia="using:Avalonia"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="clr-namespace:Optris.Icons.Avalonia;assembly=Optris.Icons.Avalonia"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:Lumidex.Features.Main"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <DockPanel>
 
         <Grid
-            Height="{Binding TopBarHeight}"
             ColumnDefinitions="Auto,1*,1*,1*"
-            DockPanel.Dock="Top">
-            <Border Grid.Column="0" Width="48" Classes.ismacos="{ReflectionBinding Source={x:Static avalonia:Application.Current}, Path=IsMacOS, Mode=OneTime}">
+            DockPanel.Dock="Top"
+            Height="{Binding TopBarHeight}">
+            <Border
+                Classes.ismacos="{ReflectionBinding Source={x:Static avalonia:Application.Current},
+                                                    Path=IsMacOS,
+                                                    Mode=OneTime}"
+                Grid.Column="0"
+                Width="48">
                 <Border.Styles>
                     <Style Selector="Border.ismacos">
                         <Style.Setters>
@@ -26,12 +31,12 @@
                     </Style>
                 </Border.Styles>
                 <Image
-                    Width="24"
                     Height="24"
                     HorizontalAlignment="Center"
-                    Source="/Assets/lumidex-icon-small.png" />
+                    Source="/Assets/lumidex-icon-small.png"
+                    Width="24" />
             </Border>
-            <Menu Grid.Column="1" Background="{x:Null}">
+            <Menu Background="{x:Null}" Grid.Column="1">
                 <MenuItem Header="_File">
                     <MenuItem Command="{Binding ExitApplicationCommand}" Header="E_xit" />
                 </MenuItem>
@@ -46,15 +51,15 @@
                 Grid.Column="0"
                 Grid.ColumnSpan="999"
                 HorizontalAlignment="Center"
-                VerticalAlignment="Center"
                 IsHitTestVisible="False"
-                Text="Lumidex" />
+                Text="Lumidex"
+                VerticalAlignment="Center" />
         </Grid>
 
         <Rectangle
-            Height="1"
             DockPanel.Dock="Top"
-            Fill="#656565" />
+            Fill="#656565"
+            Height="1" />
 
         <DockPanel>
             <ContentControl Content="{Binding SideNavBarViewModel}" DockPanel.Dock="Left" />

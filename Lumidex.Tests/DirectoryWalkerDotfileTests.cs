@@ -28,8 +28,8 @@ public class DirectoryWalkerDotfileTests : IDisposable
     // images and can be large. The walker must not descend into them.
     // Pre-fix: only "$"-prefixed dirs are skipped, so the file under .git is
     // walked and yielded.
-    [Fact]
-    public void Walk_DoesNotDescendIntoDotPrefixedSubdirectories()
+    [Test]
+    public async Task Walk_DoesNotDescendIntoDotPrefixedSubdirectories()
     {
         Directory.CreateDirectory(Path.Combine(_libDir, ".git"));
         File.WriteAllText(Path.Combine(_libDir, ".git", "hidden.fits"), "");
@@ -38,14 +38,14 @@ public class DirectoryWalkerDotfileTests : IDisposable
 
         var yielded = DirectoryWalker.Walk(_fileSystem, _libDir).Select(f => f.Name).ToList();
 
-        yielded.Should().ContainSingle().Which.Should().Be("visible.fits");
+        await Assert.That(yielded).HasSingleItem(x => x == "visible.fits");
     }
 
     // The skip applies to descendants discovered during the walk, never to the
     // explicitly-chosen root. A library rooted at a dot-directory (e.g.
     // ~/.astrophotos) must still be scanned.
-    [Fact]
-    public void Walk_DoesNotSkipDotPrefixedRoot()
+    [Test]
+    public async Task Walk_DoesNotSkipDotPrefixedRoot()
     {
         var dotRoot = Path.Combine(_libDir, ".astrophotos");
         Directory.CreateDirectory(dotRoot);
@@ -53,6 +53,6 @@ public class DirectoryWalkerDotfileTests : IDisposable
 
         var yielded = DirectoryWalker.Walk(_fileSystem, dotRoot).Select(f => f.Name).ToList();
 
-        yielded.Should().ContainSingle().Which.Should().Be("image.fits");
+        await Assert.That(yielded).HasSingleItem(x => x == "image.fits");
     }
 }

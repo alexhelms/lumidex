@@ -1,11 +1,11 @@
 <Application
+    Name="Lumidex"
+    RequestedThemeVariant="Dark"
     x:Class="Lumidex.App"
     xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:dialogHostAvalonia="using:DialogHostAvalonia"
     xmlns:local="using:Lumidex"
-    Name="Lumidex"
-    RequestedThemeVariant="Dark">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Application.DataTemplates>
         <local:ViewLocator />
@@ -18,7 +18,6 @@
         <FluentTheme>
             <FluentTheme.Palettes>
                 <ColorPaletteResources
-                    x:Key="Dark"
                     Accent="#ff005496"
                     AltHigh="#161616"
                     AltLow="Black"
@@ -45,17 +44,35 @@
                     ChromeWhite="White"
                     ListLow="#ff222325"
                     ListMedium="#ff3c3e42"
-                    RegionColor="#ff1e1f22" />
+                    RegionColor="#ff1e1f22"
+                    x:Key="Dark" />
             </FluentTheme.Palettes>
         </FluentTheme>
         <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
         <dialogHostAvalonia:DialogHostStyles />
+
+        <Style Selector="Window">
+            <Setter Property="Icon" Value="/Assets/lumidex-icon.png" />
+            <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
+        </Style>
+
+        <!--  Title  -->
+        <Style Selector="WindowDrawnDecorations /template/ Panel#PART_TitleTextPanel &gt; TextBlock">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+
+        <!--  Full screen button  -->
+        <Style Selector="WindowDrawnDecorations /template/ Button#PART_FullScreenButton">
+            <Setter Property="IsVisible" Value="False" />
+            <Setter Property="Width" Value="0" />
+        </Style>
+
     </Application.Styles>
 
     <Application.Resources>
 
-        <Flyout x:Key="CopiedToClipboardFlyout" ShowMode="TransientWithDismissOnPointerMoveAway">
+        <Flyout ShowMode="TransientWithDismissOnPointerMoveAway" x:Key="CopiedToClipboardFlyout">
             <Border Background="#333538">
                 <TextBlock
                     Foreground="White"

@@ -3,21 +3,12 @@ using Lumidex.Core.Pipelines;
 using Microsoft.EntityFrameworkCore;
 using System.IO.Abstractions;
 using Lumidex.Tests.Fixtures;
+using TUnit.Core.Interfaces;
 
 namespace Lumidex.Tests;
 
-public class LibraryIngestPipelineTests : IClassFixture<DatabaseFixture>
+public class LibraryIngestPipelineTests
 {
-    private readonly DatabaseFixture _dbFixture;
-    private readonly IFileSystem _fileSystem = new FileSystem();
-    private readonly IDbContextFactory<LumidexDbContext> _contextFactory;
-
-    public LibraryIngestPipelineTests(DatabaseFixture dbFixture)
-    {
-        _dbFixture = dbFixture;
-        _contextFactory = new TestDbContextFactory(dbFixture.DatabaseFilename);
-    }
-
     // Regression test for the cross-library dedup bug in upstream issue #66.
     //
     // Reporter scenario: the same physical XISF file was placed in two
@@ -35,9 +26,13 @@ public class LibraryIngestPipelineTests : IClassFixture<DatabaseFixture>
     // Fix: scope the dedup query to the library currently being scanned.
     // Libraries are logically independent; a hash match in another
     // library isn't a duplicate from the scanning library's perspective.
-    [Fact]
+    [Test]
     public async Task SameFileInTwoLibraries_SecondLibraryScan_DoesNotEmitMisleadingSkipped()
     {
+        using var dbFixture = new DatabaseFixture();
+        var contextFactory = new TestDbContextFactory(dbFixture.DatabaseFilename);
+        var fileSystem = new FileSystem();
+        
         using var xisf = new XisfFixture();
         var generated = xisf.GenerateXisfFile(
             new XisfHeaderContent("OBJECT", "Test-Target"),
@@ -55,30 +50,28 @@ public class LibraryIngestPipelineTests : IClassFixture<DatabaseFixture>
 
             var library1 = new Library { Name = "Lib1", Path = lib1Dir };
             var library2 = new Library { Name = "Lib2", Path = lib2Dir };
-            _dbFixture.DbContext.Libraries.AddRange(library1, library2);
-            _dbFixture.DbContext.SaveChanges();
+            dbFixture.DbContext.Libraries.AddRange(library1, library2);
+            dbFixture.DbContext.SaveChanges();
 
-            var pipeline = new LibraryIngestPipeline(_fileSystem, _contextFactory);
+            var pipeline = new LibraryIngestPipeline(fileSystem, contextFactory);
 
             // First library — fresh DB, should add cleanly with no skips.
             await pipeline.ProcessAsync(library1, forceFullScan: true);
-            pipeline.Added.Count.Should().Be(1);
-            pipeline.Skipped.Count.Should().Be(0);
+            await Assert.That(pipeline.Added.Count).IsEqualTo(1);
+            await Assert.That(pipeline.Skipped.Count).IsEqualTo(0);
 
             // Second library — this is the bug scenario. The fix should produce
             // a clean "1 Added, 0 Skipped" because the dedup now scopes to
             // library2's rows only, and library2 has no matching hash yet.
             await pipeline.ProcessAsync(library2, forceFullScan: true);
-            pipeline.Added.Count.Should().Be(1);
-            pipeline.Skipped.Count.Should().Be(0,
-                "upstream #66: the pre-fix behavior reported 1 Skipped here because the "
-                + "dedup query matched library1's row across library boundaries");
+            await Assert.That(pipeline.Added.Count).IsEqualTo(1);
+            await Assert.That(pipeline.Skipped.Count).IsEqualTo(0);
 
             // Both libraries should own their own independent row.
-            using var verify = _contextFactory.CreateDbContext();
+            using var verify = contextFactory.CreateDbContext();
             var files = verify.ImageFiles.ToList();
-            files.Should().HaveCount(2);
-            files.Select(f => f.LibraryId).Should().BeEquivalentTo(new[] { library1.Id, library2.Id });
+            await Assert.That(files.Count).IsEqualTo(2);
+            await Assert.That(files.Select(f => f.LibraryId)).IsEquivalentTo([library1.Id, library2.Id]);
         }
         finally
         {

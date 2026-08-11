@@ -1,17 +1,17 @@
 <UserControl
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d"
     x:Class="Lumidex.Features.Library.LibraryView"
+    x:DataType="library:LibraryViewModel"
     xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="using:Lumidex.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="https://github.com/projektanker/icons.avalonia"
     xmlns:library="using:Lumidex.Features.Library"
     xmlns:lumidex="using:Lumidex"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="450"
-    d:DesignWidth="800"
-    x:DataType="library:LibraryViewModel"
-    mc:Ignorable="d">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <UserControl.Resources>
         <converters:LocalDateTimeConverter x:Key="LocalDateTimeConverter" />
     </UserControl.Resources>
@@ -22,74 +22,74 @@
 
                 <DockPanel>
                     <TextBlock
-                        VerticalAlignment="Center"
                         DockPanel.Dock="Left"
-                        Text="Name" />
+                        Text="Name"
+                        VerticalAlignment="Center" />
                     <TextBox
-                        Width="300"
                         HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
+                        PlaceholderText="Library Name"
                         Text="{Binding Name}"
-                        Watermark="Library Name" />
+                        VerticalAlignment="Center"
+                        Width="300" />
                 </DockPanel>
 
                 <DockPanel Margin="0,16,0,0">
                     <TextBlock
-                        VerticalAlignment="Center"
                         DockPanel.Dock="Left"
-                        Text="Files" />
+                        Text="Files"
+                        VerticalAlignment="Center" />
                     <TextBlock
-                        VerticalAlignment="Center"
                         Text="{Binding FileCount}"
-                        TextAlignment="Right" />
+                        TextAlignment="Right"
+                        VerticalAlignment="Center" />
                 </DockPanel>
 
                 <DockPanel Margin="0,16,0,0">
                     <TextBlock
-                        VerticalAlignment="Center"
                         DockPanel.Dock="Left"
-                        Text="Last Scan" />
+                        Text="Last Scan"
+                        VerticalAlignment="Center" />
                     <TextBlock
-                        VerticalAlignment="Center"
                         Text="{Binding LastScan, StringFormat={}f, TargetNullValue=Never, Converter={StaticResource LocalDateTimeConverter}}"
-                        TextAlignment="Right" />
+                        TextAlignment="Right"
+                        VerticalAlignment="Center" />
                 </DockPanel>
 
                 <DockPanel Margin="0,16,0,0">
                     <TextBlock
-                        VerticalAlignment="Top"
                         DockPanel.Dock="Left"
-                        Text="Path" />
-                    <DockPanel Width="300" HorizontalAlignment="Right">
+                        Text="Path"
+                        VerticalAlignment="Top" />
+                    <DockPanel HorizontalAlignment="Right" Width="300">
                         <Button
-                            Margin="5,0,0,0"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Top"
                             Command="{Binding ChangeLibraryPathCommand}"
                             Content="..."
-                            DockPanel.Dock="Right" />
+                            DockPanel.Dock="Right"
+                            HorizontalAlignment="Right"
+                            Margin="5,0,0,0"
+                            VerticalAlignment="Top" />
                         <TextBox Text="{Binding Path}" />
                     </DockPanel>
                 </DockPanel>
 
                 <Button
-                    Margin="0,16,0,0"
-                    HorizontalAlignment="Right"
                     Background="Red"
                     Command="{Binding DeleteLibraryCommand}"
-                    Content="Delete Library" />
+                    Content="Delete Library"
+                    HorizontalAlignment="Right"
+                    Margin="0,16,0,0" />
 
                 <TextBlock
-                    Margin="0,6,0,0"
-                    HorizontalAlignment="Right"
                     FontSize="12"
                     Foreground="#99ffffff"
+                    HorizontalAlignment="Right"
+                    Margin="0,6,0,0"
                     Text="Deleting a library does not alter files on disk." />
 
                 <Rectangle
+                    Fill="#656565"
                     Height="1"
-                    Margin="0,16"
-                    Fill="#656565" />
+                    Margin="0,16" />
 
                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
                     <Button
@@ -98,22 +98,22 @@
                         Content="Cancel"
                         IsVisible="{Binding Scanning}" />
                     <ProgressBar
-                        Width="235"
                         Height="20"
-                        Margin="12,0"
                         IsIndeterminate="{Binding ProgressIndeterminate}"
                         IsVisible="{Binding ShowProgress}"
+                        Margin="12,0"
                         Maximum="{Binding ScanTotalCount}"
                         Minimum="0"
                         ProgressTextFormat="{}{0}/{3} Files ({1:0}%)"
                         ShowProgressText="{Binding !ProgressIndeterminate}"
-                        Value="{Binding ScanProgressCount}" />
+                        Value="{Binding ScanProgressCount}"
+                        Width="235" />
                     <Button
-                        Margin="0,0,12,0"
                         Classes="accent"
                         Command="{Binding QuickScanLibraryCommand}"
                         Content="Quick Scan"
-                        IsVisible="{Binding CanQuickScanLibrary}" />
+                        IsVisible="{Binding CanQuickScanLibrary}"
+                        Margin="0,0,12,0" />
                     <Button
                         Classes="accent"
                         Command="{Binding ScanLibraryCommand}"
@@ -124,18 +124,18 @@
             </StackPanel>
             <DockPanel IsVisible="{Binding !!ScanErrors.Count, FallbackValue=False}">
                 <TextBlock
-                    Margin="0,12"
                     DockPanel.Dock="Top"
                     FontSize="16"
+                    Margin="0,12"
                     Text="Errors" />
                 <DataGrid
-                    x:Name="ErrorsDataGrid"
                     BorderBrush="#656565"
                     BorderThickness="1"
                     GridLinesVisibility="Horizontal"
                     IsReadOnly="true"
                     ItemsSource="{Binding ScanErrors}"
-                    SelectionMode="Single">
+                    SelectionMode="Single"
+                    x:Name="ErrorsDataGrid">
                     <DataGrid.Styles>
                         <Style Selector="DataGridColumnHeader">
                             <Setter Property="Foreground" Value="White" />
@@ -167,33 +167,33 @@
                 FontSize="16"
                 Text="Duplicates" />
             <TextBlock
-                Margin="0,6"
                 DockPanel.Dock="Top"
+                Margin="0,6"
                 TextWrapping="Wrap">
                 Each group below has been identified as having identical headers.
                 For each group, manually delete all files except one item.
                 Then run Scrub Duplicates to remove the deleted items from the Lumidex database.
             </TextBlock>
-            <DockPanel Margin="0,6" DockPanel.Dock="Top">
+            <DockPanel DockPanel.Dock="Top" Margin="0,6">
                 <CheckBox
                     Content="Lights Only"
                     DockPanel.Dock="Left"
                     IsChecked="{Binding OnlyDuplicateLights}" />
                 <Button
-                    HorizontalAlignment="Right"
                     Classes="accent"
                     Command="{Binding ScrubDuplicatesCommand}"
                     Content="Scrub Duplicates"
-                    DockPanel.Dock="Right" />
+                    DockPanel.Dock="Right"
+                    HorizontalAlignment="Right" />
             </DockPanel>
             <DataGrid
-                x:Name="DuplicatesDataGrid"
                 BorderBrush="#656565"
                 BorderThickness="1"
                 GridLinesVisibility="Horizontal"
                 IsReadOnly="true"
                 ItemsSource="{Binding DuplicatesView}"
-                SelectionMode="Single">
+                SelectionMode="Single"
+                x:Name="DuplicatesDataGrid">
                 <DataGrid.Styles>
                     <Style Selector="DataGridColumnHeader">
                         <Setter Property="Foreground" Value="White" />

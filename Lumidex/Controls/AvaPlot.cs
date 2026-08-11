@@ -1,8 +1,7 @@
-﻿using Avalonia;
+﻿using Avalonia.Controls;
 using Avalonia.Skia;
 using Avalonia.Input;
 using Avalonia.Media;
-using Avalonia.Platform;
 using Avalonia.Rendering.SceneGraph;
 using Avalonia.Threading;
 using SkiaSharp;
@@ -11,7 +10,7 @@ using ScottPlot.Interactivity;
 
 namespace Lumidex.Controls;
 
-public class AvaPlot : Avalonia.Controls.Control, IPlotControl
+public class AvaPlot : Control, IPlotControl
 {
     public static readonly DirectProperty<AvaPlot, Plot> PlotProperty =
         AvaloniaProperty.RegisterDirect<AvaPlot, Plot>(
@@ -179,11 +178,20 @@ public class AvaPlot : Avalonia.Controls.Control, IPlotControl
     {
         UserInputProcessor.ProcessKeyUp(e);
     }
+    
+    protected override void OnLostFocus(FocusChangedEventArgs e)
+    {
+        base.OnLostFocus(e);
+        UserInputProcessor.ProcessLostFocus();
+    }
 
     public float DetectDisplayScale()
     {
-        // TODO: improve support for DPI scale detection
-        // https://github.com/ScottPlot/ScottPlot/issues/2760
-        return 1.0f;
+        return (float)(TopLevel.GetTopLevel(this)?.RenderScaling ?? 1.0);
+    }
+    
+    public void SetCursor(global::ScottPlot.Cursor cursor)
+    {
+        Cursor = cursor.GetCursor();
     }
 }

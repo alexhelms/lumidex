@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 

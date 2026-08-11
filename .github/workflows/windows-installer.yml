@@ -9,7 +9,7 @@ on:
       - 'v*'
 
 env:
-  PROJECT: Lumidex.Desktop/Lumidex.Desktop.csproj
+  PROJECT: Lumidex/Lumidex.csproj
 
 jobs:
   windows-installer:
@@ -18,9 +18,10 @@ jobs:
       contents: write
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          lfs: true
 
       - name: Restore
         run: dotnet restore ${{ env.PROJECT }}
@@ -29,7 +30,10 @@ jobs:
         run: dotnet tool restore
 
       - name: Publish
-        run: dotnet publish ${{ env.PROJECT }} -r win-x64 --self-contained -c Release -o publish-win
+        run: |
+          dotnet publish ${{ env.PROJECT }} -r win-x64 --self-contained -c Release -o publish-win
+          Remove-Item "publish-win/libSkiaSharp.pdb" -ErrorAction SilentlyContinue
+          Remove-Item "publish-win/libHarfBuzzSharp.pdb" -ErrorAction SilentlyContinue
 
       - name: Show Version
         run: dotnet tool run dotnet-gitversion

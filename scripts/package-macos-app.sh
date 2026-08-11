@@ -5,7 +5,7 @@ APP_NAME="Lumidex"
 VERSION=${1:-"0.0.0"}
 INFO_PLIST="./macos/Info.plist"
 ICON_FILE="./macos/Lumidex.icns"
-PROJECT_NAME="Lumidex.Desktop"
+PROJECT_NAME="Lumidex"
 OUTPUT_DIR="publish-osx-universal"
 
 LIPO_URL="https://github.com/konoui/lipo/releases/latest/download/lipo_Linux_amd64"
@@ -45,13 +45,13 @@ build_for_arch "arm64"
 # start with the x64 we will replace the binary with a universal one
 mkdir -p "${OUTPUT_DIR}"
 cp -rf "publish-osx-x64/." "${OUTPUT_DIR}"
-rm "${OUTPUT_DIR}/Lumidex.Desktop"
+rm "${OUTPUT_DIR}/Lumidex"
 
 echo "Creating universal binary..."
 lipo -create \
-	"publish-osx-x64/Lumidex.Desktop" \
-	"publish-osx-arm64/Lumidex.Desktop" \
-	-output "${OUTPUT_DIR}/Lumidex.Desktop"
+	"publish-osx-x64/Lumidex" \
+	"publish-osx-arm64/Lumidex" \
+	-output "${OUTPUT_DIR}/Lumidex"
 # sqlite is not universal, so we have to make it universal
 lipo -create \
 	"publish-osx-x64/libe_sqlite3.dylib" \

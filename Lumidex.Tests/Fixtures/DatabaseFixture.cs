@@ -5,7 +5,7 @@ namespace Lumidex.Tests.Fixtures;
 
 public class DatabaseFixture : IDisposable
 {
-    public LumidexDbContext DbContext { get; } = null!;
+    public LumidexDbContext DbContext { get; }
 
     public string DatabaseFilename { get; }
 

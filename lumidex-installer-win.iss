@@ -2,7 +2,7 @@
 #define MyAppPublisher "Alex Helms"
 #define MyAppURL "https://github.com/alexhelms/lumidex"
 #define MyAppSourceFolder "publish-win"
-#define MyAppExeName MyAppName + ".Desktop.exe"
+#define MyAppExeName MyAppName + ".exe"
 #define MyAppFileVersion GetStringFileInfo(MyAppSourceFolder + '\' + MyAppExeName, FILE_VERSION)
 
 #ifndef MyAppProductVersion

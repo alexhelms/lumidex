@@ -5,17 +5,10 @@ using AstrobinFilter = Lumidex.Core.Exporters.AstrobinFilter;
 
 namespace Lumidex.Tests;
 
-public partial class AstrobinExportTests : IDisposable
+public partial class AstrobinExportTests
 {
-    private readonly HttpTest _httpTest = new();
-
-    public void Dispose()
-    {
-        _httpTest.Dispose();
-    }
-
-    [Fact]
-    public void Export_WithFilters()
+    [Test]
+    public async Task Export_WithFilters()
     {
         var items = new List<AstrobinImageGroup>
         {
@@ -83,11 +76,11 @@ public partial class AstrobinExportTests : IDisposable
             4,6,30.0000
 
             """;
-        csv.Should().Be(expected);
+        await Assert.That(csv).IsEqualTo(expected);
     }
 
-    [Fact]
-    public void Export_WithoutFilters()
+    [Test]
+    public async Task Export_WithoutFilters()
     {
         var items = new List<AstrobinImageGroup>
         {
@@ -106,11 +99,11 @@ public partial class AstrobinExportTests : IDisposable
             3,60.0000
 
             """;
-        csv.Should().Be(expected);
+        await Assert.That(csv).IsEqualTo(expected);
     }
 
-    [Fact]
-    public void Export_WithAndWithoutFilters()
+    [Test]
+    public async Task Export_WithAndWithoutFilters()
     {
         var items = new List<AstrobinImageGroup>
         {
@@ -140,26 +133,27 @@ public partial class AstrobinExportTests : IDisposable
             ,4,120.0000
 
             """;
-        csv.Should().Be(expected);
+        await Assert.That(csv).IsEqualTo(expected);
     }
 
-    [Fact]
+    [Test]
     public async Task QueryFilters()
     {
         var query = "antlia green 2\"";
-        _httpTest
+        using var httpTest = new HttpTest();
+        httpTest
             .ForCallsTo("https://app.astrobin.com/api/v2/equipment/filter/")
             .RespondWith(AstrobinFilterResponseJson);
 
         var exporter = new AstrobinAcquisitionExporter();
         var filters = await exporter.QueryFilters(query);
-        filters.Should().HaveCount(50);
+        await Assert.That(filters.Count).IsEqualTo(50);
 
         // Spot check
-        filters[0].Id.Should().Be(4422);
-        filters[0].Name.Should().Be("Antlia Green 2\"");
+        await Assert.That(filters[0].Id).IsEqualTo(4422);
+        await Assert.That(filters[0].Name).IsEqualTo("Antlia Green 2\"");
 
-        _httpTest
+        httpTest
             .ShouldHaveCalled("https://app.astrobin.com/api/v2/equipment/filter/")
             .WithVerb(HttpMethod.Get)
             .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0")

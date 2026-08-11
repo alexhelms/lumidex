@@ -3,6 +3,7 @@ using ScottPlot.Interactivity;
 using ScottPlot;
 
 using AvaKey = Avalonia.Input.Key;
+using AvaCursor = Avalonia.Input.Cursor;
 using Key = ScottPlot.Interactivity.Key;
 using UserActions = ScottPlot.Interactivity.UserActions;
 
@@ -82,6 +83,22 @@ internal static class AvaPlotExtensions
             AvaKey.LeftCtrl => StandardKeys.Control,
             AvaKey.RightCtrl => StandardKeys.Control,
             _ => new Key(avaKey.ToString()),
+        };
+    }
+    
+    public static AvaCursor GetCursor(this global::ScottPlot.Cursor cursor)
+    {
+        return cursor switch
+        {
+            global::ScottPlot.Cursor.Arrow => new(StandardCursorType.Arrow),
+            global::ScottPlot.Cursor.No => new(StandardCursorType.No),
+            global::ScottPlot.Cursor.Wait => new(StandardCursorType.Wait),
+            global::ScottPlot.Cursor.Hand => new(StandardCursorType.Hand),
+            global::ScottPlot.Cursor.Cross => new(StandardCursorType.Cross),
+            global::ScottPlot.Cursor.SizeAll => new(StandardCursorType.SizeAll),
+            global::ScottPlot.Cursor.SizeNorthSouth => new(StandardCursorType.SizeNorthSouth),
+            global::ScottPlot.Cursor.SizeWestEast => new(StandardCursorType.SizeWestEast),
+            _ => throw new NotImplementedException(cursor.ToString()),
         };
     }
 }

@@ -1,25 +1,25 @@
 <UserControl
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d"
     x:Class="Lumidex.Features.Settings.AstrobinSettingsView"
+    x:DataType="settings:AstrobinSettingsViewModel"
     xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:common="using:Lumidex.Common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:exporter="using:Lumidex.Core.Exporters"
     xmlns:i="https://github.com/projektanker/icons.avalonia"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:settings="using:Lumidex.Features.Settings"
-    d:DesignHeight="450"
-    d:DesignWidth="800"
-    x:DataType="settings:AstrobinSettingsViewModel"
-    mc:Ignorable="d">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid ColumnDefinitions="*,*">
         <DockPanel>
 
             <StackPanel DockPanel.Dock="Top">
 
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock VerticalAlignment="Center" Text="AstroBin Filter Name" />
-                    <Border Margin="8,0,0,0" Background="Transparent">
+                    <TextBlock Text="AstroBin Filter Name" VerticalAlignment="Center" />
+                    <Border Background="Transparent" Margin="8,0,0,0">
                         <i:Icon FontSize="20" Value="mdi-information-outline" />
                         <ToolTip.Tip>
                             <TextBlock LineSpacing="5" TextWrapping="Wrap">
@@ -33,26 +33,26 @@
                 </StackPanel>
                 <DockPanel Margin="0,8,0,0">
                     <Button
-                        Width="80"
-                        Margin="5,0,0,0"
-                        VerticalAlignment="Stretch"
-                        HorizontalContentAlignment="Center"
-                        VerticalContentAlignment="Center"
                         Classes="accent"
                         Command="{Binding AddFilterCommand}"
                         Content="Add"
                         DockPanel.Dock="Right"
-                        IsDefault="True" />
+                        HorizontalContentAlignment="Center"
+                        IsDefault="True"
+                        Margin="5,0,0,0"
+                        VerticalAlignment="Stretch"
+                        VerticalContentAlignment="Center"
+                        Width="80" />
                     <AutoCompleteBox
                         AsyncPopulator="{Binding AsyncPopulator}"
                         FilterMode="Contains"
                         IsTextCompletionEnabled="True"
                         MinimumPopulateDelay="00:00:00.300"
                         MinimumPrefixLength="3"
+                        PlaceholderText="Enter a filter name"
                         SelectedItem="{Binding SelectedFilter}"
                         Text="{Binding SearchText, Mode=TwoWay}"
-                        ValueMemberBinding="{ReflectionBinding Name}"
-                        Watermark="Enter a filter name">
+                        ValueMemberBinding="{ReflectionBinding Name}">
                         <AutoCompleteBox.DataTemplates>
                             <DataTemplate x:DataType="exporter:AstrobinFilter">
                                 <TextBlock Text="{Binding Name}" />
@@ -60,21 +60,21 @@
                         </AutoCompleteBox.DataTemplates>
                         <AutoCompleteBox.InnerRightContent>
                             <i:Icon
-                                Margin="0,0,5,0"
                                 Animation="Spin"
                                 FontSize="20"
                                 IsVisible="{Binding IsQueryingAstrobin}"
+                                Margin="0,0,5,0"
                                 Value="fa-spinner" />
                         </AutoCompleteBox.InnerRightContent>
                     </AutoCompleteBox>
                 </DockPanel>
 
                 <TextBlock
-                    Margin="0,8,0,0"
-                    VerticalAlignment="Center"
                     Foreground="Red"
                     IsVisible="{Binding AstrobinUnavailableMessage, TargetNullValue=False, Converter={x:Static ObjectConverters.IsNotNull}}"
-                    Text="{Binding AstrobinUnavailableMessage}" />
+                    Margin="0,8,0,0"
+                    Text="{Binding AstrobinUnavailableMessage}"
+                    VerticalAlignment="Center" />
 
             </StackPanel>
 
@@ -83,16 +83,16 @@
                 <TextBlock DockPanel.Dock="Top" Text="Your Filters" />
 
                 <TextBlock
-                    Margin="0,16,0,0"
                     DockPanel.Dock="Top"
                     IsVisible="{Binding !AstrobinFilters.Count}"
+                    Margin="0,16,0,0"
                     Text="You have not added any filters."
                     TextAlignment="Center" />
 
                 <ScrollViewer Margin="0,8,0,0">
-                    <ItemsControl x:Name="AstrobinFiltersItemsControl" ItemsSource="{Binding AstrobinFilters}">
+                    <ItemsControl ItemsSource="{Binding AstrobinFilters}" x:Name="AstrobinFiltersItemsControl">
                         <ItemsControl.Styles>
-                            <Style Selector="ItemsControl > ContentPresenter">
+                            <Style Selector="ItemsControl &gt; ContentPresenter">
                                 <Setter Property="Padding" Value="5" />
                             </Style>
                         </ItemsControl.Styles>
@@ -105,15 +105,15 @@
                             <DataTemplate DataType="common:AstrobinFilterViewModel">
                                 <DockPanel>
                                     <TextBlock
-                                        VerticalAlignment="Center"
                                         DockPanel.Dock="Left"
-                                        Text="{Binding Name}" />
+                                        Text="{Binding Name}"
+                                        VerticalAlignment="Center" />
                                     <Button
-                                        HorizontalAlignment="Right"
                                         Background="Red"
                                         Command="{Binding #AstrobinFiltersItemsControl.((settings:AstrobinSettingsViewModel)DataContext).RemoveFilterCommand}"
                                         CommandParameter="{Binding}"
-                                        Content="Remove" />
+                                        Content="Remove"
+                                        HorizontalAlignment="Right" />
                                 </DockPanel>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

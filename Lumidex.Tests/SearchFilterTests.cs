@@ -1,21 +1,20 @@
-﻿using Lumidex.Tests.Fixtures;
+﻿using Lumidex.Core.Data;
+using Lumidex.Tests.Fixtures;
 using Lumidex.Features.MainSearch.Filters;
 
 namespace Lumidex.Tests;
-public class SearchFilterTests : IClassFixture<DatabaseFixture>
-{
-    public DatabaseFixture Fixture { get; }
 
-    public SearchFilterTests(DatabaseFixture fixture)
+public class SearchFilterTests
+{
+    private static DatabaseFixture CreateDatabaseFixture()
     {
-        Fixture = fixture;
-        SeedDatabase();
+        var fixture = new DatabaseFixture();
+        SeedDatabase(fixture.DbContext);
+        return fixture;
     }
 
-    private void SeedDatabase()
+    private static void SeedDatabase(LumidexDbContext dbContext)
     {
-        var dbContext = Fixture.DbContext;
-
         var library = new Core.Data.Library
         {
             Name = "default",
@@ -79,43 +78,41 @@ public class SearchFilterTests : IClassFixture<DatabaseFixture>
         dbContext.SaveChanges();
     }
 
-    [Theory]
-    [InlineData("Ha")]
-    [InlineData("ha")]
-    [InlineData("HA")]
-    public void Filter_Simple(string filterContent)
+    [Test]
+    [Arguments("Ha")]
+    [Arguments("ha")]
+    [Arguments("HA")]
+    public async Task Filter_Simple(string filterContent)
     {
+        using var fixture = CreateDatabaseFixture();
         var filter = new FilterFilter { Filter = filterContent };
-        var query = Fixture.DbContext.ImageFiles.AsQueryable();
-        query = filter.ApplyFilter(Fixture.DbContext, query);
+        var query = fixture.DbContext.ImageFiles.AsQueryable();
+        query = filter.ApplyFilter(fixture.DbContext, query);
 
         var matches = query.ToList();
-        
-        matches
-            .Select(x => x.FilterName)
-            .Should()
-            .NotBeEmpty()
+
+        await Assert.That(matches.Select(x => x.FilterName))
+            .IsNotEmpty()
             .And
-            .AllBe("Ha");
+            .All(x => x == "Ha");
     }
 
-    [Theory]
-    [InlineData("ha|sii|oiii")]
-    [InlineData("Ha|Sii|Oiii")]
-    [InlineData("HA|SII|OIII")]
-    public void Filter_BooleanOr(string filterContent)
+    [Test]
+    [Arguments("ha|sii|oiii")]
+    [Arguments("Ha|Sii|Oiii")]
+    [Arguments("HA|SII|OIII")]
+    public async Task Filter_BooleanOr(string filterContent)
     {
+        using var fixture = CreateDatabaseFixture();
         var filter = new FilterFilter { Filter = filterContent };
-        var query = Fixture.DbContext.ImageFiles.AsQueryable();
-        query = filter.ApplyFilter(Fixture.DbContext, query);
+        var query = fixture.DbContext.ImageFiles.AsQueryable();
+        query = filter.ApplyFilter(fixture.DbContext, query);
 
         var matches = query.ToList();
 
-        matches
-            .Select(x => x.FilterName)
-            .Should()
-            .NotBeEmpty()
+        await Assert.That(matches.Select(x => x.FilterName))
+            .IsNotEmpty()
             .And
-            .OnlyContain(s => s == "Ha" || s == "Sii" || s == "Oiii");
+            .ContainsOnly(x => x == "Ha" || x == "Sii" || x == "Oiii");
     }
 }
