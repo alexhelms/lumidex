@@ -49,10 +49,18 @@ public static class Bootstrapper
 
     private static void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
+        // Observe and log unobserved task exceptions without rethrowing. Returning
+        // false makes AggregateException.Handle RE-THROW the exception; here that runs
+        // on the finalizer thread, which escalates a benign unobserved exception into a
+        // fatal appdomain crash. On Linux this fires readily — Avalonia's D-Bus platform
+        // integration raises fire-and-forget exceptions when a desktop service isn't
+        // reachable (e.g. "org.freedesktop.DBus.Error.ServiceUnknown: The name is not
+        // activatable" for an accessibility/portal bus). Returning true marks it handled
+        // so the app logs and keeps running, which is the evident intent of logging here.
         e.Exception.Handle(ex =>
         {
             Log.Error(ex, "Unobserved task exception");
-            return false;
+            return true;
         });
     }
 }
