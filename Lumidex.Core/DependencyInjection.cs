@@ -69,7 +69,19 @@ public static class DependencyInjection
         // Create the default library
         if (dbContext.Libraries.Count() == 0)
         {
-            fileSystem.Directory.CreateDirectory(LumidexPaths.DefaultLibrary);
+            try
+            {
+                fileSystem.Directory.CreateDirectory(LumidexPaths.DefaultLibrary);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                // Don't crash startup if the default path can't be created (permissions,
+                // missing parent, readonly home, redirected MyDocuments). Skip adding the
+                // Library row too — pointing at a non-existent path is worse than no row.
+                Log.Warning(ex, "Failed to create default library at {Path}; user can add a library manually.", LumidexPaths.DefaultLibrary);
+                return;
+            }
+
             dbContext.Libraries.Add(new Library
             {
                 Name = "Default",
