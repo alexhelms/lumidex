@@ -70,7 +70,12 @@ public static class DirectoryWalker
             {
                 if (startDateUtc.HasValue)
                 {
-                    if (file.LastWriteTimeUtc >= startDateUtc.Value)
+                    // Copy tools often preserve the source mtime, so an mtime-only
+                    // filter misses freshly-arrived files; CreationTimeUtc catches
+                    // them on Windows and macOS (on Linux the BCL returns
+                    // min(birthtime, mtime), a no-op here).
+                    if (file.LastWriteTimeUtc >= startDateUtc.Value
+                        || file.CreationTimeUtc >= startDateUtc.Value)
                     {
                         yield return file;
                     }
