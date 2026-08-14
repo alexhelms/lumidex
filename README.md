@@ -6,8 +6,7 @@ Lumidex scans folders with your image files, reads the headers, and builds a dat
 You original data is never altered.
 
 ## Features
-- Windows and MacOS support
-  - Debian-based linux distros should also work but no dpkg is available
+- Windows, Linux, and MacOS (arm) support
 - .FITS and .XISF files
 - Multiple libraries support scanning files in multiple locations
 - Search -> Search your library to find the images you're looking for
