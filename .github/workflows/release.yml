@@ -31,11 +31,12 @@ jobs:
           run: dotnet test --solution Lumidex.slnx -c Release
           
         - name: Publish
+          shell: pwsh
           run: |
             dotnet tool install -g vpk
             dotnet publish Lumidex/Lumidex.csproj -c Release -r win-x64 --self-contained -o publish
-            rm -f publish/libSkiaSharp.pdb
-            rm -f publish/libHarfBuzzSharp.pdb
+            Remove-Item -Path "publish/libSkiaSharp.pdb" -ErrorAction SilentlyContinue
+            Remove-Item -Path "publish/libHarfBuzzSharp.pdb" -ErrorAction SilentlyContinue
           
         - name: Determine release channel
           id: channel
