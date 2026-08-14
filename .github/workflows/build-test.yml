@@ -5,16 +5,21 @@ on:
     branches: [main, 'support/**']
     pull_request:
       branches: [main]
+      
+  permissions:
+    contents: read
 
 env:
-  SOLUTION: Lumidex.sln
+  SOLUTION: Lumidex.slnx
   PROJECT: Lumidex/Lumidex.csproj
  
 jobs:
-  build-win:
-    runs-on: [self-hosted, windows, x64]
-    permissions:
-      contents: read
+  windows:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]  # FUTURE: add ubuntu-24.04-arm, windows-11-arm
+    runs-on: ${{ matrix.os }}
     steps:
 
       - uses: actions/checkout@v7
