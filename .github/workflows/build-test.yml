@@ -6,13 +6,9 @@ on:
     pull_request:
       branches: [main]
       
-  permissions:
-    contents: read
+permissions:
+  contents: read
 
-env:
-  SOLUTION: Lumidex.slnx
-  PROJECT: Lumidex/Lumidex.csproj
- 
 jobs:
   windows:
     strategy:
@@ -38,15 +34,15 @@ jobs:
             core.exportVariable('ACTIONS_RESULTS_URL', process.env['ACTIONS_RESULTS_URL']);
 
       - name: Restore
-        run: dotnet restore ${{ env.SOLUTION }}
+        run: dotnet restore Lumidex.slnx
 
       - name: Build
-        run: dotnet build ${{ env.SOLUTION }} -c Release --no-restore
+        run: dotnet build Lumidex.slnx -c Release --no-restore
 
       - name: Show Version
         run: dotnet tool run dotnet-gitversion /output
 
       - name: Test
-        run: dotnet test ${{ env.SOLUTION }} -c Release --no-build
+        run: dotnet test Lumidex.slnx -c Release --no-build
         env:
           TUNIT_ARTIFACT_RETENTION_DAYS: 5
