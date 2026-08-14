@@ -1,4 +1,4 @@
-﻿# NOTE: packId CANNOT BE "Lumidex" and is instead "LumidexApp" because prior to Lumidex 2.0
+﻿# NOTE: packId CANNOT BE "Lumidex" and is instead "LumidexApp" because prior to Lumidex 1.6
 #       user app data was stored in %localappdata% which conflicts with velopack install location.
 #       The only way to prevent deleting user data on install was to change the install location
 #       which means a different packId.

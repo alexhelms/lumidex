@@ -3,15 +3,17 @@ using Velopack;
 
 namespace Lumidex;
 
-class Program
+static class Program
 {
     [STAThread]
     public static void Main(string[] args)
     {
         VelopackApp.Build()
             .SetAutoApplyOnStartup(false)
-            .OnFirstRun(OnFirstRun)
+            .OnFirstRun(_ => OnFirstRun())
             .Run();
+
+        OnFirstRun();
         
         // TODO: Consider a splash screen that is shown immediately and before bootstrap.
         
@@ -61,7 +63,7 @@ class Program
             .LogToTrace();
     }
 
-    private static void OnFirstRun(SemanticVersion version)
+    private static void OnFirstRun()
     {
         var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -70,9 +72,9 @@ class Program
 
         try
         {
-            // Before Lumidex 2.0, %localappdata% was used. Lumidex 2.0 moved from InnoSetup to Velopack
+            // Before Lumidex 1.6, %localappdata% was used. Lumidex 1.6 moved from InnoSetup to Velopack
             // and Velopack deletes %localappdata%/Lumidex on install/update and we're supposed to be
-            // using %appdata% instead. On first install of Lumidex 2.0+ move the existing data (if present)
+            // using %appdata% instead. On first install of Lumidex 1.6+ move the existing data (if present)
             // to the new location.
             if (File.Exists(oldDbPath))
             {
