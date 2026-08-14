@@ -1,5 +1,18 @@
 mode: ContinuousDelivery
-branches: {}
+workflow: GitHubFlow/v1
+branches:
+  support:
+    regex: '^support[\/-](?<BranchName>.+)'
+    label: ''
+    increment: Patch
+    is-main-branch: true
+    is-release-branch: false
+    tracks-release-branches: false
+    source-branches: [main]
+    prevent-increment:
+      of-merged-branch: true
+  feature:
+    regex: '^(feature|bug|fix)s?[\/-](?<BranchName>.+)'
 ignore:
   sha: []
 merge-message-formats: {}

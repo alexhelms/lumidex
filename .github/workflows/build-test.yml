@@ -1,14 +1,10 @@
-# Build and test lumidex, create the installer and upload as an artifact.
-# This workflow runs on every commit to main, feature, and bug branches.
-
 name: Build and Test
 
 on:
   push:
-    branches:
-      - 'main'
-      - 'feature/**'
-      - 'bug/**'
+    branches: [main, 'support/**']
+    pull_request:
+      branches: [main]
 
 env:
   SOLUTION: Lumidex.sln
@@ -49,75 +45,3 @@ jobs:
         run: dotnet test ${{ env.SOLUTION }} -c Release --no-build
         env:
           TUNIT_ARTIFACT_RETENTION_DAYS: 5
-
-  # create the installer so we know it will work come release
-  windows-installer:
-    runs-on: [self-hosted, windows, x64]
-    needs: [build-win]
-    permissions:
-      contents: read
-    steps:
-      
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-          lfs: true
-
-      - name: Restore
-        run: dotnet restore ${{ env.PROJECT }}
-
-      - name: Tools
-        run: dotnet tool restore
-
-      - name: Publish
-        run: dotnet publish ${{ env.PROJECT }} -r win-x64 --self-contained -c Release -o publish-win
-
-      - name: Show Version
-        run: dotnet tool run dotnet-gitversion
-
-      - name: Installer
-        run: |
-          $VERSION=(dotnet tool run dotnet-gitversion /showvariable SemVer)
-          & 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' lumidex-installer-win.iss /DMyAppProductVersion=${VERSION}
-
-      - uses: actions/upload-artifact@v7
-        with:
-          if-no-files-found: error
-          retention-days: 7
-          name: lumidex-windows
-          path: dist/win/*.exe
-
-  # create the app bundle so we know it will work come release
-  macos-app-bundle:
-    runs-on: ubuntu-latest
-    needs: [build-win]
-    permissions:
-      contents: read
-    steps:
-  
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-          lfs: true
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v6
-        with:
-          dotnet-version: '10.0.x'
-
-      - name: Restore
-        run: dotnet restore ${{ env.PROJECT }}
-
-      - name: Build the App Bundle
-        run: |
-          dotnet tool restore
-          VERSION=$(dotnet tool run dotnet-gitversion /showvariable SemVer)
-          chmod +x scripts/package-macos-app.sh
-          scripts/package-macos-app.sh $VERSION
-
-      - name: Upload app bundle
-        uses: actions/upload-artifact@v7
-        with:
-          name: lumidex-macos
-          path: dist/Lumidex*.app.zip
-          retention-days: 7

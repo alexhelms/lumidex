@@ -1,0 +1,204 @@
+﻿# NOTE: packId CANNOT BE "Lumidex" and is instead "LumidexApp" because prior to Lumidex 2.0
+#       user app data was stored in %localappdata% which conflicts with velopack install location.
+#       The only way to prevent deleting user data on install was to change the install location
+#       which means a different packId.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+*'   # 1.2.3 (stable) or 1.2.3-beta.1 (prerelease)
+  workflow_dispatch: 
+
+permissions:
+  contents: write
+  
+jobs:
+    win-x64:
+      runs-on: windows-latest
+      steps:
+        - uses: actions/checkout@v7
+          with:
+            fetch-depth: '0'  # GitVersion needs full history
+            lfs: true
+            
+        - uses: actions/setup-dotnet@v6
+          with:
+            dotnet-version: '10.0.x'
+
+        - name: Test
+          run: dotnet test --solution Lumidex.slnx -c Release
+          
+        - name: Publish
+          run: |
+            dotnet tool install -g vpk
+            dotnet publish Lumidex/Lumidex.csproj -c Release -r win-x64 --self-contained -o publish
+            rm -f publish/libSkiaSharp.pdb
+            rm -f publish/libHarfBuzzSharp.pdb
+          
+        - name: Determine release channel
+          id: channel
+          shell: bash
+          run: |
+            TAG="${GITHUB_REF_NAME}"
+            if [[ "$TAG" == *-* ]]; then
+              echo "name=beta" >> "$GITHUB_OUTPUT"
+              echo "prerelease=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "name=stable" >> "$GITHUB_OUTPUT"
+              echo "prerelease=false" >> "$GITHUB_OUTPUT"
+            fi
+            
+        - name: Download previous release
+          shell: bash
+          run: |
+            vpk download github \
+              --outputDir dist \
+              --channel win-x64-${{ steps.channel.outputs.name }} \
+              --repoUrl https://github.com/${{ github.repository }} \
+              --token ${{ secrets.GITHUB_TOKEN }} \
+              || echo "No prior release on this channel yet, skipping delta base"
+            
+        - name: Pack release
+          shell: bash
+          run: |
+            vpk pack \
+              --packId LumidexApp \
+              --mainExe Lumidex.exe \
+              --packVersion ${{ github.ref_name }} \
+              --packDir publish \
+              --packTitle Lumidex \
+              --icon Lumidex/Assets/lumidex-icon.ico \
+              --splashImage Lumidex/Assets/lumidex-icon.png \
+              --runtime win-x64 \
+              --channel win-x64-${{ steps.channel.outputs.name }} \
+              --outputDir dist
+            
+        - uses: actions/upload-artifact@v7
+          with:
+            if-no-files-found: error
+            retention-days: 3
+            name: lumidex-win-x64
+            path: dist/
+
+    linux-x64:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v7
+          with:
+            fetch-depth: '0'  # GitVersion needs full history
+            lfs: true
+
+        - uses: actions/setup-dotnet@v6
+          with:
+            dotnet-version: '10.0.x'
+
+        - name: Test
+          run: dotnet test --solution Lumidex.slnx -c Release
+
+        - name: Publish
+          run: |
+            dotnet tool install -g vpk
+            dotnet publish Lumidex/Lumidex.csproj -c Release -r linux-x64 --self-contained -o publish
+            rm -f publish/libSkiaSharp.pdb
+            rm -f publish/libHarfBuzzSharp.pdb
+
+        - name: Determine release channel
+          id: channel
+          shell: bash
+          run: |
+            TAG="${GITHUB_REF_NAME}"
+            if [[ "$TAG" == *-* ]]; then
+              echo "name=beta" >> "$GITHUB_OUTPUT"
+              echo "prerelease=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "name=stable" >> "$GITHUB_OUTPUT"
+              echo "prerelease=false" >> "$GITHUB_OUTPUT"
+            fi
+
+        - name: Pack release
+          shell: bash
+          run: |
+            vpk pack \
+              --packId LumidexApp \
+              --mainExe Lumidex \
+              --packVersion ${{ github.ref_name }} \
+              --packDir publish \
+              --packTitle Lumidex \
+              --icon Lumidex/Assets/lumidex-icon.ico \
+              --runtime linux-x64 \
+              --channel linux-x64-${{ steps.channel.outputs.name }} \
+              --outputDir dist
+
+        - uses: actions/upload-artifact@v7
+          with:
+            if-no-files-found: error
+            retention-days: 3
+            name: lumidex-linux-x64
+            path: dist/
+            
+    osx-arm64:
+      runs-on: macos-latest
+      steps:
+        - uses: actions/checkout@v7
+          with:
+            fetch-depth: '0'  # GitVersion needs full history
+            lfs: true
+
+        - uses: actions/setup-dotnet@v6
+          with:
+            dotnet-version: '10.0.x'
+
+        - name: Test
+          run: dotnet test --solution Lumidex.slnx -c Release
+
+        - name: Publish
+          run: |
+            dotnet tool install -g vpk
+            dotnet publish 
+              -c Release \
+              -r osx-arm64 \
+              --self-contained \
+              -p:UseAppHost=true \
+              -p:PublishSingleFile=true \
+              -o publish \
+              Lumidex/Lumidex.csproj
+            cp -a publish/runtimes/osx-arm64/native/. publish/
+            chmod 744 publish/*.dylib
+            rm -rf publish/runtimes/
+
+        - name: Determine release channel
+          id: channel
+          shell: bash
+          run: |
+            TAG="${GITHUB_REF_NAME}"
+            if [[ "$TAG" == *-* ]]; then
+              echo "name=beta" >> "$GITHUB_OUTPUT"
+              echo "prerelease=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "name=stable" >> "$GITHUB_OUTPUT"
+              echo "prerelease=false" >> "$GITHUB_OUTPUT"
+            fi
+
+        - name: Pack release
+          shell: bash
+          run: |
+            vpk pack \
+              --packId LumidexApp \
+              --mainExe Lumidex \
+              --packVersion ${{ github.ref_name }} \
+              --packDir publish \
+              --packTitle Lumidex \
+              --bundleId com.Lumidex \
+              --icon Lumidex/Assets/Lumidex.icns \
+              --runtime osx-arm64 \
+              --channel osx-arm64-${{ steps.channel.outputs.name }} \
+              --outputDir dist
+
+        - uses: actions/upload-artifact@v7
+          with:
+            if-no-files-found: error
+            retention-days: 3
+            name: lumidex-osx-arm64
+            path: dist/

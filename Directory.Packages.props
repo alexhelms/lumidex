@@ -39,6 +39,7 @@
     <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3" Version="3.53.3" />
     <PackageVersion Include="TestableIO.System.IO.Abstractions.Wrappers" Version="22.2.0" />
+    <PackageVersion Include="Velopack" Version="1.2.0" />
     <PackageVersion Include="Xaml.Behaviors" Version="12.0.5" />
     <!-- Development Tools -->
     <PackageVersion Include="GitVersion.MsBuild" Version="6.8.2" />

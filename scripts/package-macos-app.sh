@@ -9,7 +9,7 @@ PROJECT_NAME="Lumidex"
 OUTPUT_DIR="publish-osx-universal"
 
 LIPO_URL="https://github.com/konoui/lipo/releases/latest/download/lipo_Linux_amd64"
-RCODESIGN_URL="https://github.com/indygreg/apple-platform-rs/releases/download/apple-codesign%2F0.27.0/apple-codesign-0.27.0-x86_64-unknown-linux-musl.tar.gz"
+RCODESIGN_URL="https://github.com/indygreg/apple-platform-rs/releases/download/apple-codesign%2F0.29.0/apple-codesign-0.29.0-x86_64-unknown-linux-musl.tar.gz"
 
 build_for_arch() {
 	local arch=$1
@@ -22,10 +22,11 @@ build_for_arch() {
 		-p:PublishSingleFile=true \
 		-o "publish-osx-${arch}" \
 		"${PROJECT_NAME}/${PROJECT_NAME}.csproj"
-
-	# some cleanup
-	cp -a "publish-osx-${arch}/runtimes/osx-${arch}/native/." "publish-osx-${arch}/"
-	rm -rf "publish-osx-${arch}/runtimes/"
+		
+		# some cleanup
+    cp -a "publish-osx-${arch}/runtimes/osx-${arch}/native/." "publish-osx-${arch}/"
+    rm -rf "publish-osx-${arch}/runtimes/"
+    chmod 744 "publish-osx-${arch}/*.dylib"
 }
 
 echo "Getting lipo..."

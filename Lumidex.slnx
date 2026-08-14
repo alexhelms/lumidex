@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="lumidex-installer-win.iss" />
+    <File Path="README.md" />
+    <File Path="scripts/publish-win.ps1" />
+  </Folder>
+  <Project Path="Lumidex.Core/Lumidex.Core.csproj" />
+  <Project Path="Lumidex.Tests/Lumidex.Tests.csproj" />
+  <Project Path="Lumidex/Lumidex.csproj" />
+</Solution>

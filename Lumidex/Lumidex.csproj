@@ -34,6 +34,7 @@
     <PackageReference Include="Optris.Icons.Avalonia.FontAwesome" />
     <PackageReference Include="ScottPlot" />
     <PackageReference Include="Serilog" />
+    <PackageReference Include="Velopack" />
     <PackageReference Include="Xaml.Behaviors" />
 
     <!-- Dev -->

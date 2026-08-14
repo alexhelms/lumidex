@@ -6,7 +6,7 @@ public static class LumidexPaths
     {
         get
         {
-            var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             return Path.Combine(appData, "Lumidex");
         }
     }
