@@ -21,7 +21,7 @@ jobs:
 
       - uses: actions/checkout@v7
         with:
-          # No need for full depth for just testing, version will be wrong but that's fine.
+          fetch-depth: '0'  # GitVersion needs full history
           lfs: true
 
       - name: Restore Tools
