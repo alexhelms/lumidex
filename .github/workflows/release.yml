@@ -101,8 +101,6 @@ jobs:
           run: |
             dotnet tool install -g vpk
             dotnet publish Lumidex/Lumidex.csproj -c Release -r linux-x64 --self-contained -o publish
-            rm -f publish/libSkiaSharp.pdb
-            rm -f publish/libHarfBuzzSharp.pdb
 
         - name: Determine release channel
           id: channel
@@ -156,7 +154,7 @@ jobs:
         - name: Publish
           run: |
             dotnet tool install -g vpk
-            dotnet publish 
+            dotnet publish \
               -c Release \
               -r osx-arm64 \
               --self-contained \
