@@ -191,6 +191,7 @@ jobs:
               --packTitle Lumidex \
               --bundleId com.Lumidex \
               --icon Lumidex/Assets/Lumidex.icns \
+              --noInst \
               --runtime osx-arm64 \
               --channel osx-arm64-${{ steps.channel.outputs.name }} \
               --outputDir dist
