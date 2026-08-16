@@ -1,0 +1,27 @@
+<UserControl
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d"
+    x:Class="Lumidex.Features.Settings.GeneralSettingsView"
+    x:DataType="settings:GeneralSettingsViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:settings="using:Lumidex.Features.Settings"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid ColumnDefinitions="*,*">
+        <StackPanel>
+            <UniformGrid Columns="2">
+                <TextBlock
+                    DockPanel.Dock="Left"
+                    Text="Full Screen On Startup"
+                    VerticalAlignment="Center" />
+                <ToggleSwitch
+                    HorizontalAlignment="Right"
+                    IsChecked="{Binding FullScreen}"
+                    OffContent=""
+                    OnContent="" />
+            </UniformGrid>
+        </StackPanel>
+    </Grid>
+</UserControl>

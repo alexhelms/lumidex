@@ -1,7 +1,10 @@
-﻿using Avalonia.Controls.ApplicationLifetimes;
+﻿using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
+using Lumidex.Core.Data;
 using Lumidex.Features.Main;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Lumidex;
@@ -24,11 +27,20 @@ public partial class App : Application
         {
             var services = Bootstrapper.Services;
 
+            var dbContextFactory = services.GetRequiredService<IDbContextFactory<LumidexDbContext>>();
+            using var dbContext = dbContextFactory.CreateDbContext();
+            var fullScreen = dbContext.AppSettings.FirstOrDefault()?.FullScreen ?? false;
+
             // MainWindow requires some manual lifecycle wiring.
             // ViewLocator does the rest for all other views.
             var mainWindow = services.GetRequiredService<MainWindow>();
             var mainViewModel = services.GetRequiredService<MainViewModel>();
             ViewLocator.Instance.SetupLifecycleHooks(mainWindow, mainViewModel);
+
+            if (fullScreen)
+            {
+                mainWindow.WindowState = WindowState.Maximized;
+            }
 
             desktop.MainWindow = mainWindow;
             desktop.ShutdownMode = Avalonia.Controls.ShutdownMode.OnMainWindowClose;
