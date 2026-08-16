@@ -142,7 +142,12 @@
                                     ToolTip.Tip="Clear"
                                     VerticalAlignment="Stretch"
                                     i:Attached.Icon="mdi-close" />
-                                <TextBox Text="{Binding Name}" />
+                                <AutoCompleteBox
+                                    AsyncPopulator="{Binding PopulateSuggestions}"
+                                    FilterMode="None"
+                                    MinimumPopulateDelay="0:0:0.25"
+                                    MinimumPrefixLength="1"
+                                    Text="{Binding Name}" />
                             </DockPanel>
                         </Grid>
                     </DataTemplate>
@@ -265,7 +270,12 @@
                                     ToolTip.Tip="Clear"
                                     VerticalAlignment="Stretch"
                                     i:Attached.Icon="mdi-close" />
-                                <TextBox Text="{Binding Filter}" />
+                                <AutoCompleteBox
+                                    AsyncPopulator="{Binding PopulateSuggestions}"
+                                    FilterMode="None"
+                                    MinimumPopulateDelay="0:0:0.25"
+                                    MinimumPrefixLength="1"
+                                    Text="{Binding Filter}" />
                             </DockPanel>
                         </Grid>
                     </DataTemplate>
@@ -492,7 +502,12 @@
                                     ToolTip.Tip="Clear"
                                     VerticalAlignment="Stretch"
                                     i:Attached.Icon="mdi-close" />
-                                <TextBox Text="{Binding Name}" />
+                                <AutoCompleteBox
+                                    AsyncPopulator="{Binding PopulateSuggestions}"
+                                    FilterMode="None"
+                                    MinimumPopulateDelay="0:0:0.25"
+                                    MinimumPrefixLength="1"
+                                    Text="{Binding Name}" />
                             </DockPanel>
                         </Grid>
                     </DataTemplate>
@@ -808,7 +823,12 @@
                                     ToolTip.Tip="Clear"
                                     VerticalAlignment="Stretch"
                                     i:Attached.Icon="mdi-close" />
-                                <TextBox Text="{Binding Name}" />
+                                <AutoCompleteBox
+                                    AsyncPopulator="{Binding PopulateSuggestions}"
+                                    FilterMode="None"
+                                    MinimumPopulateDelay="0:0:0.25"
+                                    MinimumPrefixLength="1"
+                                    Text="{Binding Name}" />
                             </DockPanel>
                         </Grid>
                     </DataTemplate>
@@ -920,7 +940,12 @@
                                     ToolTip.Tip="Clear"
                                     VerticalAlignment="Stretch"
                                     i:Attached.Icon="mdi-close" />
-                                <TextBox Text="{Binding Name}" />
+                                <AutoCompleteBox
+                                    AsyncPopulator="{Binding PopulateSuggestions}"
+                                    FilterMode="None"
+                                    MinimumPopulateDelay="0:0:0.25"
+                                    MinimumPrefixLength="1"
+                                    Text="{Binding Name}" />
                             </DockPanel>
                         </Grid>
                     </DataTemplate>
@@ -990,7 +1015,12 @@
                                     ToolTip.Tip="Clear"
                                     VerticalAlignment="Stretch"
                                     i:Attached.Icon="mdi-close" />
-                                <TextBox Text="{Binding Name}" />
+                                <AutoCompleteBox
+                                    AsyncPopulator="{Binding PopulateSuggestions}"
+                                    FilterMode="None"
+                                    MinimumPopulateDelay="0:0:0.25"
+                                    MinimumPrefixLength="1"
+                                    Text="{Binding Name}" />
                             </DockPanel>
                         </Grid>
                     </DataTemplate>
@@ -1018,7 +1048,12 @@
                                     ToolTip.Tip="Clear"
                                     VerticalAlignment="Stretch"
                                     i:Attached.Icon="mdi-close" />
-                                <TextBox Text="{Binding Name}" />
+                                <AutoCompleteBox
+                                    AsyncPopulator="{Binding PopulateSuggestions}"
+                                    FilterMode="None"
+                                    MinimumPopulateDelay="0:0:0.25"
+                                    MinimumPrefixLength="1"
+                                    Text="{Binding Name}" />
                             </DockPanel>
                         </Grid>
                     </DataTemplate>

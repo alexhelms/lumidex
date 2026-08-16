@@ -1,6 +1,7 @@
 ﻿using Lumidex.Core.Data;
 using Lumidex.Tests.Fixtures;
 using Lumidex.Features.MainSearch.Filters;
+using Microsoft.EntityFrameworkCore;
 
 namespace Lumidex.Tests;
 
@@ -85,7 +86,7 @@ public class SearchFilterTests
     public async Task Filter_Simple(string filterContent)
     {
         using var fixture = CreateDatabaseFixture();
-        var filter = new FilterFilter { Filter = filterContent };
+        var filter = new FilterFilter(Substitute.For<IDbContextFactory<LumidexDbContext>>()) { Filter = filterContent };
         var query = fixture.DbContext.ImageFiles.AsQueryable();
         query = filter.ApplyFilter(fixture.DbContext, query);
 
@@ -104,7 +105,7 @@ public class SearchFilterTests
     public async Task Filter_BooleanOr(string filterContent)
     {
         using var fixture = CreateDatabaseFixture();
-        var filter = new FilterFilter { Filter = filterContent };
+        var filter = new FilterFilter(Substitute.For<IDbContextFactory<LumidexDbContext>>()) { Filter = filterContent };
         var query = fixture.DbContext.ImageFiles.AsQueryable();
         query = filter.ApplyFilter(fixture.DbContext, query);
 

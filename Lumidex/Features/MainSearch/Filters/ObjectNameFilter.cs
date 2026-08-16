@@ -5,12 +5,34 @@ namespace Lumidex.Features.MainSearch.Filters;
 
 public partial class ObjectNameFilter : FilterViewModelBase
 {
+    private readonly IDbContextFactory<LumidexDbContext> _dbContextFactory;
+
+    public ObjectNameFilter(IDbContextFactory<LumidexDbContext> dbContextFactory)
+    {
+        _dbContextFactory = dbContextFactory;
+    }
+
     [ObservableProperty]
     public partial string? Name { get; set; }
 
     public override string DisplayName => "Object Name";
 
     protected override void OnClear() => Name = null;
+
+    // AutoCompleteBox.AsyncPopulator binds to a property, not a method group directly.
+    // ObjectName suggestions draw from two sources (ImageFiles and ObjectAliases), so this uses the
+    // general query-delegate overload rather than the single-column convenience overload.
+    public Func<string?, CancellationToken, Task<IEnumerable<object>>> PopulateSuggestions =>
+        (searchText, cancellationToken) => PopulateSuggestionsAsync(
+            _dbContextFactory,
+            (dbContext, text) => dbContext.ImageFiles
+                .Where(f => f.ObjectName != null && EF.Functions.Like(f.ObjectName, $"%{text}%"))
+                .Select(f => f.ObjectName)
+                .Concat(dbContext.ObjectAliases
+                    .Where(a => EF.Functions.Like(a.Alias, $"%{text}%"))
+                    .Select(a => a.Alias)),
+            searchText,
+            cancellationToken);
 
     public override IQueryable<ImageFile> ApplyFilter(LumidexDbContext dbContext, IQueryable<ImageFile> query)
     {
