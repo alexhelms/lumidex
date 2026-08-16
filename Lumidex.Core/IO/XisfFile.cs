@@ -121,7 +121,7 @@ public class XisfFile
 
             try
             {
-                if (keyword == "COMMENT" || keyword == "HISTORY")
+                if (keyword is "COMMENT" or "HISTORY")
                 {
                     header.Items.Add(new StringHeaderEntry(keyword, string.Empty, comment));
                 }
@@ -130,15 +130,16 @@ public class XisfFile
                 {
                     header.Items.Add(new BooleanHeaderEntry(keyword, rawValueLower == "t", comment));
                 }
-                // Floating point
-                else if (rawValue.Contains('.') && double.TryParse(rawValue, CultureInfo.InvariantCulture, out var d))
-                {
-                    header.Items.Add(new FloatHeaderEntry(keyword, d, comment));
-                }
                 // Integer
-                else if (int.TryParse(rawValue, CultureInfo.InvariantCulture, out var i))
+                else if (FitsHeaderValueParser.TryParseInteger(rawValue, out var i))
                 {
                     header.Items.Add(new IntegerHeaderEntry(keyword, i, comment));
+                }
+                // Floating point, including exponential notation with no decimal point (e.g. "296E+02")
+                // and the Fortran-style 'D' double-precision exponent (e.g. "2.956025D+02").
+                else if (FitsHeaderValueParser.TryParseFloat(rawValue, out var d))
+                {
+                    header.Items.Add(new FloatHeaderEntry(keyword, d, comment));
                 }
                 // Complex
                 else if (rawValue.StartsWith('(') && rawValue.EndsWith(')') && rawValue.Contains(','))
